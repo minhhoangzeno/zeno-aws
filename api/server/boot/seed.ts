@@ -38,7 +38,7 @@ module.exports = function (app: App) {
       });
     });
   };
-  return;
+  // return;
   // auto update
 
   (async () => {

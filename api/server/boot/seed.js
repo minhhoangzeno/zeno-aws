@@ -22,7 +22,7 @@ module.exports = function (app) {
             });
         });
     };
-    return;
+    // return;
     // auto update
     (async () => {
         const [ACL, AccountToken, RoleMapping, Role, Account, Tag, Blog, Contact, Feedback, CategoryProduct, Product, Order, OrderProduct, Banner] = await Promise.all([
