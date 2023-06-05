@@ -114,25 +114,17 @@ export interface Feedback {
 }
 
 export interface InlineResponse200 {
-    "undefined"?: any;
-}
-
-export interface InlineResponse2001 {
-    "result"?: any;
-}
-
-export interface InlineResponse2002 {
     "count"?: number;
 }
 
-export interface InlineResponse2003 {
+export interface InlineResponse2001 {
     "exists"?: boolean;
 }
 
 /**
  * Information related to the outcome of the operation
  */
-export interface InlineResponse2004 {
+export interface InlineResponse2002 {
     /**
      * The number of instances updated
      */
@@ -1473,7 +1465,7 @@ export const AccountApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    accountCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    accountCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = AccountApiFetchParamCreator.accountCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -1558,7 +1550,7 @@ export const AccountApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    accountExistsGetAccountsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    accountExistsGetAccountsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = AccountApiFetchParamCreator.accountExistsGetAccountsidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -1575,7 +1567,7 @@ export const AccountApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    accountExistsHeadAccountsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    accountExistsHeadAccountsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = AccountApiFetchParamCreator.accountExistsHeadAccountsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -1712,7 +1704,7 @@ export const AccountApiFp = {
      * @param id Account id
      * @param where Criteria to match model instances
      */
-    accountPrototypeCountAccessTokens(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    accountPrototypeCountAccessTokens(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = AccountApiFetchParamCreator.accountPrototypeCountAccessTokens(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -1730,7 +1722,7 @@ export const AccountApiFp = {
      * @param id Account id
      * @param where Criteria to match model instances
      */
-    accountPrototypeCountRoles(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    accountPrototypeCountRoles(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = AccountApiFetchParamCreator.accountPrototypeCountRoles(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -2158,7 +2150,7 @@ export const AccountApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    accountUpdateAll(params: { "where"?: string; "data"?: Account;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    accountUpdateAll(params: { "where"?: string; "data"?: Account;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = AccountApiFetchParamCreator.accountUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -3448,7 +3440,7 @@ export const AccountTokenApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    accountTokenCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    accountTokenCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = AccountTokenApiFetchParamCreator.accountTokenCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -3533,7 +3525,7 @@ export const AccountTokenApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    accountTokenExistsGetAccountTokensidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    accountTokenExistsGetAccountTokensidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = AccountTokenApiFetchParamCreator.accountTokenExistsGetAccountTokensidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -3550,7 +3542,7 @@ export const AccountTokenApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    accountTokenExistsHeadAccountTokensid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    accountTokenExistsHeadAccountTokensid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = AccountTokenApiFetchParamCreator.accountTokenExistsHeadAccountTokensid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -3743,7 +3735,7 @@ export const AccountTokenApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    accountTokenUpdateAll(params: { "where"?: string; "data"?: AccountToken;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    accountTokenUpdateAll(params: { "where"?: string; "data"?: AccountToken;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = AccountTokenApiFetchParamCreator.accountTokenUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -4567,7 +4559,7 @@ export const BannerApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    bannerCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    bannerCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = BannerApiFetchParamCreator.bannerCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -4652,7 +4644,7 @@ export const BannerApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    bannerExistsGetBannersidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    bannerExistsGetBannersidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = BannerApiFetchParamCreator.bannerExistsGetBannersidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -4669,7 +4661,7 @@ export const BannerApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    bannerExistsHeadBannersid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    bannerExistsHeadBannersid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = BannerApiFetchParamCreator.bannerExistsHeadBannersid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -4844,7 +4836,7 @@ export const BannerApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    bannerUpdateAll(params: { "where"?: string; "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    bannerUpdateAll(params: { "where"?: string; "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = BannerApiFetchParamCreator.bannerUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -5706,7 +5698,7 @@ export const BlogApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    blogCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    blogCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = BlogApiFetchParamCreator.blogCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -5791,7 +5783,7 @@ export const BlogApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    blogExistsGetBlogsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    blogExistsGetBlogsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = BlogApiFetchParamCreator.blogExistsGetBlogsidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -5808,7 +5800,7 @@ export const BlogApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    blogExistsHeadBlogsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    blogExistsHeadBlogsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = BlogApiFetchParamCreator.blogExistsHeadBlogsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -6019,7 +6011,7 @@ export const BlogApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    blogUpdateAll(params: { "where"?: string; "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    blogUpdateAll(params: { "where"?: string; "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = BlogApiFetchParamCreator.blogUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -6861,7 +6853,7 @@ export const CategoryProductApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    categoryProductCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    categoryProductCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -6946,7 +6938,7 @@ export const CategoryProductApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    categoryProductExistsGetCategoryProductsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    categoryProductExistsGetCategoryProductsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductExistsGetCategoryProductsidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -6963,7 +6955,7 @@ export const CategoryProductApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    categoryProductExistsHeadCategoryProductsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    categoryProductExistsHeadCategoryProductsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductExistsHeadCategoryProductsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -7138,7 +7130,7 @@ export const CategoryProductApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    categoryProductUpdateAll(params: { "where"?: string; "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    categoryProductUpdateAll(params: { "where"?: string; "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -7944,7 +7936,7 @@ export const ContactApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    contactCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    contactCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = ContactApiFetchParamCreator.contactCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -8029,7 +8021,7 @@ export const ContactApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    contactExistsGetContactsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    contactExistsGetContactsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = ContactApiFetchParamCreator.contactExistsGetContactsidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -8046,7 +8038,7 @@ export const ContactApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    contactExistsHeadContactsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    contactExistsHeadContactsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = ContactApiFetchParamCreator.contactExistsHeadContactsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -8221,7 +8213,7 @@ export const ContactApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    contactUpdateAll(params: { "where"?: string; "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    contactUpdateAll(params: { "where"?: string; "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = ContactApiFetchParamCreator.contactUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -8563,527 +8555,6 @@ export const ContactApiFactory = function (fetch?: FetchAPI, basePath?: string) 
          */
         contactUpsertWithWhere(params: {  "where"?: string; "data"?: Contact; }, options?: any) {
             return ContactApiFp.contactUpsertWithWhere(params, options)(fetch, basePath);
-        },
-    };
-};
-
-
-/**
- * ContainerApi - fetch parameter creator
- */
-export const ContainerApiFetchParamCreator = {
-    /**
-     * 
-     * @param options 
-     */
-    containerCreateContainer(params: {  "options"?: any; }, options?: any): FetchArgs {
-        const baseUrl = `/Containers`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["options"]) {
-            fetchOptions.body = JSON.stringify(params["options"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @param container 
-     */
-    containerDestroyContainer(params: {  "container": string; }, options?: any): FetchArgs {
-        // verify required parameter "container" is set
-        if (params["container"] == null) {
-            throw new Error("Missing required parameter container when calling containerDestroyContainer");
-        }
-        const baseUrl = `/Containers/{container}`
-            .replace(`{${"container"}}`, `${ params["container"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @param container 
-     * @param file 
-     */
-    containerDownload(params: {  "container": string; "file": string; }, options?: any): FetchArgs {
-        // verify required parameter "container" is set
-        if (params["container"] == null) {
-            throw new Error("Missing required parameter container when calling containerDownload");
-        }
-        // verify required parameter "file" is set
-        if (params["file"] == null) {
-            throw new Error("Missing required parameter file when calling containerDownload");
-        }
-        const baseUrl = `/Containers/{container}/download/{file}`
-            .replace(`{${"container"}}`, `${ params["container"] }`)
-            .replace(`{${"file"}}`, `${ params["file"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @param container 
-     */
-    containerGetContainer(params: {  "container": string; }, options?: any): FetchArgs {
-        // verify required parameter "container" is set
-        if (params["container"] == null) {
-            throw new Error("Missing required parameter container when calling containerGetContainer");
-        }
-        const baseUrl = `/Containers/{container}`
-            .replace(`{${"container"}}`, `${ params["container"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     */
-    containerGetContainers(options?: any): FetchArgs {
-        const baseUrl = `/Containers`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @param container 
-     * @param file 
-     */
-    containerGetFile(params: {  "container": string; "file": string; }, options?: any): FetchArgs {
-        // verify required parameter "container" is set
-        if (params["container"] == null) {
-            throw new Error("Missing required parameter container when calling containerGetFile");
-        }
-        // verify required parameter "file" is set
-        if (params["file"] == null) {
-            throw new Error("Missing required parameter file when calling containerGetFile");
-        }
-        const baseUrl = `/Containers/{container}/files/{file}`
-            .replace(`{${"container"}}`, `${ params["container"] }`)
-            .replace(`{${"file"}}`, `${ params["file"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @param container 
-     */
-    containerGetFiles(params: {  "container": string; }, options?: any): FetchArgs {
-        // verify required parameter "container" is set
-        if (params["container"] == null) {
-            throw new Error("Missing required parameter container when calling containerGetFiles");
-        }
-        const baseUrl = `/Containers/{container}/files`
-            .replace(`{${"container"}}`, `${ params["container"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @param container 
-     * @param file 
-     */
-    containerRemoveFile(params: {  "container": string; "file": string; }, options?: any): FetchArgs {
-        // verify required parameter "container" is set
-        if (params["container"] == null) {
-            throw new Error("Missing required parameter container when calling containerRemoveFile");
-        }
-        // verify required parameter "file" is set
-        if (params["file"] == null) {
-            throw new Error("Missing required parameter file when calling containerRemoveFile");
-        }
-        const baseUrl = `/Containers/{container}/files/{file}`
-            .replace(`{${"container"}}`, `${ params["container"] }`)
-            .replace(`{${"file"}}`, `${ params["file"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @param container 
-     */
-    containerUpload(params: {  "container": string; }, options?: any): FetchArgs {
-        // verify required parameter "container" is set
-        if (params["container"] == null) {
-            throw new Error("Missing required parameter container when calling containerUpload");
-        }
-        const baseUrl = `/Containers/{container}/upload`
-            .replace(`{${"container"}}`, `${ params["container"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-};
-
-/**
- * ContainerApi - functional programming interface
- */
-export const ContainerApiFp = {
-    /**
-     * 
-     * @param options 
-     */
-    containerCreateContainer(params: { "options"?: any;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ContainerApiFetchParamCreator.containerCreateContainer(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @param container 
-     */
-    containerDestroyContainer(params: { "container": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
-        const fetchArgs = ContainerApiFetchParamCreator.containerDestroyContainer(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @param container 
-     * @param file 
-     */
-    containerDownload(params: { "container": string; "file": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ContainerApiFetchParamCreator.containerDownload(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response;
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @param container 
-     */
-    containerGetContainer(params: { "container": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ContainerApiFetchParamCreator.containerGetContainer(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     */
-    containerGetContainers(options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<any>> {
-        const fetchArgs = ContainerApiFetchParamCreator.containerGetContainers(options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @param container 
-     * @param file 
-     */
-    containerGetFile(params: { "container": string; "file": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ContainerApiFetchParamCreator.containerGetFile(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @param container 
-     */
-    containerGetFiles(params: { "container": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<any>> {
-        const fetchArgs = ContainerApiFetchParamCreator.containerGetFiles(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @param container 
-     * @param file 
-     */
-    containerRemoveFile(params: { "container": string; "file": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
-        const fetchArgs = ContainerApiFetchParamCreator.containerRemoveFile(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @param container 
-     */
-    containerUpload(params: { "container": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
-        const fetchArgs = ContainerApiFetchParamCreator.containerUpload(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-};
-
-/**
- * ContainerApi - object-oriented interface
- */
-export class ContainerApi extends BaseAPI {
-    /**
-     * 
-     * @param options 
-     */
-    containerCreateContainer(params: {  "options"?: any; }, options?: any) {
-        return ContainerApiFp.containerCreateContainer(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @param container 
-     */
-    containerDestroyContainer(params: {  "container": string; }, options?: any) {
-        return ContainerApiFp.containerDestroyContainer(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @param container 
-     * @param file 
-     */
-    containerDownload(params: {  "container": string; "file": string; }, options?: any) {
-        return ContainerApiFp.containerDownload(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @param container 
-     */
-    containerGetContainer(params: {  "container": string; }, options?: any) {
-        return ContainerApiFp.containerGetContainer(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     */
-    containerGetContainers(options?: any) {
-        return ContainerApiFp.containerGetContainers(options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @param container 
-     * @param file 
-     */
-    containerGetFile(params: {  "container": string; "file": string; }, options?: any) {
-        return ContainerApiFp.containerGetFile(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @param container 
-     */
-    containerGetFiles(params: {  "container": string; }, options?: any) {
-        return ContainerApiFp.containerGetFiles(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @param container 
-     * @param file 
-     */
-    containerRemoveFile(params: {  "container": string; "file": string; }, options?: any) {
-        return ContainerApiFp.containerRemoveFile(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @param container 
-     */
-    containerUpload(params: {  "container": string; }, options?: any) {
-        return ContainerApiFp.containerUpload(params, options)(this.fetch, this.basePath);
-    }
-};
-
-/**
- * ContainerApi - factory interface
- */
-export const ContainerApiFactory = function (fetch?: FetchAPI, basePath?: string) {
-    return {
-        /**
-         * 
-         * @param options 
-         */
-        containerCreateContainer(params: {  "options"?: any; }, options?: any) {
-            return ContainerApiFp.containerCreateContainer(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @param container 
-         */
-        containerDestroyContainer(params: {  "container": string; }, options?: any) {
-            return ContainerApiFp.containerDestroyContainer(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @param container 
-         * @param file 
-         */
-        containerDownload(params: {  "container": string; "file": string; }, options?: any) {
-            return ContainerApiFp.containerDownload(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @param container 
-         */
-        containerGetContainer(params: {  "container": string; }, options?: any) {
-            return ContainerApiFp.containerGetContainer(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         */
-        containerGetContainers(options?: any) {
-            return ContainerApiFp.containerGetContainers(options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @param container 
-         * @param file 
-         */
-        containerGetFile(params: {  "container": string; "file": string; }, options?: any) {
-            return ContainerApiFp.containerGetFile(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @param container 
-         */
-        containerGetFiles(params: {  "container": string; }, options?: any) {
-            return ContainerApiFp.containerGetFiles(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @param container 
-         * @param file 
-         */
-        containerRemoveFile(params: {  "container": string; "file": string; }, options?: any) {
-            return ContainerApiFp.containerRemoveFile(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @param container 
-         */
-        containerUpload(params: {  "container": string; }, options?: any) {
-            return ContainerApiFp.containerUpload(params, options)(fetch, basePath);
         },
     };
 };
@@ -9576,7 +9047,7 @@ export const FeedbackApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    feedbackCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    feedbackCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = FeedbackApiFetchParamCreator.feedbackCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -9661,7 +9132,7 @@ export const FeedbackApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    feedbackExistsGetFeedbacksidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    feedbackExistsGetFeedbacksidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = FeedbackApiFetchParamCreator.feedbackExistsGetFeedbacksidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -9678,7 +9149,7 @@ export const FeedbackApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    feedbackExistsHeadFeedbacksid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    feedbackExistsHeadFeedbacksid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = FeedbackApiFetchParamCreator.feedbackExistsHeadFeedbacksid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -9871,7 +9342,7 @@ export const FeedbackApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    feedbackUpdateAll(params: { "where"?: string; "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    feedbackUpdateAll(params: { "where"?: string; "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = FeedbackApiFetchParamCreator.feedbackUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -11144,7 +10615,7 @@ export const OrderApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    orderCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    orderCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = OrderApiFetchParamCreator.orderCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -11229,7 +10700,7 @@ export const OrderApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    orderExistsGetOrdersidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    orderExistsGetOrdersidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = OrderApiFetchParamCreator.orderExistsGetOrdersidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -11246,7 +10717,7 @@ export const OrderApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    orderExistsHeadOrdersid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    orderExistsHeadOrdersid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = OrderApiFetchParamCreator.orderExistsHeadOrdersid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -11350,7 +10821,7 @@ export const OrderApiFp = {
      * @param id Order id
      * @param where Criteria to match model instances
      */
-    orderPrototypeCountProduct(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    orderPrototypeCountProduct(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = OrderApiFetchParamCreator.orderPrototypeCountProduct(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -11671,7 +11142,7 @@ export const OrderApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    orderUpdateAll(params: { "where"?: string; "data"?: Order;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    orderUpdateAll(params: { "where"?: string; "data"?: Order;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = OrderApiFetchParamCreator.orderUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -12823,7 +12294,7 @@ export const OrderProductApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    orderProductCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    orderProductCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = OrderProductApiFetchParamCreator.orderProductCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -12908,7 +12379,7 @@ export const OrderProductApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    orderProductExistsGetOrderProductsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    orderProductExistsGetOrderProductsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = OrderProductApiFetchParamCreator.orderProductExistsGetOrderProductsidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -12925,7 +12396,7 @@ export const OrderProductApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    orderProductExistsHeadOrderProductsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    orderProductExistsHeadOrderProductsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = OrderProductApiFetchParamCreator.orderProductExistsHeadOrderProductsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -13153,7 +12624,7 @@ export const OrderProductApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    orderProductUpdateAll(params: { "where"?: string; "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    orderProductUpdateAll(params: { "where"?: string; "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = OrderProductApiFetchParamCreator.orderProductUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -14338,7 +13809,7 @@ export const ProductApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    productCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    productCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = ProductApiFetchParamCreator.productCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -14423,7 +13894,7 @@ export const ProductApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    productExistsGetProductsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    productExistsGetProductsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = ProductApiFetchParamCreator.productExistsGetProductsidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -14440,7 +13911,7 @@ export const ProductApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    productExistsHeadProductsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    productExistsHeadProductsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = ProductApiFetchParamCreator.productExistsHeadProductsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -14527,7 +13998,7 @@ export const ProductApiFp = {
      * @param id Product id
      * @param where Criteria to match model instances
      */
-    productPrototypeCountOrder(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    productPrototypeCountOrder(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = ProductApiFetchParamCreator.productPrototypeCountOrder(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -14814,7 +14285,7 @@ export const ProductApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    productUpdateAll(params: { "where"?: string; "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    productUpdateAll(params: { "where"?: string; "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = ProductApiFetchParamCreator.productUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -15820,7 +15291,7 @@ export const TagApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    tagCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    tagCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = TagApiFetchParamCreator.tagCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -15905,7 +15376,7 @@ export const TagApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    tagExistsGetTagsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    tagExistsGetTagsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = TagApiFetchParamCreator.tagExistsGetTagsidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -15922,7 +15393,7 @@ export const TagApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    tagExistsHeadTagsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    tagExistsHeadTagsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = TagApiFetchParamCreator.tagExistsHeadTagsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -16097,7 +15568,7 @@ export const TagApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    tagUpdateAll(params: { "where"?: string; "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    tagUpdateAll(params: { "where"?: string; "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = TagApiFetchParamCreator.tagUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -16903,7 +16374,7 @@ export const TestApiFp = {
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    testCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+    testCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
         const fetchArgs = TestApiFetchParamCreator.testCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -16988,7 +16459,7 @@ export const TestApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    testExistsGetTestsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    testExistsGetTestsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = TestApiFetchParamCreator.testExistsGetTestsidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -17005,7 +16476,7 @@ export const TestApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    testExistsHeadTestsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+    testExistsHeadTestsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
         const fetchArgs = TestApiFetchParamCreator.testExistsHeadTestsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
@@ -17180,7 +16651,7 @@ export const TestApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    testUpdateAll(params: { "where"?: string; "data"?: Test;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+    testUpdateAll(params: { "where"?: string; "data"?: Test;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
         const fetchArgs = TestApiFetchParamCreator.testUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {

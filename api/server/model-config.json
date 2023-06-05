@@ -37,10 +37,6 @@
     "dataSource": "postgres",
     "public": false
   },
-  "Container": {
-    "dataSource": "storage",
-    "public": true
-  },
   "Account": {
     "dataSource": "postgres",
     "public": true

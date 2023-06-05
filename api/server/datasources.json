@@ -9,14 +9,6 @@
     "connector": "postgresql",
     "maxOfflineRequests": 350
   },
-  "storage": {
-    "name": "storage",
-    "connector": "loopback-component-storage",
-    "provider": "filesystem",
-    "root": "./uploads",
-    "nameConflict": "makeUnique",
-    "maxFileSize": "4294967296"
-  },
   "mail": {
     "name": "mail",
     "connector": "mail",

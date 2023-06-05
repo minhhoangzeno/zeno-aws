@@ -25,34 +25,34 @@ module.exports = function (app) {
     // return;
     // auto update
     (async () => {
-        const [ACL, AccountToken, RoleMapping, Role, Account, Tag, Blog, Contact, Feedback, CategoryProduct, Product, Order, OrderProduct, Banner] = await Promise.all([
-            'ACL',
-            'AccountToken',
-            'RoleMapping',
-            'Role',
-            'Account',
-            'Tag',
-            'Blog',
-            'Contact',
-            'Feedback',
-            'CategoryProduct',
-            'Product',
-            'Order',
-            'OrderProduct',
-            'Banner'
-        ].map(process.env.NODE_ENV === 'production'
-            ? automigrate('postgres')
-            : autoupdate('postgres')));
-        // return;
-        if (process.env.NODE_ENV === 'production') {
+        const [ACL, AccountToken, RoleMapping, Role, Account, Tag, Blog, Contact, Feedback, CategoryProduct, Product, Order, OrderProduct, Banner,] = await Promise.all([
+            "ACL",
+            "AccountToken",
+            "RoleMapping",
+            "Role",
+            "Account",
+            "Tag",
+            "Blog",
+            "Contact",
+            "Feedback",
+            "CategoryProduct",
+            "Product",
+            "Order",
+            "OrderProduct",
+            "Banner",
+        ].map(process.env.NODE_ENV === "production"
+            ? automigrate("postgres")
+            : autoupdate("postgres")));
+        return;
+        if (process.env.NODE_ENV === "production") {
             return;
         }
-        console.log('Seeding start...');
+        console.log("Seeding start...");
         const roles = [
-            { id: 1, name: 'SUPERADMIN', description: '' },
-            { id: 2, name: 'ADMIN', description: '' },
-            { id: 3, name: 'USER', description: '' },
-            { id: 4, name: 'UNKNOWN', description: '' },
+            { id: 1, name: "SUPERADMIN", description: "" },
+            { id: 2, name: "ADMIN", description: "" },
+            { id: 3, name: "USER", description: "" },
+            { id: 4, name: "UNKNOWN", description: "" },
         ];
         for (const role of roles) {
             await Role.create(withoutId(role));
@@ -61,57 +61,57 @@ module.exports = function (app) {
         accounts.push({
             id: 1,
             username: `super-admin`,
-            email: 'super-admin@bfast-vn.net',
-            password: '1',
-            firstName: 'Adams',
-            lastName: 'Ansel',
+            email: "super-admin@bfast-vn.net",
+            password: "1",
+            firstName: "Adams",
+            lastName: "Ansel",
             city: 1,
             district: 1,
-            phoneNumber: 123456789
+            phoneNumber: 123456789,
         });
         accounts.push({
             id: 2,
             username: `admin`,
-            email: 'admin@bfast-vn.net',
-            password: '1',
-            firstName: 'Elizabeth',
-            lastName: 'Queen',
+            email: "admin@bfast-vn.net",
+            password: "1",
+            firstName: "Elizabeth",
+            lastName: "Queen",
             city: 1,
             district: 1,
-            phoneNumber: 123456789
+            phoneNumber: 123456789,
         });
         accounts.push({
             id: 3,
             username: `userstandard`,
-            email: 'userstandard@bfast-vn.net',
-            password: '1',
-            firstName: 'Great',
-            lastName: 'Britain',
+            email: "userstandard@bfast-vn.net",
+            password: "1",
+            firstName: "Great",
+            lastName: "Britain",
             city: 1,
             district: 1,
-            phoneNumber: 123456789
+            phoneNumber: 123456789,
         });
         accounts.push({
             id: 4,
             username: `hoangminh`,
-            email: 'hoangminh@bfast-vn.net',
-            password: '1',
-            firstName: 'Hoang',
-            lastName: 'Minh',
+            email: "hoangminh@bfast-vn.net",
+            password: "1",
+            firstName: "Hoang",
+            lastName: "Minh",
             city: 1,
             district: 1,
-            phoneNumber: 123456789
+            phoneNumber: 123456789,
         });
         accounts.push({
             id: 5,
             username: `minhhoang`,
-            email: 'minhhoang@bfast-vn.net',
-            password: '1',
-            firstName: 'Minh',
-            lastName: 'Hoang',
+            email: "minhhoang@bfast-vn.net",
+            password: "1",
+            firstName: "Minh",
+            lastName: "Hoang",
             city: 1,
             district: 1,
-            phoneNumber: 123456789
+            phoneNumber: 123456789,
         });
         for (let account of accounts) {
             const item = await Account.create(withoutId(account));
@@ -131,12 +131,12 @@ module.exports = function (app) {
             })();
             const roleMapping = {
                 principalId: item.id,
-                principalType: 'USER',
+                principalType: "USER",
                 roleId: roleId,
             };
             await RoleMapping.create(roleMapping);
         }
-        console.log('Seeding end!!!');
+        console.log("Seeding end!!!");
     })().catch((e) => {
         console.log(e);
     });
