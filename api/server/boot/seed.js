@@ -54,6 +54,7 @@ module.exports = function (app) {
             { id: 3, name: 'USER', description: '' },
             { id: 4, name: 'UNKNOWN', description: '' },
         ];
+        return;
         for (const role of roles) {
             await Role.create(withoutId(role));
         }

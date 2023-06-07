@@ -38,6 +38,7 @@ module.exports = function (app: App) {
       });
     });
   };
+  
   //return;
   // auto update
 
@@ -79,24 +80,25 @@ module.exports = function (app: App) {
           : autoupdate('postgres'),
       ),
     );
-
+    
     // return;
     if (process.env.NODE_ENV === 'production') {
       return;
     }
-    console.log('Seeding start...');
 
+    
+    console.log('Seeding start...');
+    
     const roles: Role[] = [
       { id: 1, name: 'SUPERADMIN', description: '' },
       { id: 2, name: 'ADMIN', description: '' },
       { id: 3, name: 'USER', description: '' },
       { id: 4, name: 'UNKNOWN', description: '' },
     ];
-
+    return;
     for (const role of roles) {
       await Role.create(withoutId(role));
     }
-
     const accounts: Account[] = [];
     accounts.push({
       id: 1,
