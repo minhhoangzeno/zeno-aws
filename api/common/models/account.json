@@ -12,23 +12,14 @@
     }
   },
   "properties": {
-    "firstName": {
-      "type": "string"
-    },
-    "lastName": {
+    "name": {
       "type": "string"
     },
     "avatar": {
       "type": "string"
     },
-    "city": {
-      "type": "number"
-    },
-    "district": {
-      "type": "number"
-    },
-    "phoneNumber": {
-      "type": "number"
+    "phone": {
+      "type": "string"
     }
   },
   "validations": [],
@@ -43,6 +34,11 @@
       "model": "Role",
       "foreignKey": "principalId",
       "through": "RoleMapping"
+    },
+    "team": {
+      "type": "belongsTo",
+      "model": "Team",
+      "foreignKey": ""
     }
   },
   "acls": [

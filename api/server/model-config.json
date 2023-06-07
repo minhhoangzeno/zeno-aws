@@ -49,35 +49,7 @@
     "dataSource": "postgres",
     "public": true
   },
-  "Contact": {
-    "dataSource": "postgres",
-    "public": true
-  },
-  "Tag": {
-    "dataSource": "postgres",
-    "public": true
-  },
-  "Blog": {
-    "dataSource": "postgres",
-    "public": true
-  },
-  "Email": {
-    "dataSource": "mail",
-    "public": false
-  },
-  "Feedback": {
-    "dataSource": "postgres",
-    "public": true
-  },
-  "CategoryProduct": {
-    "dataSource": "postgres",
-    "public": true
-  },
-  "Product": {
-    "dataSource": "postgres",
-    "public": true
-  },
-  "OrderProduct": {
+  "DurationTime": {
     "dataSource": "postgres",
     "public": true
   },
@@ -85,11 +57,11 @@
     "dataSource": "postgres",
     "public": true
   },
-  "Banner": {
+  "Target": {
     "dataSource": "postgres",
     "public": true
   },
-  "Test": {
+  "Team": {
     "dataSource": "postgres",
     "public": true
   }

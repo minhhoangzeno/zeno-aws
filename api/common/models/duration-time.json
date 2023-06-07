@@ -1,5 +1,5 @@
 {
-  "name": "CategoryProduct",
+  "name": "DurationTime",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
@@ -14,13 +14,16 @@
   "properties": {
     "title": {
       "type": "string"
-    },
-    "photoURL": {
-      "type": "string"
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "leader": {
+      "type": "belongsTo",
+      "model": "Account",
+      "foreignKey": ""
+    }
+  },
   "acls": [
     {
       "accessType": "*",

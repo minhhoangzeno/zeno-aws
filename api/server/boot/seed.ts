@@ -3,15 +3,10 @@ import {
   Account,
   Role,
   RoleMapping,
-  Contact,
-  Tag,
-  Blog,
-  Feedback,
-  CategoryProduct,
-  Product,
+  DurationTime,
   Order,
-  OrderProduct,
-  Banner,
+  Target,
+  Team,
 } from '../../codegen/api/fetch/api';
 
 module.exports = function (app: App) {
@@ -38,7 +33,7 @@ module.exports = function (app: App) {
       });
     });
   };
-  
+
   //return;
   // auto update
 
@@ -49,15 +44,10 @@ module.exports = function (app: App) {
       RoleMapping,
       Role,
       Account,
-      Tag,
-      Blog,
-      Contact,
-      Feedback,
-      CategoryProduct,
-      Product,
+      DurationTime,
       Order,
-      OrderProduct,
-      Banner,
+      Target,
+      Team,
     ] = await Promise.all(
       [
         'ACL',
@@ -65,37 +55,31 @@ module.exports = function (app: App) {
         'RoleMapping',
         'Role',
         'Account',
-        'Tag',
-        'Blog',
-        'Contact',
-        'Feedback',
-        'CategoryProduct',
-        'Product',
+        'DurationTime',
         'Order',
-        'OrderProduct',
-        'Banner',
+        'Target',
+        'Team',
       ].map(
         process.env.NODE_ENV === 'production'
           ? automigrate('postgres')
           : autoupdate('postgres'),
       ),
     );
-    
-    // return;
+
+    return;
     if (process.env.NODE_ENV === 'production') {
       return;
     }
 
-    
     console.log('Seeding start...');
-    
+
     const roles: Role[] = [
       { id: 1, name: 'SUPERADMIN', description: '' },
       { id: 2, name: 'ADMIN', description: '' },
       { id: 3, name: 'USER', description: '' },
       { id: 4, name: 'UNKNOWN', description: '' },
     ];
-    return;
+
     for (const role of roles) {
       await Role.create(withoutId(role));
     }

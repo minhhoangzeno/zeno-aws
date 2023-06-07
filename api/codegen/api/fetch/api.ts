@@ -1,5 +1,5 @@
 /**
- * plan-de-transport-api
+ * api
  * plan-de-transport-api
  *
  * OpenAPI spec version: 1.0.0
@@ -37,12 +37,9 @@ export class BaseAPI {
 };
 
 export interface Account {
-    "firstName"?: string;
-    "lastName"?: string;
+    "name"?: string;
     "avatar"?: string;
-    "city"?: number;
-    "district"?: number;
-    "phoneNumber"?: number;
+    "phone"?: string;
     "realm"?: string;
     "username"?: string;
     "email": string;
@@ -50,6 +47,7 @@ export interface Account {
     "id"?: number;
     "createdAt"?: Date;
     "updatedAt"?: Date;
+    "teamId"?: number;
 }
 
 export interface AccountToken {
@@ -68,47 +66,10 @@ export interface AccountToken {
     "updatedAt"?: Date;
 }
 
-export interface Banner {
-    "photoURL"?: string;
-    "id"?: number;
-    "createdAt"?: Date;
-    "updatedAt"?: Date;
-}
-
-export interface Blog {
+export interface DurationTime {
     "title"?: string;
-    "metaDescription"?: string;
-    "content"?: string;
-    "photoURL"?: string;
     "id"?: number;
-    "accountId"?: number;
-    "tagId"?: number;
-    "createdAt"?: Date;
-    "updatedAt"?: Date;
-}
-
-export interface CategoryProduct {
-    "title"?: string;
-    "photoURL"?: string;
-    "id"?: number;
-    "createdAt"?: Date;
-    "updatedAt"?: Date;
-}
-
-export interface Contact {
-    "name"?: string;
-    "email"?: string;
-    "subject"?: string;
-    "message"?: string;
-    "id"?: number;
-    "createdAt"?: Date;
-    "updatedAt"?: Date;
-}
-
-export interface Feedback {
-    "content"?: string;
-    "id"?: number;
-    "accountId"?: number;
+    "leaderId"?: number;
     "createdAt"?: Date;
     "updatedAt"?: Date;
 }
@@ -140,46 +101,18 @@ export interface InlineResponse2004 {
 }
 
 export interface Order {
-    "code"?: string;
-    "firstName"?: string;
-    "lastName"?: string;
-    "phoneNumber"?: number;
-    "email"?: string;
-    "address"?: string;
-    "city"?: number;
-    "district"?: number;
-    "note"?: string;
-    "status"?: string;
-    "price"?: number;
+    "numberOfCall"?: number;
+    "numberOfAdvise"?: number;
+    "numberOfOrder"?: number;
+    "numberOfAccepted"?: number;
+    "revenueOfOrder"?: number;
+    "revenueOfAccepted"?: number;
     "id"?: number;
     "accountId"?: number;
+    "durationTimeId"?: number;
     "createdAt"?: Date;
     "updatedAt"?: Date;
-}
-
-export interface OrderProduct {
-    "amount"?: number;
-    "price"?: number;
-    "id"?: number;
-    "productId"?: number;
-    "createdAt"?: Date;
-    "updatedAt"?: Date;
-    "orderId"?: number;
-}
-
-export interface Product {
-    "title"?: string;
-    "price"?: number;
-    "color"?: string;
-    "origin"?: string;
-    "photoURL"?: string;
-    "content"?: string;
-    "metaDescription"?: string;
-    "record"?: number;
-    "id"?: number;
-    "categoryProductId"?: number;
-    "createdAt"?: Date;
-    "updatedAt"?: Date;
+    "teamId"?: number;
 }
 
 export interface Role {
@@ -203,9 +136,20 @@ export interface RoleMapping {
     "roleId"?: number;
 }
 
-export interface Tag {
-    "title"?: string;
+export interface Target {
+    "revenue"?: number;
+    "worksday"?: number;
+    "month"?: Date;
     "id"?: number;
+    "accountId"?: number;
+    "createdAt"?: Date;
+    "updatedAt"?: Date;
+}
+
+export interface Team {
+    "name"?: string;
+    "id"?: number;
+    "leaderId"?: number;
     "createdAt"?: Date;
     "updatedAt"?: Date;
 }
@@ -989,6 +933,34 @@ export const AccountApiFetchParamCreator = {
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "filter": params["filter"],
+        });
+        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
+
+        let contentTypeHeader: Dictionary<string> = {};
+        if (contentTypeHeader) {
+            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
+        }
+        return {
+            url: url.format(urlObj),
+            options: fetchOptions,
+        };
+    },
+    /**
+     * 
+     * @summary Fetches belongsTo relation team.
+     * @param id Account id
+     * @param refresh 
+     */
+    accountPrototypeGetTeam(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
+        // verify required parameter "id" is set
+        if (params["id"] == null) {
+            throw new Error("Missing required parameter id when calling accountPrototypeGetTeam");
+        }
+        const baseUrl = `/Accounts/{id}/team`
+            .replace(`{${"id"}}`, `${ params["id"] }`);
+        let urlObj = url.parse(baseUrl, true);
+        urlObj.query = assign({}, urlObj.query, {
+            "refresh": params["refresh"],
         });
         let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
 
@@ -1933,6 +1905,24 @@ export const AccountApiFp = {
     },
     /**
      * 
+     * @summary Fetches belongsTo relation team.
+     * @param id Account id
+     * @param refresh 
+     */
+    accountPrototypeGetTeam(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = AccountApiFetchParamCreator.accountPrototypeGetTeam(params, options);
+        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
+            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
+                if (response.status >= 200 && response.status < 300) {
+                    return response.json();
+                } else {
+                    throw response;
+                }
+            });
+        };
+    },
+    /**
+     * 
      * @summary Add a related item by id for roles.
      * @param id Account id
      * @param fk Foreign key for roles
@@ -2443,6 +2433,15 @@ export class AccountApi extends BaseAPI {
     }
     /**
      * 
+     * @summary Fetches belongsTo relation team.
+     * @param id Account id
+     * @param refresh 
+     */
+    accountPrototypeGetTeam(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+        return AccountApiFp.accountPrototypeGetTeam(params, options)(this.fetch, this.basePath);
+    }
+    /**
+     * 
      * @summary Add a related item by id for roles.
      * @param id Account id
      * @param fk Foreign key for roles
@@ -2825,6 +2824,15 @@ export const AccountApiFactory = function (fetch?: FetchAPI, basePath?: string) 
          */
         accountPrototypeGetRoles(params: {  "id": string; "filter"?: string; }, options?: any) {
             return AccountApiFp.accountPrototypeGetRoles(params, options)(fetch, basePath);
+        },
+        /**
+         * 
+         * @summary Fetches belongsTo relation team.
+         * @param id Account id
+         * @param refresh 
+         */
+        accountPrototypeGetTeam(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+            return AccountApiFp.accountPrototypeGetTeam(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -4102,4466 +4110,6 @@ export const AccountTokenApiFactory = function (fetch?: FetchAPI, basePath?: str
 
 
 /**
- * BannerApi - fetch parameter creator
- */
-export const BannerApiFetchParamCreator = {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    bannerCount(params: {  "where"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners/count`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    bannerCreate(params: {  "data"?: Banner; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    bannerCreateChangeStreamGetBannersChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners/change-stream`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "options": params["options"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    bannerCreateChangeStreamPostBannersChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners/change-stream`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/x-www-form-urlencoded" };
-        fetchOptions.body = querystring.stringify({
-            "options": params["options"],
-        });
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    bannerDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling bannerDeleteById");
-        }
-        const baseUrl = `/Banners/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    bannerExistsGetBannersidExists(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling bannerExistsGetBannersidExists");
-        }
-        const baseUrl = `/Banners/{id}/exists`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    bannerExistsHeadBannersid(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling bannerExistsHeadBannersid");
-        }
-        const baseUrl = `/Banners/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "HEAD" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    bannerFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    bannerFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling bannerFindById");
-        }
-        const baseUrl = `/Banners/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    bannerFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners/findOne`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    bannerPatchOrCreate(params: {  "data"?: Banner; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Banner id
-     * @param data An object of model property name/value pairs
-     */
-    bannerPrototypePatchAttributes(params: {  "id": string; "data"?: Banner; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling bannerPrototypePatchAttributes");
-        }
-        const baseUrl = `/Banners/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    bannerReplaceByIdPostBannersidReplace(params: {  "id": string; "data"?: Banner; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling bannerReplaceByIdPostBannersidReplace");
-        }
-        const baseUrl = `/Banners/{id}/replace`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    bannerReplaceByIdPutBannersid(params: {  "id": string; "data"?: Banner; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling bannerReplaceByIdPutBannersid");
-        }
-        const baseUrl = `/Banners/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    bannerReplaceOrCreatePostBannersReplaceOrCreate(params: {  "data"?: Banner; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners/replaceOrCreate`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    bannerReplaceOrCreatePutBanners(params: {  "data"?: Banner; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    bannerUpdateAll(params: {  "where"?: string; "data"?: Banner; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners/update`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    bannerUpsertWithWhere(params: {  "where"?: string; "data"?: Banner; }, options?: any): FetchArgs {
-        const baseUrl = `/Banners/upsertWithWhere`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-};
-
-/**
- * BannerApi - functional programming interface
- */
-export const BannerApiFp = {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    bannerCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerCount(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    bannerCreate(params: { "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Banner> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    bannerCreateChangeStreamGetBannersChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerCreateChangeStreamGetBannersChangeStream(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    bannerCreateChangeStreamPostBannersChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerCreateChangeStreamPostBannersChangeStream(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    bannerDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerDeleteById(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    bannerExistsGetBannersidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerExistsGetBannersidExists(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    bannerExistsHeadBannersid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerExistsHeadBannersid(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    bannerFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Banner>> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerFind(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    bannerFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Banner> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerFindById(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    bannerFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Banner> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerFindOne(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    bannerPatchOrCreate(params: { "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Banner> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerPatchOrCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Banner id
-     * @param data An object of model property name/value pairs
-     */
-    bannerPrototypePatchAttributes(params: { "id": string; "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Banner> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerPrototypePatchAttributes(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    bannerReplaceByIdPostBannersidReplace(params: { "id": string; "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Banner> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerReplaceByIdPostBannersidReplace(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    bannerReplaceByIdPutBannersid(params: { "id": string; "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Banner> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerReplaceByIdPutBannersid(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    bannerReplaceOrCreatePostBannersReplaceOrCreate(params: { "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Banner> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerReplaceOrCreatePostBannersReplaceOrCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    bannerReplaceOrCreatePutBanners(params: { "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Banner> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerReplaceOrCreatePutBanners(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    bannerUpdateAll(params: { "where"?: string; "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerUpdateAll(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    bannerUpsertWithWhere(params: { "where"?: string; "data"?: Banner;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Banner> {
-        const fetchArgs = BannerApiFetchParamCreator.bannerUpsertWithWhere(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-};
-
-/**
- * BannerApi - object-oriented interface
- */
-export class BannerApi extends BaseAPI {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    bannerCount(params: {  "where"?: string; }, options?: any) {
-        return BannerApiFp.bannerCount(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    bannerCreate(params: {  "data"?: Banner; }, options?: any) {
-        return BannerApiFp.bannerCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    bannerCreateChangeStreamGetBannersChangeStream(params: {  "options"?: string; }, options?: any) {
-        return BannerApiFp.bannerCreateChangeStreamGetBannersChangeStream(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    bannerCreateChangeStreamPostBannersChangeStream(params: {  "options"?: string; }, options?: any) {
-        return BannerApiFp.bannerCreateChangeStreamPostBannersChangeStream(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    bannerDeleteById(params: {  "id": string; }, options?: any) {
-        return BannerApiFp.bannerDeleteById(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    bannerExistsGetBannersidExists(params: {  "id": string; }, options?: any) {
-        return BannerApiFp.bannerExistsGetBannersidExists(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    bannerExistsHeadBannersid(params: {  "id": string; }, options?: any) {
-        return BannerApiFp.bannerExistsHeadBannersid(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    bannerFind(params: {  "filter"?: string; }, options?: any) {
-        return BannerApiFp.bannerFind(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    bannerFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-        return BannerApiFp.bannerFindById(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    bannerFindOne(params: {  "filter"?: string; }, options?: any) {
-        return BannerApiFp.bannerFindOne(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    bannerPatchOrCreate(params: {  "data"?: Banner; }, options?: any) {
-        return BannerApiFp.bannerPatchOrCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Banner id
-     * @param data An object of model property name/value pairs
-     */
-    bannerPrototypePatchAttributes(params: {  "id": string; "data"?: Banner; }, options?: any) {
-        return BannerApiFp.bannerPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    bannerReplaceByIdPostBannersidReplace(params: {  "id": string; "data"?: Banner; }, options?: any) {
-        return BannerApiFp.bannerReplaceByIdPostBannersidReplace(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    bannerReplaceByIdPutBannersid(params: {  "id": string; "data"?: Banner; }, options?: any) {
-        return BannerApiFp.bannerReplaceByIdPutBannersid(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    bannerReplaceOrCreatePostBannersReplaceOrCreate(params: {  "data"?: Banner; }, options?: any) {
-        return BannerApiFp.bannerReplaceOrCreatePostBannersReplaceOrCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    bannerReplaceOrCreatePutBanners(params: {  "data"?: Banner; }, options?: any) {
-        return BannerApiFp.bannerReplaceOrCreatePutBanners(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    bannerUpdateAll(params: {  "where"?: string; "data"?: Banner; }, options?: any) {
-        return BannerApiFp.bannerUpdateAll(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    bannerUpsertWithWhere(params: {  "where"?: string; "data"?: Banner; }, options?: any) {
-        return BannerApiFp.bannerUpsertWithWhere(params, options)(this.fetch, this.basePath);
-    }
-};
-
-/**
- * BannerApi - factory interface
- */
-export const BannerApiFactory = function (fetch?: FetchAPI, basePath?: string) {
-    return {
-        /**
-         * 
-         * @summary Count instances of the model matched by where from the data source.
-         * @param where Criteria to match model instances
-         */
-        bannerCount(params: {  "where"?: string; }, options?: any) {
-            return BannerApiFp.bannerCount(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a new instance of the model and persist it into the data source.
-         * @param data Model instance data
-         */
-        bannerCreate(params: {  "data"?: Banner; }, options?: any) {
-            return BannerApiFp.bannerCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a change stream.
-         * @param options 
-         */
-        bannerCreateChangeStreamGetBannersChangeStream(params: {  "options"?: string; }, options?: any) {
-            return BannerApiFp.bannerCreateChangeStreamGetBannersChangeStream(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a change stream.
-         * @param options 
-         */
-        bannerCreateChangeStreamPostBannersChangeStream(params: {  "options"?: string; }, options?: any) {
-            return BannerApiFp.bannerCreateChangeStreamPostBannersChangeStream(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Delete a model instance by {{id}} from the data source.
-         * @param id Model id
-         */
-        bannerDeleteById(params: {  "id": string; }, options?: any) {
-            return BannerApiFp.bannerDeleteById(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check whether a model instance exists in the data source.
-         * @param id Model id
-         */
-        bannerExistsGetBannersidExists(params: {  "id": string; }, options?: any) {
-            return BannerApiFp.bannerExistsGetBannersidExists(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check whether a model instance exists in the data source.
-         * @param id Model id
-         */
-        bannerExistsHeadBannersid(params: {  "id": string; }, options?: any) {
-            return BannerApiFp.bannerExistsHeadBannersid(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find all instances of the model matched by filter from the data source.
-         * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-         */
-        bannerFind(params: {  "filter"?: string; }, options?: any) {
-            return BannerApiFp.bannerFind(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find a model instance by {{id}} from the data source.
-         * @param id Model id
-         * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-         */
-        bannerFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-            return BannerApiFp.bannerFindById(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find first instance of the model matched by filter from the data source.
-         * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-         */
-        bannerFindOne(params: {  "filter"?: string; }, options?: any) {
-            return BannerApiFp.bannerFindOne(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Patch an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        bannerPatchOrCreate(params: {  "data"?: Banner; }, options?: any) {
-            return BannerApiFp.bannerPatchOrCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Patch attributes for a model instance and persist it into the data source.
-         * @param id Banner id
-         * @param data An object of model property name/value pairs
-         */
-        bannerPrototypePatchAttributes(params: {  "id": string; "data"?: Banner; }, options?: any) {
-            return BannerApiFp.bannerPrototypePatchAttributes(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace attributes for a model instance and persist it into the data source.
-         * @param id Model id
-         * @param data Model instance data
-         */
-        bannerReplaceByIdPostBannersidReplace(params: {  "id": string; "data"?: Banner; }, options?: any) {
-            return BannerApiFp.bannerReplaceByIdPostBannersidReplace(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace attributes for a model instance and persist it into the data source.
-         * @param id Model id
-         * @param data Model instance data
-         */
-        bannerReplaceByIdPutBannersid(params: {  "id": string; "data"?: Banner; }, options?: any) {
-            return BannerApiFp.bannerReplaceByIdPutBannersid(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        bannerReplaceOrCreatePostBannersReplaceOrCreate(params: {  "data"?: Banner; }, options?: any) {
-            return BannerApiFp.bannerReplaceOrCreatePostBannersReplaceOrCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        bannerReplaceOrCreatePutBanners(params: {  "data"?: Banner; }, options?: any) {
-            return BannerApiFp.bannerReplaceOrCreatePutBanners(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update instances of the model matched by {{where}} from the data source.
-         * @param where Criteria to match model instances
-         * @param data An object of model property name/value pairs
-         */
-        bannerUpdateAll(params: {  "where"?: string; "data"?: Banner; }, options?: any) {
-            return BannerApiFp.bannerUpdateAll(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-         * @param where Criteria to match model instances
-         * @param data An object of model property name/value pairs
-         */
-        bannerUpsertWithWhere(params: {  "where"?: string; "data"?: Banner; }, options?: any) {
-            return BannerApiFp.bannerUpsertWithWhere(params, options)(fetch, basePath);
-        },
-    };
-};
-
-
-/**
- * BlogApi - fetch parameter creator
- */
-export const BlogApiFetchParamCreator = {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    blogCount(params: {  "where"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs/count`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    blogCreate(params: {  "data"?: Blog; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    blogCreateChangeStreamGetBlogsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs/change-stream`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "options": params["options"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    blogCreateChangeStreamPostBlogsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs/change-stream`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/x-www-form-urlencoded" };
-        fetchOptions.body = querystring.stringify({
-            "options": params["options"],
-        });
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    blogDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling blogDeleteById");
-        }
-        const baseUrl = `/Blogs/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    blogExistsGetBlogsidExists(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling blogExistsGetBlogsidExists");
-        }
-        const baseUrl = `/Blogs/{id}/exists`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    blogExistsHeadBlogsid(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling blogExistsHeadBlogsid");
-        }
-        const baseUrl = `/Blogs/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "HEAD" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    blogFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    blogFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling blogFindById");
-        }
-        const baseUrl = `/Blogs/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    blogFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs/findOne`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    blogPatchOrCreate(params: {  "data"?: Blog; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Fetches belongsTo relation account.
-     * @param id Blog id
-     * @param refresh 
-     */
-    blogPrototypeGetAccount(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling blogPrototypeGetAccount");
-        }
-        const baseUrl = `/Blogs/{id}/account`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "refresh": params["refresh"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Fetches belongsTo relation tag.
-     * @param id Blog id
-     * @param refresh 
-     */
-    blogPrototypeGetTag(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling blogPrototypeGetTag");
-        }
-        const baseUrl = `/Blogs/{id}/tag`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "refresh": params["refresh"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Blog id
-     * @param data An object of model property name/value pairs
-     */
-    blogPrototypePatchAttributes(params: {  "id": string; "data"?: Blog; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling blogPrototypePatchAttributes");
-        }
-        const baseUrl = `/Blogs/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    blogReplaceByIdPostBlogsidReplace(params: {  "id": string; "data"?: Blog; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling blogReplaceByIdPostBlogsidReplace");
-        }
-        const baseUrl = `/Blogs/{id}/replace`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    blogReplaceByIdPutBlogsid(params: {  "id": string; "data"?: Blog; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling blogReplaceByIdPutBlogsid");
-        }
-        const baseUrl = `/Blogs/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    blogReplaceOrCreatePostBlogsReplaceOrCreate(params: {  "data"?: Blog; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs/replaceOrCreate`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    blogReplaceOrCreatePutBlogs(params: {  "data"?: Blog; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    blogUpdateAll(params: {  "where"?: string; "data"?: Blog; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs/update`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    blogUpsertWithWhere(params: {  "where"?: string; "data"?: Blog; }, options?: any): FetchArgs {
-        const baseUrl = `/Blogs/upsertWithWhere`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-};
-
-/**
- * BlogApi - functional programming interface
- */
-export const BlogApiFp = {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    blogCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
-        const fetchArgs = BlogApiFetchParamCreator.blogCount(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    blogCreate(params: { "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Blog> {
-        const fetchArgs = BlogApiFetchParamCreator.blogCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    blogCreateChangeStreamGetBlogsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = BlogApiFetchParamCreator.blogCreateChangeStreamGetBlogsChangeStream(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    blogCreateChangeStreamPostBlogsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = BlogApiFetchParamCreator.blogCreateChangeStreamPostBlogsChangeStream(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    blogDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = BlogApiFetchParamCreator.blogDeleteById(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    blogExistsGetBlogsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = BlogApiFetchParamCreator.blogExistsGetBlogsidExists(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    blogExistsHeadBlogsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = BlogApiFetchParamCreator.blogExistsHeadBlogsid(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    blogFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Blog>> {
-        const fetchArgs = BlogApiFetchParamCreator.blogFind(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    blogFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Blog> {
-        const fetchArgs = BlogApiFetchParamCreator.blogFindById(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    blogFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Blog> {
-        const fetchArgs = BlogApiFetchParamCreator.blogFindOne(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    blogPatchOrCreate(params: { "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Blog> {
-        const fetchArgs = BlogApiFetchParamCreator.blogPatchOrCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Fetches belongsTo relation account.
-     * @param id Blog id
-     * @param refresh 
-     */
-    blogPrototypeGetAccount(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Account> {
-        const fetchArgs = BlogApiFetchParamCreator.blogPrototypeGetAccount(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Fetches belongsTo relation tag.
-     * @param id Blog id
-     * @param refresh 
-     */
-    blogPrototypeGetTag(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = BlogApiFetchParamCreator.blogPrototypeGetTag(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Blog id
-     * @param data An object of model property name/value pairs
-     */
-    blogPrototypePatchAttributes(params: { "id": string; "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Blog> {
-        const fetchArgs = BlogApiFetchParamCreator.blogPrototypePatchAttributes(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    blogReplaceByIdPostBlogsidReplace(params: { "id": string; "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Blog> {
-        const fetchArgs = BlogApiFetchParamCreator.blogReplaceByIdPostBlogsidReplace(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    blogReplaceByIdPutBlogsid(params: { "id": string; "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Blog> {
-        const fetchArgs = BlogApiFetchParamCreator.blogReplaceByIdPutBlogsid(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    blogReplaceOrCreatePostBlogsReplaceOrCreate(params: { "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Blog> {
-        const fetchArgs = BlogApiFetchParamCreator.blogReplaceOrCreatePostBlogsReplaceOrCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    blogReplaceOrCreatePutBlogs(params: { "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Blog> {
-        const fetchArgs = BlogApiFetchParamCreator.blogReplaceOrCreatePutBlogs(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    blogUpdateAll(params: { "where"?: string; "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
-        const fetchArgs = BlogApiFetchParamCreator.blogUpdateAll(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    blogUpsertWithWhere(params: { "where"?: string; "data"?: Blog;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Blog> {
-        const fetchArgs = BlogApiFetchParamCreator.blogUpsertWithWhere(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-};
-
-/**
- * BlogApi - object-oriented interface
- */
-export class BlogApi extends BaseAPI {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    blogCount(params: {  "where"?: string; }, options?: any) {
-        return BlogApiFp.blogCount(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    blogCreate(params: {  "data"?: Blog; }, options?: any) {
-        return BlogApiFp.blogCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    blogCreateChangeStreamGetBlogsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return BlogApiFp.blogCreateChangeStreamGetBlogsChangeStream(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    blogCreateChangeStreamPostBlogsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return BlogApiFp.blogCreateChangeStreamPostBlogsChangeStream(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    blogDeleteById(params: {  "id": string; }, options?: any) {
-        return BlogApiFp.blogDeleteById(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    blogExistsGetBlogsidExists(params: {  "id": string; }, options?: any) {
-        return BlogApiFp.blogExistsGetBlogsidExists(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    blogExistsHeadBlogsid(params: {  "id": string; }, options?: any) {
-        return BlogApiFp.blogExistsHeadBlogsid(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    blogFind(params: {  "filter"?: string; }, options?: any) {
-        return BlogApiFp.blogFind(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    blogFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-        return BlogApiFp.blogFindById(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    blogFindOne(params: {  "filter"?: string; }, options?: any) {
-        return BlogApiFp.blogFindOne(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    blogPatchOrCreate(params: {  "data"?: Blog; }, options?: any) {
-        return BlogApiFp.blogPatchOrCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Fetches belongsTo relation account.
-     * @param id Blog id
-     * @param refresh 
-     */
-    blogPrototypeGetAccount(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-        return BlogApiFp.blogPrototypeGetAccount(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Fetches belongsTo relation tag.
-     * @param id Blog id
-     * @param refresh 
-     */
-    blogPrototypeGetTag(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-        return BlogApiFp.blogPrototypeGetTag(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Blog id
-     * @param data An object of model property name/value pairs
-     */
-    blogPrototypePatchAttributes(params: {  "id": string; "data"?: Blog; }, options?: any) {
-        return BlogApiFp.blogPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    blogReplaceByIdPostBlogsidReplace(params: {  "id": string; "data"?: Blog; }, options?: any) {
-        return BlogApiFp.blogReplaceByIdPostBlogsidReplace(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    blogReplaceByIdPutBlogsid(params: {  "id": string; "data"?: Blog; }, options?: any) {
-        return BlogApiFp.blogReplaceByIdPutBlogsid(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    blogReplaceOrCreatePostBlogsReplaceOrCreate(params: {  "data"?: Blog; }, options?: any) {
-        return BlogApiFp.blogReplaceOrCreatePostBlogsReplaceOrCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    blogReplaceOrCreatePutBlogs(params: {  "data"?: Blog; }, options?: any) {
-        return BlogApiFp.blogReplaceOrCreatePutBlogs(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    blogUpdateAll(params: {  "where"?: string; "data"?: Blog; }, options?: any) {
-        return BlogApiFp.blogUpdateAll(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    blogUpsertWithWhere(params: {  "where"?: string; "data"?: Blog; }, options?: any) {
-        return BlogApiFp.blogUpsertWithWhere(params, options)(this.fetch, this.basePath);
-    }
-};
-
-/**
- * BlogApi - factory interface
- */
-export const BlogApiFactory = function (fetch?: FetchAPI, basePath?: string) {
-    return {
-        /**
-         * 
-         * @summary Count instances of the model matched by where from the data source.
-         * @param where Criteria to match model instances
-         */
-        blogCount(params: {  "where"?: string; }, options?: any) {
-            return BlogApiFp.blogCount(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a new instance of the model and persist it into the data source.
-         * @param data Model instance data
-         */
-        blogCreate(params: {  "data"?: Blog; }, options?: any) {
-            return BlogApiFp.blogCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a change stream.
-         * @param options 
-         */
-        blogCreateChangeStreamGetBlogsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return BlogApiFp.blogCreateChangeStreamGetBlogsChangeStream(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a change stream.
-         * @param options 
-         */
-        blogCreateChangeStreamPostBlogsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return BlogApiFp.blogCreateChangeStreamPostBlogsChangeStream(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Delete a model instance by {{id}} from the data source.
-         * @param id Model id
-         */
-        blogDeleteById(params: {  "id": string; }, options?: any) {
-            return BlogApiFp.blogDeleteById(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check whether a model instance exists in the data source.
-         * @param id Model id
-         */
-        blogExistsGetBlogsidExists(params: {  "id": string; }, options?: any) {
-            return BlogApiFp.blogExistsGetBlogsidExists(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check whether a model instance exists in the data source.
-         * @param id Model id
-         */
-        blogExistsHeadBlogsid(params: {  "id": string; }, options?: any) {
-            return BlogApiFp.blogExistsHeadBlogsid(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find all instances of the model matched by filter from the data source.
-         * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-         */
-        blogFind(params: {  "filter"?: string; }, options?: any) {
-            return BlogApiFp.blogFind(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find a model instance by {{id}} from the data source.
-         * @param id Model id
-         * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-         */
-        blogFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-            return BlogApiFp.blogFindById(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find first instance of the model matched by filter from the data source.
-         * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-         */
-        blogFindOne(params: {  "filter"?: string; }, options?: any) {
-            return BlogApiFp.blogFindOne(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Patch an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        blogPatchOrCreate(params: {  "data"?: Blog; }, options?: any) {
-            return BlogApiFp.blogPatchOrCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Fetches belongsTo relation account.
-         * @param id Blog id
-         * @param refresh 
-         */
-        blogPrototypeGetAccount(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-            return BlogApiFp.blogPrototypeGetAccount(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Fetches belongsTo relation tag.
-         * @param id Blog id
-         * @param refresh 
-         */
-        blogPrototypeGetTag(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-            return BlogApiFp.blogPrototypeGetTag(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Patch attributes for a model instance and persist it into the data source.
-         * @param id Blog id
-         * @param data An object of model property name/value pairs
-         */
-        blogPrototypePatchAttributes(params: {  "id": string; "data"?: Blog; }, options?: any) {
-            return BlogApiFp.blogPrototypePatchAttributes(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace attributes for a model instance and persist it into the data source.
-         * @param id Model id
-         * @param data Model instance data
-         */
-        blogReplaceByIdPostBlogsidReplace(params: {  "id": string; "data"?: Blog; }, options?: any) {
-            return BlogApiFp.blogReplaceByIdPostBlogsidReplace(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace attributes for a model instance and persist it into the data source.
-         * @param id Model id
-         * @param data Model instance data
-         */
-        blogReplaceByIdPutBlogsid(params: {  "id": string; "data"?: Blog; }, options?: any) {
-            return BlogApiFp.blogReplaceByIdPutBlogsid(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        blogReplaceOrCreatePostBlogsReplaceOrCreate(params: {  "data"?: Blog; }, options?: any) {
-            return BlogApiFp.blogReplaceOrCreatePostBlogsReplaceOrCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        blogReplaceOrCreatePutBlogs(params: {  "data"?: Blog; }, options?: any) {
-            return BlogApiFp.blogReplaceOrCreatePutBlogs(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update instances of the model matched by {{where}} from the data source.
-         * @param where Criteria to match model instances
-         * @param data An object of model property name/value pairs
-         */
-        blogUpdateAll(params: {  "where"?: string; "data"?: Blog; }, options?: any) {
-            return BlogApiFp.blogUpdateAll(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-         * @param where Criteria to match model instances
-         * @param data An object of model property name/value pairs
-         */
-        blogUpsertWithWhere(params: {  "where"?: string; "data"?: Blog; }, options?: any) {
-            return BlogApiFp.blogUpsertWithWhere(params, options)(fetch, basePath);
-        },
-    };
-};
-
-
-/**
- * CategoryProductApi - fetch parameter creator
- */
-export const CategoryProductApiFetchParamCreator = {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    categoryProductCount(params: {  "where"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts/count`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    categoryProductCreate(params: {  "data"?: CategoryProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    categoryProductCreateChangeStreamGetCategoryProductsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts/change-stream`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "options": params["options"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    categoryProductCreateChangeStreamPostCategoryProductsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts/change-stream`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/x-www-form-urlencoded" };
-        fetchOptions.body = querystring.stringify({
-            "options": params["options"],
-        });
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    categoryProductDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling categoryProductDeleteById");
-        }
-        const baseUrl = `/CategoryProducts/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    categoryProductExistsGetCategoryProductsidExists(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling categoryProductExistsGetCategoryProductsidExists");
-        }
-        const baseUrl = `/CategoryProducts/{id}/exists`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    categoryProductExistsHeadCategoryProductsid(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling categoryProductExistsHeadCategoryProductsid");
-        }
-        const baseUrl = `/CategoryProducts/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "HEAD" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    categoryProductFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    categoryProductFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling categoryProductFindById");
-        }
-        const baseUrl = `/CategoryProducts/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    categoryProductFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts/findOne`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    categoryProductPatchOrCreate(params: {  "data"?: CategoryProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id CategoryProduct id
-     * @param data An object of model property name/value pairs
-     */
-    categoryProductPrototypePatchAttributes(params: {  "id": string; "data"?: CategoryProduct; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling categoryProductPrototypePatchAttributes");
-        }
-        const baseUrl = `/CategoryProducts/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    categoryProductReplaceByIdPostCategoryProductsidReplace(params: {  "id": string; "data"?: CategoryProduct; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling categoryProductReplaceByIdPostCategoryProductsidReplace");
-        }
-        const baseUrl = `/CategoryProducts/{id}/replace`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    categoryProductReplaceByIdPutCategoryProductsid(params: {  "id": string; "data"?: CategoryProduct; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling categoryProductReplaceByIdPutCategoryProductsid");
-        }
-        const baseUrl = `/CategoryProducts/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    categoryProductReplaceOrCreatePostCategoryProductsReplaceOrCreate(params: {  "data"?: CategoryProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts/replaceOrCreate`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    categoryProductReplaceOrCreatePutCategoryProducts(params: {  "data"?: CategoryProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    categoryProductUpdateAll(params: {  "where"?: string; "data"?: CategoryProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts/update`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    categoryProductUpsertWithWhere(params: {  "where"?: string; "data"?: CategoryProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/CategoryProducts/upsertWithWhere`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-};
-
-/**
- * CategoryProductApi - functional programming interface
- */
-export const CategoryProductApiFp = {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    categoryProductCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductCount(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    categoryProductCreate(params: { "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    categoryProductCreateChangeStreamGetCategoryProductsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductCreateChangeStreamGetCategoryProductsChangeStream(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    categoryProductCreateChangeStreamPostCategoryProductsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductCreateChangeStreamPostCategoryProductsChangeStream(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    categoryProductDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductDeleteById(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    categoryProductExistsGetCategoryProductsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductExistsGetCategoryProductsidExists(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    categoryProductExistsHeadCategoryProductsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductExistsHeadCategoryProductsid(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    categoryProductFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<CategoryProduct>> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductFind(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    categoryProductFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductFindById(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    categoryProductFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductFindOne(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    categoryProductPatchOrCreate(params: { "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductPatchOrCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id CategoryProduct id
-     * @param data An object of model property name/value pairs
-     */
-    categoryProductPrototypePatchAttributes(params: { "id": string; "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductPrototypePatchAttributes(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    categoryProductReplaceByIdPostCategoryProductsidReplace(params: { "id": string; "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductReplaceByIdPostCategoryProductsidReplace(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    categoryProductReplaceByIdPutCategoryProductsid(params: { "id": string; "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductReplaceByIdPutCategoryProductsid(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    categoryProductReplaceOrCreatePostCategoryProductsReplaceOrCreate(params: { "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductReplaceOrCreatePostCategoryProductsReplaceOrCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    categoryProductReplaceOrCreatePutCategoryProducts(params: { "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductReplaceOrCreatePutCategoryProducts(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    categoryProductUpdateAll(params: { "where"?: string; "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductUpdateAll(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    categoryProductUpsertWithWhere(params: { "where"?: string; "data"?: CategoryProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = CategoryProductApiFetchParamCreator.categoryProductUpsertWithWhere(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-};
-
-/**
- * CategoryProductApi - object-oriented interface
- */
-export class CategoryProductApi extends BaseAPI {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    categoryProductCount(params: {  "where"?: string; }, options?: any) {
-        return CategoryProductApiFp.categoryProductCount(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    categoryProductCreate(params: {  "data"?: CategoryProduct; }, options?: any) {
-        return CategoryProductApiFp.categoryProductCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    categoryProductCreateChangeStreamGetCategoryProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return CategoryProductApiFp.categoryProductCreateChangeStreamGetCategoryProductsChangeStream(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    categoryProductCreateChangeStreamPostCategoryProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return CategoryProductApiFp.categoryProductCreateChangeStreamPostCategoryProductsChangeStream(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    categoryProductDeleteById(params: {  "id": string; }, options?: any) {
-        return CategoryProductApiFp.categoryProductDeleteById(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    categoryProductExistsGetCategoryProductsidExists(params: {  "id": string; }, options?: any) {
-        return CategoryProductApiFp.categoryProductExistsGetCategoryProductsidExists(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    categoryProductExistsHeadCategoryProductsid(params: {  "id": string; }, options?: any) {
-        return CategoryProductApiFp.categoryProductExistsHeadCategoryProductsid(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    categoryProductFind(params: {  "filter"?: string; }, options?: any) {
-        return CategoryProductApiFp.categoryProductFind(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    categoryProductFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-        return CategoryProductApiFp.categoryProductFindById(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    categoryProductFindOne(params: {  "filter"?: string; }, options?: any) {
-        return CategoryProductApiFp.categoryProductFindOne(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    categoryProductPatchOrCreate(params: {  "data"?: CategoryProduct; }, options?: any) {
-        return CategoryProductApiFp.categoryProductPatchOrCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id CategoryProduct id
-     * @param data An object of model property name/value pairs
-     */
-    categoryProductPrototypePatchAttributes(params: {  "id": string; "data"?: CategoryProduct; }, options?: any) {
-        return CategoryProductApiFp.categoryProductPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    categoryProductReplaceByIdPostCategoryProductsidReplace(params: {  "id": string; "data"?: CategoryProduct; }, options?: any) {
-        return CategoryProductApiFp.categoryProductReplaceByIdPostCategoryProductsidReplace(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    categoryProductReplaceByIdPutCategoryProductsid(params: {  "id": string; "data"?: CategoryProduct; }, options?: any) {
-        return CategoryProductApiFp.categoryProductReplaceByIdPutCategoryProductsid(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    categoryProductReplaceOrCreatePostCategoryProductsReplaceOrCreate(params: {  "data"?: CategoryProduct; }, options?: any) {
-        return CategoryProductApiFp.categoryProductReplaceOrCreatePostCategoryProductsReplaceOrCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    categoryProductReplaceOrCreatePutCategoryProducts(params: {  "data"?: CategoryProduct; }, options?: any) {
-        return CategoryProductApiFp.categoryProductReplaceOrCreatePutCategoryProducts(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    categoryProductUpdateAll(params: {  "where"?: string; "data"?: CategoryProduct; }, options?: any) {
-        return CategoryProductApiFp.categoryProductUpdateAll(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    categoryProductUpsertWithWhere(params: {  "where"?: string; "data"?: CategoryProduct; }, options?: any) {
-        return CategoryProductApiFp.categoryProductUpsertWithWhere(params, options)(this.fetch, this.basePath);
-    }
-};
-
-/**
- * CategoryProductApi - factory interface
- */
-export const CategoryProductApiFactory = function (fetch?: FetchAPI, basePath?: string) {
-    return {
-        /**
-         * 
-         * @summary Count instances of the model matched by where from the data source.
-         * @param where Criteria to match model instances
-         */
-        categoryProductCount(params: {  "where"?: string; }, options?: any) {
-            return CategoryProductApiFp.categoryProductCount(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a new instance of the model and persist it into the data source.
-         * @param data Model instance data
-         */
-        categoryProductCreate(params: {  "data"?: CategoryProduct; }, options?: any) {
-            return CategoryProductApiFp.categoryProductCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a change stream.
-         * @param options 
-         */
-        categoryProductCreateChangeStreamGetCategoryProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return CategoryProductApiFp.categoryProductCreateChangeStreamGetCategoryProductsChangeStream(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a change stream.
-         * @param options 
-         */
-        categoryProductCreateChangeStreamPostCategoryProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return CategoryProductApiFp.categoryProductCreateChangeStreamPostCategoryProductsChangeStream(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Delete a model instance by {{id}} from the data source.
-         * @param id Model id
-         */
-        categoryProductDeleteById(params: {  "id": string; }, options?: any) {
-            return CategoryProductApiFp.categoryProductDeleteById(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check whether a model instance exists in the data source.
-         * @param id Model id
-         */
-        categoryProductExistsGetCategoryProductsidExists(params: {  "id": string; }, options?: any) {
-            return CategoryProductApiFp.categoryProductExistsGetCategoryProductsidExists(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check whether a model instance exists in the data source.
-         * @param id Model id
-         */
-        categoryProductExistsHeadCategoryProductsid(params: {  "id": string; }, options?: any) {
-            return CategoryProductApiFp.categoryProductExistsHeadCategoryProductsid(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find all instances of the model matched by filter from the data source.
-         * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-         */
-        categoryProductFind(params: {  "filter"?: string; }, options?: any) {
-            return CategoryProductApiFp.categoryProductFind(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find a model instance by {{id}} from the data source.
-         * @param id Model id
-         * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-         */
-        categoryProductFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-            return CategoryProductApiFp.categoryProductFindById(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find first instance of the model matched by filter from the data source.
-         * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-         */
-        categoryProductFindOne(params: {  "filter"?: string; }, options?: any) {
-            return CategoryProductApiFp.categoryProductFindOne(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Patch an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        categoryProductPatchOrCreate(params: {  "data"?: CategoryProduct; }, options?: any) {
-            return CategoryProductApiFp.categoryProductPatchOrCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Patch attributes for a model instance and persist it into the data source.
-         * @param id CategoryProduct id
-         * @param data An object of model property name/value pairs
-         */
-        categoryProductPrototypePatchAttributes(params: {  "id": string; "data"?: CategoryProduct; }, options?: any) {
-            return CategoryProductApiFp.categoryProductPrototypePatchAttributes(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace attributes for a model instance and persist it into the data source.
-         * @param id Model id
-         * @param data Model instance data
-         */
-        categoryProductReplaceByIdPostCategoryProductsidReplace(params: {  "id": string; "data"?: CategoryProduct; }, options?: any) {
-            return CategoryProductApiFp.categoryProductReplaceByIdPostCategoryProductsidReplace(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace attributes for a model instance and persist it into the data source.
-         * @param id Model id
-         * @param data Model instance data
-         */
-        categoryProductReplaceByIdPutCategoryProductsid(params: {  "id": string; "data"?: CategoryProduct; }, options?: any) {
-            return CategoryProductApiFp.categoryProductReplaceByIdPutCategoryProductsid(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        categoryProductReplaceOrCreatePostCategoryProductsReplaceOrCreate(params: {  "data"?: CategoryProduct; }, options?: any) {
-            return CategoryProductApiFp.categoryProductReplaceOrCreatePostCategoryProductsReplaceOrCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        categoryProductReplaceOrCreatePutCategoryProducts(params: {  "data"?: CategoryProduct; }, options?: any) {
-            return CategoryProductApiFp.categoryProductReplaceOrCreatePutCategoryProducts(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update instances of the model matched by {{where}} from the data source.
-         * @param where Criteria to match model instances
-         * @param data An object of model property name/value pairs
-         */
-        categoryProductUpdateAll(params: {  "where"?: string; "data"?: CategoryProduct; }, options?: any) {
-            return CategoryProductApiFp.categoryProductUpdateAll(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-         * @param where Criteria to match model instances
-         * @param data An object of model property name/value pairs
-         */
-        categoryProductUpsertWithWhere(params: {  "where"?: string; "data"?: CategoryProduct; }, options?: any) {
-            return CategoryProductApiFp.categoryProductUpsertWithWhere(params, options)(fetch, basePath);
-        },
-    };
-};
-
-
-/**
- * ContactApi - fetch parameter creator
- */
-export const ContactApiFetchParamCreator = {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    contactCount(params: {  "where"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts/count`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    contactCreate(params: {  "data"?: Contact; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    contactCreateChangeStreamGetContactsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts/change-stream`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "options": params["options"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    contactCreateChangeStreamPostContactsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts/change-stream`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/x-www-form-urlencoded" };
-        fetchOptions.body = querystring.stringify({
-            "options": params["options"],
-        });
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    contactDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling contactDeleteById");
-        }
-        const baseUrl = `/Contacts/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    contactExistsGetContactsidExists(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling contactExistsGetContactsidExists");
-        }
-        const baseUrl = `/Contacts/{id}/exists`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    contactExistsHeadContactsid(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling contactExistsHeadContactsid");
-        }
-        const baseUrl = `/Contacts/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "HEAD" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    contactFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    contactFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling contactFindById");
-        }
-        const baseUrl = `/Contacts/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    contactFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts/findOne`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    contactPatchOrCreate(params: {  "data"?: Contact; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Contact id
-     * @param data An object of model property name/value pairs
-     */
-    contactPrototypePatchAttributes(params: {  "id": string; "data"?: Contact; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling contactPrototypePatchAttributes");
-        }
-        const baseUrl = `/Contacts/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    contactReplaceByIdPostContactsidReplace(params: {  "id": string; "data"?: Contact; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling contactReplaceByIdPostContactsidReplace");
-        }
-        const baseUrl = `/Contacts/{id}/replace`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    contactReplaceByIdPutContactsid(params: {  "id": string; "data"?: Contact; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling contactReplaceByIdPutContactsid");
-        }
-        const baseUrl = `/Contacts/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    contactReplaceOrCreatePostContactsReplaceOrCreate(params: {  "data"?: Contact; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts/replaceOrCreate`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    contactReplaceOrCreatePutContacts(params: {  "data"?: Contact; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    contactUpdateAll(params: {  "where"?: string; "data"?: Contact; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts/update`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    contactUpsertWithWhere(params: {  "where"?: string; "data"?: Contact; }, options?: any): FetchArgs {
-        const baseUrl = `/Contacts/upsertWithWhere`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-};
-
-/**
- * ContactApi - functional programming interface
- */
-export const ContactApiFp = {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    contactCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
-        const fetchArgs = ContactApiFetchParamCreator.contactCount(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    contactCreate(params: { "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Contact> {
-        const fetchArgs = ContactApiFetchParamCreator.contactCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    contactCreateChangeStreamGetContactsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ContactApiFetchParamCreator.contactCreateChangeStreamGetContactsChangeStream(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    contactCreateChangeStreamPostContactsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ContactApiFetchParamCreator.contactCreateChangeStreamPostContactsChangeStream(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    contactDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ContactApiFetchParamCreator.contactDeleteById(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    contactExistsGetContactsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = ContactApiFetchParamCreator.contactExistsGetContactsidExists(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    contactExistsHeadContactsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = ContactApiFetchParamCreator.contactExistsHeadContactsid(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    contactFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Contact>> {
-        const fetchArgs = ContactApiFetchParamCreator.contactFind(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    contactFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Contact> {
-        const fetchArgs = ContactApiFetchParamCreator.contactFindById(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    contactFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Contact> {
-        const fetchArgs = ContactApiFetchParamCreator.contactFindOne(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    contactPatchOrCreate(params: { "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Contact> {
-        const fetchArgs = ContactApiFetchParamCreator.contactPatchOrCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Contact id
-     * @param data An object of model property name/value pairs
-     */
-    contactPrototypePatchAttributes(params: { "id": string; "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Contact> {
-        const fetchArgs = ContactApiFetchParamCreator.contactPrototypePatchAttributes(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    contactReplaceByIdPostContactsidReplace(params: { "id": string; "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Contact> {
-        const fetchArgs = ContactApiFetchParamCreator.contactReplaceByIdPostContactsidReplace(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    contactReplaceByIdPutContactsid(params: { "id": string; "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Contact> {
-        const fetchArgs = ContactApiFetchParamCreator.contactReplaceByIdPutContactsid(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    contactReplaceOrCreatePostContactsReplaceOrCreate(params: { "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Contact> {
-        const fetchArgs = ContactApiFetchParamCreator.contactReplaceOrCreatePostContactsReplaceOrCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    contactReplaceOrCreatePutContacts(params: { "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Contact> {
-        const fetchArgs = ContactApiFetchParamCreator.contactReplaceOrCreatePutContacts(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    contactUpdateAll(params: { "where"?: string; "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
-        const fetchArgs = ContactApiFetchParamCreator.contactUpdateAll(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    contactUpsertWithWhere(params: { "where"?: string; "data"?: Contact;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Contact> {
-        const fetchArgs = ContactApiFetchParamCreator.contactUpsertWithWhere(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-};
-
-/**
- * ContactApi - object-oriented interface
- */
-export class ContactApi extends BaseAPI {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    contactCount(params: {  "where"?: string; }, options?: any) {
-        return ContactApiFp.contactCount(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    contactCreate(params: {  "data"?: Contact; }, options?: any) {
-        return ContactApiFp.contactCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    contactCreateChangeStreamGetContactsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return ContactApiFp.contactCreateChangeStreamGetContactsChangeStream(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    contactCreateChangeStreamPostContactsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return ContactApiFp.contactCreateChangeStreamPostContactsChangeStream(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    contactDeleteById(params: {  "id": string; }, options?: any) {
-        return ContactApiFp.contactDeleteById(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    contactExistsGetContactsidExists(params: {  "id": string; }, options?: any) {
-        return ContactApiFp.contactExistsGetContactsidExists(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    contactExistsHeadContactsid(params: {  "id": string; }, options?: any) {
-        return ContactApiFp.contactExistsHeadContactsid(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    contactFind(params: {  "filter"?: string; }, options?: any) {
-        return ContactApiFp.contactFind(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    contactFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-        return ContactApiFp.contactFindById(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    contactFindOne(params: {  "filter"?: string; }, options?: any) {
-        return ContactApiFp.contactFindOne(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    contactPatchOrCreate(params: {  "data"?: Contact; }, options?: any) {
-        return ContactApiFp.contactPatchOrCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Contact id
-     * @param data An object of model property name/value pairs
-     */
-    contactPrototypePatchAttributes(params: {  "id": string; "data"?: Contact; }, options?: any) {
-        return ContactApiFp.contactPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    contactReplaceByIdPostContactsidReplace(params: {  "id": string; "data"?: Contact; }, options?: any) {
-        return ContactApiFp.contactReplaceByIdPostContactsidReplace(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    contactReplaceByIdPutContactsid(params: {  "id": string; "data"?: Contact; }, options?: any) {
-        return ContactApiFp.contactReplaceByIdPutContactsid(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    contactReplaceOrCreatePostContactsReplaceOrCreate(params: {  "data"?: Contact; }, options?: any) {
-        return ContactApiFp.contactReplaceOrCreatePostContactsReplaceOrCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    contactReplaceOrCreatePutContacts(params: {  "data"?: Contact; }, options?: any) {
-        return ContactApiFp.contactReplaceOrCreatePutContacts(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    contactUpdateAll(params: {  "where"?: string; "data"?: Contact; }, options?: any) {
-        return ContactApiFp.contactUpdateAll(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    contactUpsertWithWhere(params: {  "where"?: string; "data"?: Contact; }, options?: any) {
-        return ContactApiFp.contactUpsertWithWhere(params, options)(this.fetch, this.basePath);
-    }
-};
-
-/**
- * ContactApi - factory interface
- */
-export const ContactApiFactory = function (fetch?: FetchAPI, basePath?: string) {
-    return {
-        /**
-         * 
-         * @summary Count instances of the model matched by where from the data source.
-         * @param where Criteria to match model instances
-         */
-        contactCount(params: {  "where"?: string; }, options?: any) {
-            return ContactApiFp.contactCount(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a new instance of the model and persist it into the data source.
-         * @param data Model instance data
-         */
-        contactCreate(params: {  "data"?: Contact; }, options?: any) {
-            return ContactApiFp.contactCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a change stream.
-         * @param options 
-         */
-        contactCreateChangeStreamGetContactsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return ContactApiFp.contactCreateChangeStreamGetContactsChangeStream(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a change stream.
-         * @param options 
-         */
-        contactCreateChangeStreamPostContactsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return ContactApiFp.contactCreateChangeStreamPostContactsChangeStream(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Delete a model instance by {{id}} from the data source.
-         * @param id Model id
-         */
-        contactDeleteById(params: {  "id": string; }, options?: any) {
-            return ContactApiFp.contactDeleteById(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check whether a model instance exists in the data source.
-         * @param id Model id
-         */
-        contactExistsGetContactsidExists(params: {  "id": string; }, options?: any) {
-            return ContactApiFp.contactExistsGetContactsidExists(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check whether a model instance exists in the data source.
-         * @param id Model id
-         */
-        contactExistsHeadContactsid(params: {  "id": string; }, options?: any) {
-            return ContactApiFp.contactExistsHeadContactsid(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find all instances of the model matched by filter from the data source.
-         * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-         */
-        contactFind(params: {  "filter"?: string; }, options?: any) {
-            return ContactApiFp.contactFind(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find a model instance by {{id}} from the data source.
-         * @param id Model id
-         * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-         */
-        contactFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-            return ContactApiFp.contactFindById(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find first instance of the model matched by filter from the data source.
-         * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-         */
-        contactFindOne(params: {  "filter"?: string; }, options?: any) {
-            return ContactApiFp.contactFindOne(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Patch an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        contactPatchOrCreate(params: {  "data"?: Contact; }, options?: any) {
-            return ContactApiFp.contactPatchOrCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Patch attributes for a model instance and persist it into the data source.
-         * @param id Contact id
-         * @param data An object of model property name/value pairs
-         */
-        contactPrototypePatchAttributes(params: {  "id": string; "data"?: Contact; }, options?: any) {
-            return ContactApiFp.contactPrototypePatchAttributes(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace attributes for a model instance and persist it into the data source.
-         * @param id Model id
-         * @param data Model instance data
-         */
-        contactReplaceByIdPostContactsidReplace(params: {  "id": string; "data"?: Contact; }, options?: any) {
-            return ContactApiFp.contactReplaceByIdPostContactsidReplace(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace attributes for a model instance and persist it into the data source.
-         * @param id Model id
-         * @param data Model instance data
-         */
-        contactReplaceByIdPutContactsid(params: {  "id": string; "data"?: Contact; }, options?: any) {
-            return ContactApiFp.contactReplaceByIdPutContactsid(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        contactReplaceOrCreatePostContactsReplaceOrCreate(params: {  "data"?: Contact; }, options?: any) {
-            return ContactApiFp.contactReplaceOrCreatePostContactsReplaceOrCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        contactReplaceOrCreatePutContacts(params: {  "data"?: Contact; }, options?: any) {
-            return ContactApiFp.contactReplaceOrCreatePutContacts(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update instances of the model matched by {{where}} from the data source.
-         * @param where Criteria to match model instances
-         * @param data An object of model property name/value pairs
-         */
-        contactUpdateAll(params: {  "where"?: string; "data"?: Contact; }, options?: any) {
-            return ContactApiFp.contactUpdateAll(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-         * @param where Criteria to match model instances
-         * @param data An object of model property name/value pairs
-         */
-        contactUpsertWithWhere(params: {  "where"?: string; "data"?: Contact; }, options?: any) {
-            return ContactApiFp.contactUpsertWithWhere(params, options)(fetch, basePath);
-        },
-    };
-};
-
-
-/**
  * ContainerApi - fetch parameter creator
  */
 export const ContainerApiFetchParamCreator = {
@@ -9083,16 +4631,16 @@ export const ContainerApiFactory = function (fetch?: FetchAPI, basePath?: string
 
 
 /**
- * FeedbackApi - fetch parameter creator
+ * DurationTimeApi - fetch parameter creator
  */
-export const FeedbackApiFetchParamCreator = {
+export const DurationTimeApiFetchParamCreator = {
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    feedbackCount(params: {  "where"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks/count`;
+    durationTimeCount(params: {  "where"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes/count`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "where": params["where"],
@@ -9113,8 +4661,8 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Create a new instance of the model and persist it into the data source.
      * @param data Model instance data
      */
-    feedbackCreate(params: {  "data"?: Feedback; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks`;
+    durationTimeCreate(params: {  "data"?: DurationTime; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
 
@@ -9136,8 +4684,8 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Create a change stream.
      * @param options 
      */
-    feedbackCreateChangeStreamGetFeedbacksChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks/change-stream`;
+    durationTimeCreateChangeStreamGetDurationTimesChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes/change-stream`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "options": params["options"],
@@ -9158,8 +4706,8 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Create a change stream.
      * @param options 
      */
-    feedbackCreateChangeStreamPostFeedbacksChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks/change-stream`;
+    durationTimeCreateChangeStreamPostDurationTimesChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes/change-stream`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
 
@@ -9181,12 +4729,12 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Delete a model instance by {{id}} from the data source.
      * @param id Model id
      */
-    feedbackDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
+    durationTimeDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling feedbackDeleteById");
+            throw new Error("Missing required parameter id when calling durationTimeDeleteById");
         }
-        const baseUrl = `/Feedbacks/{id}`
+        const baseUrl = `/DurationTimes/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
@@ -9205,12 +4753,12 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    feedbackExistsGetFeedbacksidExists(params: {  "id": string; }, options?: any): FetchArgs {
+    durationTimeExistsGetDurationTimesidExists(params: {  "id": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling feedbackExistsGetFeedbacksidExists");
+            throw new Error("Missing required parameter id when calling durationTimeExistsGetDurationTimesidExists");
         }
-        const baseUrl = `/Feedbacks/{id}/exists`
+        const baseUrl = `/DurationTimes/{id}/exists`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
@@ -9229,12 +4777,12 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    feedbackExistsHeadFeedbacksid(params: {  "id": string; }, options?: any): FetchArgs {
+    durationTimeExistsHeadDurationTimesid(params: {  "id": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling feedbackExistsHeadFeedbacksid");
+            throw new Error("Missing required parameter id when calling durationTimeExistsHeadDurationTimesid");
         }
-        const baseUrl = `/Feedbacks/{id}`
+        const baseUrl = `/DurationTimes/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "HEAD" }, options);
@@ -9253,8 +4801,8 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Find all instances of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    feedbackFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks`;
+    durationTimeFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "filter": params["filter"],
@@ -9276,12 +4824,12 @@ export const FeedbackApiFetchParamCreator = {
      * @param id Model id
      * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
      */
-    feedbackFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
+    durationTimeFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling feedbackFindById");
+            throw new Error("Missing required parameter id when calling durationTimeFindById");
         }
-        const baseUrl = `/Feedbacks/{id}`
+        const baseUrl = `/DurationTimes/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
@@ -9303,8 +4851,8 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    feedbackFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks/findOne`;
+    durationTimeFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes/findOne`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "filter": params["filter"],
@@ -9325,8 +4873,8 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Patch an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    feedbackPatchOrCreate(params: {  "data"?: Feedback; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks`;
+    durationTimePatchOrCreate(params: {  "data"?: DurationTime; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
 
@@ -9345,16 +4893,16 @@ export const FeedbackApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Fetches belongsTo relation account.
-     * @param id Feedback id
+     * @summary Fetches belongsTo relation leader.
+     * @param id DurationTime id
      * @param refresh 
      */
-    feedbackPrototypeGetAccount(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
+    durationTimePrototypeGetLeader(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling feedbackPrototypeGetAccount");
+            throw new Error("Missing required parameter id when calling durationTimePrototypeGetLeader");
         }
-        const baseUrl = `/Feedbacks/{id}/account`
+        const baseUrl = `/DurationTimes/{id}/leader`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
@@ -9374,15 +4922,15 @@ export const FeedbackApiFetchParamCreator = {
     /**
      * 
      * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Feedback id
+     * @param id DurationTime id
      * @param data An object of model property name/value pairs
      */
-    feedbackPrototypePatchAttributes(params: {  "id": string; "data"?: Feedback; }, options?: any): FetchArgs {
+    durationTimePrototypePatchAttributes(params: {  "id": string; "data"?: DurationTime; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling feedbackPrototypePatchAttributes");
+            throw new Error("Missing required parameter id when calling durationTimePrototypePatchAttributes");
         }
-        const baseUrl = `/Feedbacks/{id}`
+        const baseUrl = `/DurationTimes/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
@@ -9406,12 +4954,12 @@ export const FeedbackApiFetchParamCreator = {
      * @param id Model id
      * @param data Model instance data
      */
-    feedbackReplaceByIdPostFeedbacksidReplace(params: {  "id": string; "data"?: Feedback; }, options?: any): FetchArgs {
+    durationTimeReplaceByIdPostDurationTimesidReplace(params: {  "id": string; "data"?: DurationTime; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling feedbackReplaceByIdPostFeedbacksidReplace");
+            throw new Error("Missing required parameter id when calling durationTimeReplaceByIdPostDurationTimesidReplace");
         }
-        const baseUrl = `/Feedbacks/{id}/replace`
+        const baseUrl = `/DurationTimes/{id}/replace`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
@@ -9435,12 +4983,12 @@ export const FeedbackApiFetchParamCreator = {
      * @param id Model id
      * @param data Model instance data
      */
-    feedbackReplaceByIdPutFeedbacksid(params: {  "id": string; "data"?: Feedback; }, options?: any): FetchArgs {
+    durationTimeReplaceByIdPutDurationTimesid(params: {  "id": string; "data"?: DurationTime; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling feedbackReplaceByIdPutFeedbacksid");
+            throw new Error("Missing required parameter id when calling durationTimeReplaceByIdPutDurationTimesid");
         }
-        const baseUrl = `/Feedbacks/{id}`
+        const baseUrl = `/DurationTimes/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
@@ -9463,8 +5011,8 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    feedbackReplaceOrCreatePostFeedbacksReplaceOrCreate(params: {  "data"?: Feedback; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks/replaceOrCreate`;
+    durationTimeReplaceOrCreatePostDurationTimesReplaceOrCreate(params: {  "data"?: DurationTime; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes/replaceOrCreate`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
 
@@ -9486,8 +5034,8 @@ export const FeedbackApiFetchParamCreator = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    feedbackReplaceOrCreatePutFeedbacks(params: {  "data"?: Feedback; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks`;
+    durationTimeReplaceOrCreatePutDurationTimes(params: {  "data"?: DurationTime; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
 
@@ -9510,8 +5058,8 @@ export const FeedbackApiFetchParamCreator = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    feedbackUpdateAll(params: {  "where"?: string; "data"?: Feedback; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks/update`;
+    durationTimeUpdateAll(params: {  "where"?: string; "data"?: DurationTime; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes/update`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "where": params["where"],
@@ -9537,8 +5085,8 @@ export const FeedbackApiFetchParamCreator = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    feedbackUpsertWithWhere(params: {  "where"?: string; "data"?: Feedback; }, options?: any): FetchArgs {
-        const baseUrl = `/Feedbacks/upsertWithWhere`;
+    durationTimeUpsertWithWhere(params: {  "where"?: string; "data"?: DurationTime; }, options?: any): FetchArgs {
+        const baseUrl = `/DurationTimes/upsertWithWhere`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "where": params["where"],
@@ -9561,16 +5109,16 @@ export const FeedbackApiFetchParamCreator = {
 };
 
 /**
- * FeedbackApi - functional programming interface
+ * DurationTimeApi - functional programming interface
  */
-export const FeedbackApiFp = {
+export const DurationTimeApiFp = {
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    feedbackCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackCount(params, options);
+    durationTimeCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9586,8 +5134,8 @@ export const FeedbackApiFp = {
      * @summary Create a new instance of the model and persist it into the data source.
      * @param data Model instance data
      */
-    feedbackCreate(params: { "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Feedback> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackCreate(params, options);
+    durationTimeCreate(params: { "data"?: DurationTime;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeCreate(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9603,8 +5151,8 @@ export const FeedbackApiFp = {
      * @summary Create a change stream.
      * @param options 
      */
-    feedbackCreateChangeStreamGetFeedbacksChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackCreateChangeStreamGetFeedbacksChangeStream(params, options);
+    durationTimeCreateChangeStreamGetDurationTimesChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeCreateChangeStreamGetDurationTimesChangeStream(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9620,8 +5168,8 @@ export const FeedbackApiFp = {
      * @summary Create a change stream.
      * @param options 
      */
-    feedbackCreateChangeStreamPostFeedbacksChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackCreateChangeStreamPostFeedbacksChangeStream(params, options);
+    durationTimeCreateChangeStreamPostDurationTimesChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeCreateChangeStreamPostDurationTimesChangeStream(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9637,8 +5185,8 @@ export const FeedbackApiFp = {
      * @summary Delete a model instance by {{id}} from the data source.
      * @param id Model id
      */
-    feedbackDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackDeleteById(params, options);
+    durationTimeDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeDeleteById(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9654,8 +5202,8 @@ export const FeedbackApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    feedbackExistsGetFeedbacksidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackExistsGetFeedbacksidExists(params, options);
+    durationTimeExistsGetDurationTimesidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeExistsGetDurationTimesidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9671,8 +5219,8 @@ export const FeedbackApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    feedbackExistsHeadFeedbacksid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackExistsHeadFeedbacksid(params, options);
+    durationTimeExistsHeadDurationTimesid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeExistsHeadDurationTimesid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9688,8 +5236,8 @@ export const FeedbackApiFp = {
      * @summary Find all instances of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    feedbackFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Feedback>> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackFind(params, options);
+    durationTimeFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<DurationTime>> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeFind(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9706,8 +5254,8 @@ export const FeedbackApiFp = {
      * @param id Model id
      * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
      */
-    feedbackFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Feedback> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackFindById(params, options);
+    durationTimeFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeFindById(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9723,8 +5271,8 @@ export const FeedbackApiFp = {
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    feedbackFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Feedback> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackFindOne(params, options);
+    durationTimeFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeFindOne(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9740,8 +5288,8 @@ export const FeedbackApiFp = {
      * @summary Patch an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    feedbackPatchOrCreate(params: { "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Feedback> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackPatchOrCreate(params, options);
+    durationTimePatchOrCreate(params: { "data"?: DurationTime;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimePatchOrCreate(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9754,12 +5302,12 @@ export const FeedbackApiFp = {
     },
     /**
      * 
-     * @summary Fetches belongsTo relation account.
-     * @param id Feedback id
+     * @summary Fetches belongsTo relation leader.
+     * @param id DurationTime id
      * @param refresh 
      */
-    feedbackPrototypeGetAccount(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Account> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackPrototypeGetAccount(params, options);
+    durationTimePrototypeGetLeader(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Account> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimePrototypeGetLeader(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9773,11 +5321,11 @@ export const FeedbackApiFp = {
     /**
      * 
      * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Feedback id
+     * @param id DurationTime id
      * @param data An object of model property name/value pairs
      */
-    feedbackPrototypePatchAttributes(params: { "id": string; "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Feedback> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackPrototypePatchAttributes(params, options);
+    durationTimePrototypePatchAttributes(params: { "id": string; "data"?: DurationTime;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimePrototypePatchAttributes(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9794,8 +5342,8 @@ export const FeedbackApiFp = {
      * @param id Model id
      * @param data Model instance data
      */
-    feedbackReplaceByIdPostFeedbacksidReplace(params: { "id": string; "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Feedback> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackReplaceByIdPostFeedbacksidReplace(params, options);
+    durationTimeReplaceByIdPostDurationTimesidReplace(params: { "id": string; "data"?: DurationTime;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeReplaceByIdPostDurationTimesidReplace(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9812,8 +5360,8 @@ export const FeedbackApiFp = {
      * @param id Model id
      * @param data Model instance data
      */
-    feedbackReplaceByIdPutFeedbacksid(params: { "id": string; "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Feedback> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackReplaceByIdPutFeedbacksid(params, options);
+    durationTimeReplaceByIdPutDurationTimesid(params: { "id": string; "data"?: DurationTime;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeReplaceByIdPutDurationTimesid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9829,8 +5377,8 @@ export const FeedbackApiFp = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    feedbackReplaceOrCreatePostFeedbacksReplaceOrCreate(params: { "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Feedback> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackReplaceOrCreatePostFeedbacksReplaceOrCreate(params, options);
+    durationTimeReplaceOrCreatePostDurationTimesReplaceOrCreate(params: { "data"?: DurationTime;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeReplaceOrCreatePostDurationTimesReplaceOrCreate(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9846,8 +5394,8 @@ export const FeedbackApiFp = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    feedbackReplaceOrCreatePutFeedbacks(params: { "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Feedback> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackReplaceOrCreatePutFeedbacks(params, options);
+    durationTimeReplaceOrCreatePutDurationTimes(params: { "data"?: DurationTime;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeReplaceOrCreatePutDurationTimes(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9864,8 +5412,8 @@ export const FeedbackApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    feedbackUpdateAll(params: { "where"?: string; "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackUpdateAll(params, options);
+    durationTimeUpdateAll(params: { "where"?: string; "data"?: DurationTime;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9882,8 +5430,8 @@ export const FeedbackApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    feedbackUpsertWithWhere(params: { "where"?: string; "data"?: Feedback;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Feedback> {
-        const fetchArgs = FeedbackApiFetchParamCreator.feedbackUpsertWithWhere(params, options);
+    durationTimeUpsertWithWhere(params: { "where"?: string; "data"?: DurationTime;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = DurationTimeApiFetchParamCreator.durationTimeUpsertWithWhere(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -9897,72 +5445,72 @@ export const FeedbackApiFp = {
 };
 
 /**
- * FeedbackApi - object-oriented interface
+ * DurationTimeApi - object-oriented interface
  */
-export class FeedbackApi extends BaseAPI {
+export class DurationTimeApi extends BaseAPI {
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    feedbackCount(params: {  "where"?: string; }, options?: any) {
-        return FeedbackApiFp.feedbackCount(params, options)(this.fetch, this.basePath);
+    durationTimeCount(params: {  "where"?: string; }, options?: any) {
+        return DurationTimeApiFp.durationTimeCount(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Create a new instance of the model and persist it into the data source.
      * @param data Model instance data
      */
-    feedbackCreate(params: {  "data"?: Feedback; }, options?: any) {
-        return FeedbackApiFp.feedbackCreate(params, options)(this.fetch, this.basePath);
+    durationTimeCreate(params: {  "data"?: DurationTime; }, options?: any) {
+        return DurationTimeApiFp.durationTimeCreate(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Create a change stream.
      * @param options 
      */
-    feedbackCreateChangeStreamGetFeedbacksChangeStream(params: {  "options"?: string; }, options?: any) {
-        return FeedbackApiFp.feedbackCreateChangeStreamGetFeedbacksChangeStream(params, options)(this.fetch, this.basePath);
+    durationTimeCreateChangeStreamGetDurationTimesChangeStream(params: {  "options"?: string; }, options?: any) {
+        return DurationTimeApiFp.durationTimeCreateChangeStreamGetDurationTimesChangeStream(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Create a change stream.
      * @param options 
      */
-    feedbackCreateChangeStreamPostFeedbacksChangeStream(params: {  "options"?: string; }, options?: any) {
-        return FeedbackApiFp.feedbackCreateChangeStreamPostFeedbacksChangeStream(params, options)(this.fetch, this.basePath);
+    durationTimeCreateChangeStreamPostDurationTimesChangeStream(params: {  "options"?: string; }, options?: any) {
+        return DurationTimeApiFp.durationTimeCreateChangeStreamPostDurationTimesChangeStream(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Delete a model instance by {{id}} from the data source.
      * @param id Model id
      */
-    feedbackDeleteById(params: {  "id": string; }, options?: any) {
-        return FeedbackApiFp.feedbackDeleteById(params, options)(this.fetch, this.basePath);
+    durationTimeDeleteById(params: {  "id": string; }, options?: any) {
+        return DurationTimeApiFp.durationTimeDeleteById(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    feedbackExistsGetFeedbacksidExists(params: {  "id": string; }, options?: any) {
-        return FeedbackApiFp.feedbackExistsGetFeedbacksidExists(params, options)(this.fetch, this.basePath);
+    durationTimeExistsGetDurationTimesidExists(params: {  "id": string; }, options?: any) {
+        return DurationTimeApiFp.durationTimeExistsGetDurationTimesidExists(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    feedbackExistsHeadFeedbacksid(params: {  "id": string; }, options?: any) {
-        return FeedbackApiFp.feedbackExistsHeadFeedbacksid(params, options)(this.fetch, this.basePath);
+    durationTimeExistsHeadDurationTimesid(params: {  "id": string; }, options?: any) {
+        return DurationTimeApiFp.durationTimeExistsHeadDurationTimesid(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Find all instances of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    feedbackFind(params: {  "filter"?: string; }, options?: any) {
-        return FeedbackApiFp.feedbackFind(params, options)(this.fetch, this.basePath);
+    durationTimeFind(params: {  "filter"?: string; }, options?: any) {
+        return DurationTimeApiFp.durationTimeFind(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -9970,42 +5518,42 @@ export class FeedbackApi extends BaseAPI {
      * @param id Model id
      * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
      */
-    feedbackFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-        return FeedbackApiFp.feedbackFindById(params, options)(this.fetch, this.basePath);
+    durationTimeFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
+        return DurationTimeApiFp.durationTimeFindById(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    feedbackFindOne(params: {  "filter"?: string; }, options?: any) {
-        return FeedbackApiFp.feedbackFindOne(params, options)(this.fetch, this.basePath);
+    durationTimeFindOne(params: {  "filter"?: string; }, options?: any) {
+        return DurationTimeApiFp.durationTimeFindOne(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Patch an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    feedbackPatchOrCreate(params: {  "data"?: Feedback; }, options?: any) {
-        return FeedbackApiFp.feedbackPatchOrCreate(params, options)(this.fetch, this.basePath);
+    durationTimePatchOrCreate(params: {  "data"?: DurationTime; }, options?: any) {
+        return DurationTimeApiFp.durationTimePatchOrCreate(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Fetches belongsTo relation account.
-     * @param id Feedback id
+     * @summary Fetches belongsTo relation leader.
+     * @param id DurationTime id
      * @param refresh 
      */
-    feedbackPrototypeGetAccount(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-        return FeedbackApiFp.feedbackPrototypeGetAccount(params, options)(this.fetch, this.basePath);
+    durationTimePrototypeGetLeader(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+        return DurationTimeApiFp.durationTimePrototypeGetLeader(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Feedback id
+     * @param id DurationTime id
      * @param data An object of model property name/value pairs
      */
-    feedbackPrototypePatchAttributes(params: {  "id": string; "data"?: Feedback; }, options?: any) {
-        return FeedbackApiFp.feedbackPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
+    durationTimePrototypePatchAttributes(params: {  "id": string; "data"?: DurationTime; }, options?: any) {
+        return DurationTimeApiFp.durationTimePrototypePatchAttributes(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -10013,8 +5561,8 @@ export class FeedbackApi extends BaseAPI {
      * @param id Model id
      * @param data Model instance data
      */
-    feedbackReplaceByIdPostFeedbacksidReplace(params: {  "id": string; "data"?: Feedback; }, options?: any) {
-        return FeedbackApiFp.feedbackReplaceByIdPostFeedbacksidReplace(params, options)(this.fetch, this.basePath);
+    durationTimeReplaceByIdPostDurationTimesidReplace(params: {  "id": string; "data"?: DurationTime; }, options?: any) {
+        return DurationTimeApiFp.durationTimeReplaceByIdPostDurationTimesidReplace(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -10022,24 +5570,24 @@ export class FeedbackApi extends BaseAPI {
      * @param id Model id
      * @param data Model instance data
      */
-    feedbackReplaceByIdPutFeedbacksid(params: {  "id": string; "data"?: Feedback; }, options?: any) {
-        return FeedbackApiFp.feedbackReplaceByIdPutFeedbacksid(params, options)(this.fetch, this.basePath);
+    durationTimeReplaceByIdPutDurationTimesid(params: {  "id": string; "data"?: DurationTime; }, options?: any) {
+        return DurationTimeApiFp.durationTimeReplaceByIdPutDurationTimesid(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    feedbackReplaceOrCreatePostFeedbacksReplaceOrCreate(params: {  "data"?: Feedback; }, options?: any) {
-        return FeedbackApiFp.feedbackReplaceOrCreatePostFeedbacksReplaceOrCreate(params, options)(this.fetch, this.basePath);
+    durationTimeReplaceOrCreatePostDurationTimesReplaceOrCreate(params: {  "data"?: DurationTime; }, options?: any) {
+        return DurationTimeApiFp.durationTimeReplaceOrCreatePostDurationTimesReplaceOrCreate(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    feedbackReplaceOrCreatePutFeedbacks(params: {  "data"?: Feedback; }, options?: any) {
-        return FeedbackApiFp.feedbackReplaceOrCreatePutFeedbacks(params, options)(this.fetch, this.basePath);
+    durationTimeReplaceOrCreatePutDurationTimes(params: {  "data"?: DurationTime; }, options?: any) {
+        return DurationTimeApiFp.durationTimeReplaceOrCreatePutDurationTimes(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -10047,8 +5595,8 @@ export class FeedbackApi extends BaseAPI {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    feedbackUpdateAll(params: {  "where"?: string; "data"?: Feedback; }, options?: any) {
-        return FeedbackApiFp.feedbackUpdateAll(params, options)(this.fetch, this.basePath);
+    durationTimeUpdateAll(params: {  "where"?: string; "data"?: DurationTime; }, options?: any) {
+        return DurationTimeApiFp.durationTimeUpdateAll(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -10056,79 +5604,79 @@ export class FeedbackApi extends BaseAPI {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    feedbackUpsertWithWhere(params: {  "where"?: string; "data"?: Feedback; }, options?: any) {
-        return FeedbackApiFp.feedbackUpsertWithWhere(params, options)(this.fetch, this.basePath);
+    durationTimeUpsertWithWhere(params: {  "where"?: string; "data"?: DurationTime; }, options?: any) {
+        return DurationTimeApiFp.durationTimeUpsertWithWhere(params, options)(this.fetch, this.basePath);
     }
 };
 
 /**
- * FeedbackApi - factory interface
+ * DurationTimeApi - factory interface
  */
-export const FeedbackApiFactory = function (fetch?: FetchAPI, basePath?: string) {
+export const DurationTimeApiFactory = function (fetch?: FetchAPI, basePath?: string) {
     return {
         /**
          * 
          * @summary Count instances of the model matched by where from the data source.
          * @param where Criteria to match model instances
          */
-        feedbackCount(params: {  "where"?: string; }, options?: any) {
-            return FeedbackApiFp.feedbackCount(params, options)(fetch, basePath);
+        durationTimeCount(params: {  "where"?: string; }, options?: any) {
+            return DurationTimeApiFp.durationTimeCount(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Create a new instance of the model and persist it into the data source.
          * @param data Model instance data
          */
-        feedbackCreate(params: {  "data"?: Feedback; }, options?: any) {
-            return FeedbackApiFp.feedbackCreate(params, options)(fetch, basePath);
+        durationTimeCreate(params: {  "data"?: DurationTime; }, options?: any) {
+            return DurationTimeApiFp.durationTimeCreate(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Create a change stream.
          * @param options 
          */
-        feedbackCreateChangeStreamGetFeedbacksChangeStream(params: {  "options"?: string; }, options?: any) {
-            return FeedbackApiFp.feedbackCreateChangeStreamGetFeedbacksChangeStream(params, options)(fetch, basePath);
+        durationTimeCreateChangeStreamGetDurationTimesChangeStream(params: {  "options"?: string; }, options?: any) {
+            return DurationTimeApiFp.durationTimeCreateChangeStreamGetDurationTimesChangeStream(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Create a change stream.
          * @param options 
          */
-        feedbackCreateChangeStreamPostFeedbacksChangeStream(params: {  "options"?: string; }, options?: any) {
-            return FeedbackApiFp.feedbackCreateChangeStreamPostFeedbacksChangeStream(params, options)(fetch, basePath);
+        durationTimeCreateChangeStreamPostDurationTimesChangeStream(params: {  "options"?: string; }, options?: any) {
+            return DurationTimeApiFp.durationTimeCreateChangeStreamPostDurationTimesChangeStream(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Delete a model instance by {{id}} from the data source.
          * @param id Model id
          */
-        feedbackDeleteById(params: {  "id": string; }, options?: any) {
-            return FeedbackApiFp.feedbackDeleteById(params, options)(fetch, basePath);
+        durationTimeDeleteById(params: {  "id": string; }, options?: any) {
+            return DurationTimeApiFp.durationTimeDeleteById(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Check whether a model instance exists in the data source.
          * @param id Model id
          */
-        feedbackExistsGetFeedbacksidExists(params: {  "id": string; }, options?: any) {
-            return FeedbackApiFp.feedbackExistsGetFeedbacksidExists(params, options)(fetch, basePath);
+        durationTimeExistsGetDurationTimesidExists(params: {  "id": string; }, options?: any) {
+            return DurationTimeApiFp.durationTimeExistsGetDurationTimesidExists(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Check whether a model instance exists in the data source.
          * @param id Model id
          */
-        feedbackExistsHeadFeedbacksid(params: {  "id": string; }, options?: any) {
-            return FeedbackApiFp.feedbackExistsHeadFeedbacksid(params, options)(fetch, basePath);
+        durationTimeExistsHeadDurationTimesid(params: {  "id": string; }, options?: any) {
+            return DurationTimeApiFp.durationTimeExistsHeadDurationTimesid(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Find all instances of the model matched by filter from the data source.
          * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
          */
-        feedbackFind(params: {  "filter"?: string; }, options?: any) {
-            return FeedbackApiFp.feedbackFind(params, options)(fetch, basePath);
+        durationTimeFind(params: {  "filter"?: string; }, options?: any) {
+            return DurationTimeApiFp.durationTimeFind(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -10136,42 +5684,42 @@ export const FeedbackApiFactory = function (fetch?: FetchAPI, basePath?: string)
          * @param id Model id
          * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
          */
-        feedbackFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-            return FeedbackApiFp.feedbackFindById(params, options)(fetch, basePath);
+        durationTimeFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
+            return DurationTimeApiFp.durationTimeFindById(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Find first instance of the model matched by filter from the data source.
          * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
          */
-        feedbackFindOne(params: {  "filter"?: string; }, options?: any) {
-            return FeedbackApiFp.feedbackFindOne(params, options)(fetch, basePath);
+        durationTimeFindOne(params: {  "filter"?: string; }, options?: any) {
+            return DurationTimeApiFp.durationTimeFindOne(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Patch an existing model instance or insert a new one into the data source.
          * @param data Model instance data
          */
-        feedbackPatchOrCreate(params: {  "data"?: Feedback; }, options?: any) {
-            return FeedbackApiFp.feedbackPatchOrCreate(params, options)(fetch, basePath);
+        durationTimePatchOrCreate(params: {  "data"?: DurationTime; }, options?: any) {
+            return DurationTimeApiFp.durationTimePatchOrCreate(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Fetches belongsTo relation account.
-         * @param id Feedback id
+         * @summary Fetches belongsTo relation leader.
+         * @param id DurationTime id
          * @param refresh 
          */
-        feedbackPrototypeGetAccount(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-            return FeedbackApiFp.feedbackPrototypeGetAccount(params, options)(fetch, basePath);
+        durationTimePrototypeGetLeader(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+            return DurationTimeApiFp.durationTimePrototypeGetLeader(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Patch attributes for a model instance and persist it into the data source.
-         * @param id Feedback id
+         * @param id DurationTime id
          * @param data An object of model property name/value pairs
          */
-        feedbackPrototypePatchAttributes(params: {  "id": string; "data"?: Feedback; }, options?: any) {
-            return FeedbackApiFp.feedbackPrototypePatchAttributes(params, options)(fetch, basePath);
+        durationTimePrototypePatchAttributes(params: {  "id": string; "data"?: DurationTime; }, options?: any) {
+            return DurationTimeApiFp.durationTimePrototypePatchAttributes(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -10179,8 +5727,8 @@ export const FeedbackApiFactory = function (fetch?: FetchAPI, basePath?: string)
          * @param id Model id
          * @param data Model instance data
          */
-        feedbackReplaceByIdPostFeedbacksidReplace(params: {  "id": string; "data"?: Feedback; }, options?: any) {
-            return FeedbackApiFp.feedbackReplaceByIdPostFeedbacksidReplace(params, options)(fetch, basePath);
+        durationTimeReplaceByIdPostDurationTimesidReplace(params: {  "id": string; "data"?: DurationTime; }, options?: any) {
+            return DurationTimeApiFp.durationTimeReplaceByIdPostDurationTimesidReplace(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -10188,24 +5736,24 @@ export const FeedbackApiFactory = function (fetch?: FetchAPI, basePath?: string)
          * @param id Model id
          * @param data Model instance data
          */
-        feedbackReplaceByIdPutFeedbacksid(params: {  "id": string; "data"?: Feedback; }, options?: any) {
-            return FeedbackApiFp.feedbackReplaceByIdPutFeedbacksid(params, options)(fetch, basePath);
+        durationTimeReplaceByIdPutDurationTimesid(params: {  "id": string; "data"?: DurationTime; }, options?: any) {
+            return DurationTimeApiFp.durationTimeReplaceByIdPutDurationTimesid(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Replace an existing model instance or insert a new one into the data source.
          * @param data Model instance data
          */
-        feedbackReplaceOrCreatePostFeedbacksReplaceOrCreate(params: {  "data"?: Feedback; }, options?: any) {
-            return FeedbackApiFp.feedbackReplaceOrCreatePostFeedbacksReplaceOrCreate(params, options)(fetch, basePath);
+        durationTimeReplaceOrCreatePostDurationTimesReplaceOrCreate(params: {  "data"?: DurationTime; }, options?: any) {
+            return DurationTimeApiFp.durationTimeReplaceOrCreatePostDurationTimesReplaceOrCreate(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Replace an existing model instance or insert a new one into the data source.
          * @param data Model instance data
          */
-        feedbackReplaceOrCreatePutFeedbacks(params: {  "data"?: Feedback; }, options?: any) {
-            return FeedbackApiFp.feedbackReplaceOrCreatePutFeedbacks(params, options)(fetch, basePath);
+        durationTimeReplaceOrCreatePutDurationTimes(params: {  "data"?: DurationTime; }, options?: any) {
+            return DurationTimeApiFp.durationTimeReplaceOrCreatePutDurationTimes(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -10213,8 +5761,8 @@ export const FeedbackApiFactory = function (fetch?: FetchAPI, basePath?: string)
          * @param where Criteria to match model instances
          * @param data An object of model property name/value pairs
          */
-        feedbackUpdateAll(params: {  "where"?: string; "data"?: Feedback; }, options?: any) {
-            return FeedbackApiFp.feedbackUpdateAll(params, options)(fetch, basePath);
+        durationTimeUpdateAll(params: {  "where"?: string; "data"?: DurationTime; }, options?: any) {
+            return DurationTimeApiFp.durationTimeUpdateAll(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -10222,8 +5770,8 @@ export const FeedbackApiFactory = function (fetch?: FetchAPI, basePath?: string)
          * @param where Criteria to match model instances
          * @param data An object of model property name/value pairs
          */
-        feedbackUpsertWithWhere(params: {  "where"?: string; "data"?: Feedback; }, options?: any) {
-            return FeedbackApiFp.feedbackUpsertWithWhere(params, options)(fetch, basePath);
+        durationTimeUpsertWithWhere(params: {  "where"?: string; "data"?: DurationTime; }, options?: any) {
+            return DurationTimeApiFp.durationTimeUpsertWithWhere(params, options)(fetch, basePath);
         },
     };
 };
@@ -10233,32 +5781,6 @@ export const FeedbackApiFactory = function (fetch?: FetchAPI, basePath?: string)
  * OrderApi - fetch parameter creator
  */
 export const OrderApiFetchParamCreator = {
-    /**
-     * 
-     * @summary check order by account token and product
-     * @param product product
-     */
-    orderAddToCart(params: {  "product": string; }, options?: any): FetchArgs {
-        // verify required parameter "product" is set
-        if (params["product"] == null) {
-            throw new Error("Missing required parameter product when calling orderAddToCart");
-        }
-        const baseUrl = `/Orders/add-to-cart`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "product": params["product"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
@@ -10518,204 +6040,6 @@ export const OrderApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary payment online
-     * @param data information payment
-     */
-    orderPaymentOrder(params: {  "data": any; }, options?: any): FetchArgs {
-        // verify required parameter "data" is set
-        if (params["data"] == null) {
-            throw new Error("Missing required parameter data when calling orderPaymentOrder");
-        }
-        const baseUrl = `/Orders/payment-order`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Counts product of Order.
-     * @param id Order id
-     * @param where Criteria to match model instances
-     */
-    orderPrototypeCountProduct(params: {  "id": string; "where"?: string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderPrototypeCountProduct");
-        }
-        const baseUrl = `/Orders/{id}/product/count`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Creates a new instance in product of this model.
-     * @param id Order id
-     * @param data 
-     */
-    orderPrototypeCreateProduct(params: {  "id": string; "data"?: Product; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderPrototypeCreateProduct");
-        }
-        const baseUrl = `/Orders/{id}/product`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Deletes all product of this model.
-     * @param id Order id
-     */
-    orderPrototypeDeleteProduct(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderPrototypeDeleteProduct");
-        }
-        const baseUrl = `/Orders/{id}/product`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Delete a related item by id for product.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeDestroyByIdProduct(params: {  "id": string; "fk": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderPrototypeDestroyByIdProduct");
-        }
-        // verify required parameter "fk" is set
-        if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling orderPrototypeDestroyByIdProduct");
-        }
-        const baseUrl = `/Orders/{id}/product/{fk}`
-            .replace(`{${"id"}}`, `${ params["id"] }`)
-            .replace(`{${"fk"}}`, `${ params["fk"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check the existence of product relation to an item by id.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeExistsProduct(params: {  "id": string; "fk": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderPrototypeExistsProduct");
-        }
-        // verify required parameter "fk" is set
-        if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling orderPrototypeExistsProduct");
-        }
-        const baseUrl = `/Orders/{id}/product/rel/{fk}`
-            .replace(`{${"id"}}`, `${ params["id"] }`)
-            .replace(`{${"fk"}}`, `${ params["fk"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "HEAD" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find a related item by id for product.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeFindByIdProduct(params: {  "id": string; "fk": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderPrototypeFindByIdProduct");
-        }
-        // verify required parameter "fk" is set
-        if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling orderPrototypeFindByIdProduct");
-        }
-        const baseUrl = `/Orders/{id}/product/{fk}`
-            .replace(`{${"id"}}`, `${ params["id"] }`)
-            .replace(`{${"fk"}}`, `${ params["fk"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
      * @summary Fetches belongsTo relation account.
      * @param id Order id
      * @param refresh 
@@ -10744,20 +6068,20 @@ export const OrderApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Queries product of Order.
+     * @summary Fetches belongsTo relation durationTime.
      * @param id Order id
-     * @param filter 
+     * @param refresh 
      */
-    orderPrototypeGetProduct(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
+    orderPrototypeGetDurationTime(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderPrototypeGetProduct");
+            throw new Error("Missing required parameter id when calling orderPrototypeGetDurationTime");
         }
-        const baseUrl = `/Orders/{id}/product`
+        const baseUrl = `/Orders/{id}/durationTime`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
+            "refresh": params["refresh"],
         });
         let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
 
@@ -10772,31 +6096,24 @@ export const OrderApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Add a related item by id for product.
+     * @summary Fetches belongsTo relation team.
      * @param id Order id
-     * @param fk Foreign key for product
-     * @param data 
+     * @param refresh 
      */
-    orderPrototypeLinkProduct(params: {  "id": string; "fk": string; "data"?: OrderProduct; }, options?: any): FetchArgs {
+    orderPrototypeGetTeam(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderPrototypeLinkProduct");
+            throw new Error("Missing required parameter id when calling orderPrototypeGetTeam");
         }
-        // verify required parameter "fk" is set
-        if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling orderPrototypeLinkProduct");
-        }
-        const baseUrl = `/Orders/{id}/product/rel/{fk}`
-            .replace(`{${"id"}}`, `${ params["id"] }`)
-            .replace(`{${"fk"}}`, `${ params["fk"] }`);
+        const baseUrl = `/Orders/{id}/team`
+            .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
+        urlObj.query = assign({}, urlObj.query, {
+            "refresh": params["refresh"],
+        });
+        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
 
         let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
         if (contentTypeHeader) {
             fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
         }
@@ -10820,71 +6137,6 @@ export const OrderApiFetchParamCreator = {
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Remove the product relation to an item by id.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeUnlinkProduct(params: {  "id": string; "fk": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderPrototypeUnlinkProduct");
-        }
-        // verify required parameter "fk" is set
-        if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling orderPrototypeUnlinkProduct");
-        }
-        const baseUrl = `/Orders/{id}/product/rel/{fk}`
-            .replace(`{${"id"}}`, `${ params["id"] }`)
-            .replace(`{${"fk"}}`, `${ params["fk"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update a related item by id for product.
-     * @param id Order id
-     * @param fk Foreign key for product
-     * @param data 
-     */
-    orderPrototypeUpdateByIdProduct(params: {  "id": string; "fk": string; "data"?: Product; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderPrototypeUpdateByIdProduct");
-        }
-        // verify required parameter "fk" is set
-        if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling orderPrototypeUpdateByIdProduct");
-        }
-        const baseUrl = `/Orders/{id}/product/{fk}`
-            .replace(`{${"id"}}`, `${ params["id"] }`)
-            .replace(`{${"fk"}}`, `${ params["fk"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
 
         let contentTypeHeader: Dictionary<string> = {};
         contentTypeHeader = { "Content-Type": "application/json" };
@@ -11005,58 +6257,6 @@ export const OrderApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary statistic order by year
-     * @param year year
-     */
-    orderStatisticByAmount(params: {  "year": number; }, options?: any): FetchArgs {
-        // verify required parameter "year" is set
-        if (params["year"] == null) {
-            throw new Error("Missing required parameter year when calling orderStatisticByAmount");
-        }
-        const baseUrl = `/Orders/statistic-amount`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "year": params["year"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary statistic order by year
-     * @param year year
-     */
-    orderStatisticByRevenue(params: {  "year": number; }, options?: any): FetchArgs {
-        // verify required parameter "year" is set
-        if (params["year"] == null) {
-            throw new Error("Missing required parameter year when calling orderStatisticByRevenue");
-        }
-        const baseUrl = `/Orders/statistic-revenue`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "year": params["year"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
      * @summary Update instances of the model matched by {{where}} from the data source.
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
@@ -11115,23 +6315,6 @@ export const OrderApiFetchParamCreator = {
  * OrderApi - functional programming interface
  */
 export const OrderApiFp = {
-    /**
-     * 
-     * @summary check order by account token and product
-     * @param product product
-     */
-    orderAddToCart(params: { "product": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<string> {
-        const fetchArgs = OrderApiFetchParamCreator.orderAddToCart(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
@@ -11322,130 +6505,6 @@ export const OrderApiFp = {
     },
     /**
      * 
-     * @summary payment online
-     * @param data information payment
-     */
-    orderPaymentOrder(params: { "data": any;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<string> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPaymentOrder(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Counts product of Order.
-     * @param id Order id
-     * @param where Criteria to match model instances
-     */
-    orderPrototypeCountProduct(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeCountProduct(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Creates a new instance in product of this model.
-     * @param id Order id
-     * @param data 
-     */
-    orderPrototypeCreateProduct(params: { "id": string; "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeCreateProduct(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Deletes all product of this model.
-     * @param id Order id
-     */
-    orderPrototypeDeleteProduct(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeDeleteProduct(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response;
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Delete a related item by id for product.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeDestroyByIdProduct(params: { "id": string; "fk": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeDestroyByIdProduct(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response;
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check the existence of product relation to an item by id.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeExistsProduct(params: { "id": string; "fk": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<boolean> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeExistsProduct(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find a related item by id for product.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeFindByIdProduct(params: { "id": string; "fk": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeFindByIdProduct(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
      * @summary Fetches belongsTo relation account.
      * @param id Order id
      * @param refresh 
@@ -11464,12 +6523,12 @@ export const OrderApiFp = {
     },
     /**
      * 
-     * @summary Queries product of Order.
+     * @summary Fetches belongsTo relation durationTime.
      * @param id Order id
-     * @param filter 
+     * @param refresh 
      */
-    orderPrototypeGetProduct(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Product>> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeGetProduct(params, options);
+    orderPrototypeGetDurationTime(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<DurationTime> {
+        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeGetDurationTime(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -11482,13 +6541,12 @@ export const OrderApiFp = {
     },
     /**
      * 
-     * @summary Add a related item by id for product.
+     * @summary Fetches belongsTo relation team.
      * @param id Order id
-     * @param fk Foreign key for product
-     * @param data 
+     * @param refresh 
      */
-    orderPrototypeLinkProduct(params: { "id": string; "fk": string; "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeLinkProduct(params, options);
+    orderPrototypeGetTeam(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeGetTeam(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -11507,43 +6565,6 @@ export const OrderApiFp = {
      */
     orderPrototypePatchAttributes(params: { "id": string; "data"?: Order;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Order> {
         const fetchArgs = OrderApiFetchParamCreator.orderPrototypePatchAttributes(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Remove the product relation to an item by id.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeUnlinkProduct(params: { "id": string; "fk": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeUnlinkProduct(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response;
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update a related item by id for product.
-     * @param id Order id
-     * @param fk Foreign key for product
-     * @param data 
-     */
-    orderPrototypeUpdateByIdProduct(params: { "id": string; "fk": string; "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = OrderApiFetchParamCreator.orderPrototypeUpdateByIdProduct(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -11626,40 +6647,6 @@ export const OrderApiFp = {
     },
     /**
      * 
-     * @summary statistic order by year
-     * @param year year
-     */
-    orderStatisticByAmount(params: { "year": number;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = OrderApiFetchParamCreator.orderStatisticByAmount(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary statistic order by year
-     * @param year year
-     */
-    orderStatisticByRevenue(params: { "year": number;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = OrderApiFetchParamCreator.orderStatisticByRevenue(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
      * @summary Update instances of the model matched by {{where}} from the data source.
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
@@ -11700,14 +6687,6 @@ export const OrderApiFp = {
  * OrderApi - object-oriented interface
  */
 export class OrderApi extends BaseAPI {
-    /**
-     * 
-     * @summary check order by account token and product
-     * @param product product
-     */
-    orderAddToCart(params: {  "product": string; }, options?: any) {
-        return OrderApiFp.orderAddToCart(params, options)(this.fetch, this.basePath);
-    }
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
@@ -11799,67 +6778,6 @@ export class OrderApi extends BaseAPI {
     }
     /**
      * 
-     * @summary payment online
-     * @param data information payment
-     */
-    orderPaymentOrder(params: {  "data": any; }, options?: any) {
-        return OrderApiFp.orderPaymentOrder(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Counts product of Order.
-     * @param id Order id
-     * @param where Criteria to match model instances
-     */
-    orderPrototypeCountProduct(params: {  "id": string; "where"?: string; }, options?: any) {
-        return OrderApiFp.orderPrototypeCountProduct(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Creates a new instance in product of this model.
-     * @param id Order id
-     * @param data 
-     */
-    orderPrototypeCreateProduct(params: {  "id": string; "data"?: Product; }, options?: any) {
-        return OrderApiFp.orderPrototypeCreateProduct(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Deletes all product of this model.
-     * @param id Order id
-     */
-    orderPrototypeDeleteProduct(params: {  "id": string; }, options?: any) {
-        return OrderApiFp.orderPrototypeDeleteProduct(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Delete a related item by id for product.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeDestroyByIdProduct(params: {  "id": string; "fk": string; }, options?: any) {
-        return OrderApiFp.orderPrototypeDestroyByIdProduct(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check the existence of product relation to an item by id.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeExistsProduct(params: {  "id": string; "fk": string; }, options?: any) {
-        return OrderApiFp.orderPrototypeExistsProduct(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find a related item by id for product.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeFindByIdProduct(params: {  "id": string; "fk": string; }, options?: any) {
-        return OrderApiFp.orderPrototypeFindByIdProduct(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
      * @summary Fetches belongsTo relation account.
      * @param id Order id
      * @param refresh 
@@ -11869,22 +6787,21 @@ export class OrderApi extends BaseAPI {
     }
     /**
      * 
-     * @summary Queries product of Order.
+     * @summary Fetches belongsTo relation durationTime.
      * @param id Order id
-     * @param filter 
+     * @param refresh 
      */
-    orderPrototypeGetProduct(params: {  "id": string; "filter"?: string; }, options?: any) {
-        return OrderApiFp.orderPrototypeGetProduct(params, options)(this.fetch, this.basePath);
+    orderPrototypeGetDurationTime(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+        return OrderApiFp.orderPrototypeGetDurationTime(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Add a related item by id for product.
+     * @summary Fetches belongsTo relation team.
      * @param id Order id
-     * @param fk Foreign key for product
-     * @param data 
+     * @param refresh 
      */
-    orderPrototypeLinkProduct(params: {  "id": string; "fk": string; "data"?: OrderProduct; }, options?: any) {
-        return OrderApiFp.orderPrototypeLinkProduct(params, options)(this.fetch, this.basePath);
+    orderPrototypeGetTeam(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+        return OrderApiFp.orderPrototypeGetTeam(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -11894,25 +6811,6 @@ export class OrderApi extends BaseAPI {
      */
     orderPrototypePatchAttributes(params: {  "id": string; "data"?: Order; }, options?: any) {
         return OrderApiFp.orderPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Remove the product relation to an item by id.
-     * @param id Order id
-     * @param fk Foreign key for product
-     */
-    orderPrototypeUnlinkProduct(params: {  "id": string; "fk": string; }, options?: any) {
-        return OrderApiFp.orderPrototypeUnlinkProduct(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update a related item by id for product.
-     * @param id Order id
-     * @param fk Foreign key for product
-     * @param data 
-     */
-    orderPrototypeUpdateByIdProduct(params: {  "id": string; "fk": string; "data"?: Product; }, options?: any) {
-        return OrderApiFp.orderPrototypeUpdateByIdProduct(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -11950,22 +6848,6 @@ export class OrderApi extends BaseAPI {
     }
     /**
      * 
-     * @summary statistic order by year
-     * @param year year
-     */
-    orderStatisticByAmount(params: {  "year": number; }, options?: any) {
-        return OrderApiFp.orderStatisticByAmount(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary statistic order by year
-     * @param year year
-     */
-    orderStatisticByRevenue(params: {  "year": number; }, options?: any) {
-        return OrderApiFp.orderStatisticByRevenue(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
      * @summary Update instances of the model matched by {{where}} from the data source.
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
@@ -11989,14 +6871,6 @@ export class OrderApi extends BaseAPI {
  */
 export const OrderApiFactory = function (fetch?: FetchAPI, basePath?: string) {
     return {
-        /**
-         * 
-         * @summary check order by account token and product
-         * @param product product
-         */
-        orderAddToCart(params: {  "product": string; }, options?: any) {
-            return OrderApiFp.orderAddToCart(params, options)(fetch, basePath);
-        },
         /**
          * 
          * @summary Count instances of the model matched by where from the data source.
@@ -12088,67 +6962,6 @@ export const OrderApiFactory = function (fetch?: FetchAPI, basePath?: string) {
         },
         /**
          * 
-         * @summary payment online
-         * @param data information payment
-         */
-        orderPaymentOrder(params: {  "data": any; }, options?: any) {
-            return OrderApiFp.orderPaymentOrder(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Counts product of Order.
-         * @param id Order id
-         * @param where Criteria to match model instances
-         */
-        orderPrototypeCountProduct(params: {  "id": string; "where"?: string; }, options?: any) {
-            return OrderApiFp.orderPrototypeCountProduct(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Creates a new instance in product of this model.
-         * @param id Order id
-         * @param data 
-         */
-        orderPrototypeCreateProduct(params: {  "id": string; "data"?: Product; }, options?: any) {
-            return OrderApiFp.orderPrototypeCreateProduct(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Deletes all product of this model.
-         * @param id Order id
-         */
-        orderPrototypeDeleteProduct(params: {  "id": string; }, options?: any) {
-            return OrderApiFp.orderPrototypeDeleteProduct(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Delete a related item by id for product.
-         * @param id Order id
-         * @param fk Foreign key for product
-         */
-        orderPrototypeDestroyByIdProduct(params: {  "id": string; "fk": string; }, options?: any) {
-            return OrderApiFp.orderPrototypeDestroyByIdProduct(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check the existence of product relation to an item by id.
-         * @param id Order id
-         * @param fk Foreign key for product
-         */
-        orderPrototypeExistsProduct(params: {  "id": string; "fk": string; }, options?: any) {
-            return OrderApiFp.orderPrototypeExistsProduct(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find a related item by id for product.
-         * @param id Order id
-         * @param fk Foreign key for product
-         */
-        orderPrototypeFindByIdProduct(params: {  "id": string; "fk": string; }, options?: any) {
-            return OrderApiFp.orderPrototypeFindByIdProduct(params, options)(fetch, basePath);
-        },
-        /**
-         * 
          * @summary Fetches belongsTo relation account.
          * @param id Order id
          * @param refresh 
@@ -12158,22 +6971,21 @@ export const OrderApiFactory = function (fetch?: FetchAPI, basePath?: string) {
         },
         /**
          * 
-         * @summary Queries product of Order.
+         * @summary Fetches belongsTo relation durationTime.
          * @param id Order id
-         * @param filter 
+         * @param refresh 
          */
-        orderPrototypeGetProduct(params: {  "id": string; "filter"?: string; }, options?: any) {
-            return OrderApiFp.orderPrototypeGetProduct(params, options)(fetch, basePath);
+        orderPrototypeGetDurationTime(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+            return OrderApiFp.orderPrototypeGetDurationTime(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Add a related item by id for product.
+         * @summary Fetches belongsTo relation team.
          * @param id Order id
-         * @param fk Foreign key for product
-         * @param data 
+         * @param refresh 
          */
-        orderPrototypeLinkProduct(params: {  "id": string; "fk": string; "data"?: OrderProduct; }, options?: any) {
-            return OrderApiFp.orderPrototypeLinkProduct(params, options)(fetch, basePath);
+        orderPrototypeGetTeam(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+            return OrderApiFp.orderPrototypeGetTeam(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -12183,25 +6995,6 @@ export const OrderApiFactory = function (fetch?: FetchAPI, basePath?: string) {
          */
         orderPrototypePatchAttributes(params: {  "id": string; "data"?: Order; }, options?: any) {
             return OrderApiFp.orderPrototypePatchAttributes(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Remove the product relation to an item by id.
-         * @param id Order id
-         * @param fk Foreign key for product
-         */
-        orderPrototypeUnlinkProduct(params: {  "id": string; "fk": string; }, options?: any) {
-            return OrderApiFp.orderPrototypeUnlinkProduct(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update a related item by id for product.
-         * @param id Order id
-         * @param fk Foreign key for product
-         * @param data 
-         */
-        orderPrototypeUpdateByIdProduct(params: {  "id": string; "fk": string; "data"?: Product; }, options?: any) {
-            return OrderApiFp.orderPrototypeUpdateByIdProduct(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -12239,22 +7032,6 @@ export const OrderApiFactory = function (fetch?: FetchAPI, basePath?: string) {
         },
         /**
          * 
-         * @summary statistic order by year
-         * @param year year
-         */
-        orderStatisticByAmount(params: {  "year": number; }, options?: any) {
-            return OrderApiFp.orderStatisticByAmount(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary statistic order by year
-         * @param year year
-         */
-        orderStatisticByRevenue(params: {  "year": number; }, options?: any) {
-            return OrderApiFp.orderStatisticByRevenue(params, options)(fetch, basePath);
-        },
-        /**
-         * 
          * @summary Update instances of the model matched by {{where}} from the data source.
          * @param where Criteria to match model instances
          * @param data An object of model property name/value pairs
@@ -12276,16 +7053,16 @@ export const OrderApiFactory = function (fetch?: FetchAPI, basePath?: string) {
 
 
 /**
- * OrderProductApi - fetch parameter creator
+ * TargetApi - fetch parameter creator
  */
-export const OrderProductApiFetchParamCreator = {
+export const TargetApiFetchParamCreator = {
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    orderProductCount(params: {  "where"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts/count`;
+    targetCount(params: {  "where"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets/count`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "where": params["where"],
@@ -12306,8 +7083,8 @@ export const OrderProductApiFetchParamCreator = {
      * @summary Create a new instance of the model and persist it into the data source.
      * @param data Model instance data
      */
-    orderProductCreate(params: {  "data"?: OrderProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts`;
+    targetCreate(params: {  "data"?: Target; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
 
@@ -12329,8 +7106,8 @@ export const OrderProductApiFetchParamCreator = {
      * @summary Create a change stream.
      * @param options 
      */
-    orderProductCreateChangeStreamGetOrderProductsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts/change-stream`;
+    targetCreateChangeStreamGetTargetsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets/change-stream`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "options": params["options"],
@@ -12351,8 +7128,8 @@ export const OrderProductApiFetchParamCreator = {
      * @summary Create a change stream.
      * @param options 
      */
-    orderProductCreateChangeStreamPostOrderProductsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts/change-stream`;
+    targetCreateChangeStreamPostTargetsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets/change-stream`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
 
@@ -12374,12 +7151,12 @@ export const OrderProductApiFetchParamCreator = {
      * @summary Delete a model instance by {{id}} from the data source.
      * @param id Model id
      */
-    orderProductDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
+    targetDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderProductDeleteById");
+            throw new Error("Missing required parameter id when calling targetDeleteById");
         }
-        const baseUrl = `/OrderProducts/{id}`
+        const baseUrl = `/Targets/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
@@ -12398,12 +7175,12 @@ export const OrderProductApiFetchParamCreator = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    orderProductExistsGetOrderProductsidExists(params: {  "id": string; }, options?: any): FetchArgs {
+    targetExistsGetTargetsidExists(params: {  "id": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderProductExistsGetOrderProductsidExists");
+            throw new Error("Missing required parameter id when calling targetExistsGetTargetsidExists");
         }
-        const baseUrl = `/OrderProducts/{id}/exists`
+        const baseUrl = `/Targets/{id}/exists`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
@@ -12422,12 +7199,12 @@ export const OrderProductApiFetchParamCreator = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    orderProductExistsHeadOrderProductsid(params: {  "id": string; }, options?: any): FetchArgs {
+    targetExistsHeadTargetsid(params: {  "id": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderProductExistsHeadOrderProductsid");
+            throw new Error("Missing required parameter id when calling targetExistsHeadTargetsid");
         }
-        const baseUrl = `/OrderProducts/{id}`
+        const baseUrl = `/Targets/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "HEAD" }, options);
@@ -12446,8 +7223,8 @@ export const OrderProductApiFetchParamCreator = {
      * @summary Find all instances of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    orderProductFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts`;
+    targetFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "filter": params["filter"],
@@ -12469,12 +7246,12 @@ export const OrderProductApiFetchParamCreator = {
      * @param id Model id
      * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
      */
-    orderProductFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
+    targetFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderProductFindById");
+            throw new Error("Missing required parameter id when calling targetFindById");
         }
-        const baseUrl = `/OrderProducts/{id}`
+        const baseUrl = `/Targets/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
@@ -12496,8 +7273,8 @@ export const OrderProductApiFetchParamCreator = {
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    orderProductFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts/findOne`;
+    targetFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets/findOne`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "filter": params["filter"],
@@ -12515,37 +7292,11 @@ export const OrderProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Get order product in cart by token
-     * @param user userId
-     */
-    orderProductGetOrder(params: {  "user": string; }, options?: any): FetchArgs {
-        // verify required parameter "user" is set
-        if (params["user"] == null) {
-            throw new Error("Missing required parameter user when calling orderProductGetOrder");
-        }
-        const baseUrl = `/OrderProducts/get-order-cart`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "user": params["user"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
      * @summary Patch an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    orderProductPatchOrCreate(params: {  "data"?: OrderProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts`;
+    targetPatchOrCreate(params: {  "data"?: Target; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
 
@@ -12564,44 +7315,16 @@ export const OrderProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Fetches belongsTo relation order.
-     * @param id OrderProduct id
+     * @summary Fetches belongsTo relation account.
+     * @param id Target id
      * @param refresh 
      */
-    orderProductPrototypeGetOrder(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
+    targetPrototypeGetAccount(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderProductPrototypeGetOrder");
+            throw new Error("Missing required parameter id when calling targetPrototypeGetAccount");
         }
-        const baseUrl = `/OrderProducts/{id}/order`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "refresh": params["refresh"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Fetches belongsTo relation product.
-     * @param id OrderProduct id
-     * @param refresh 
-     */
-    orderProductPrototypeGetProduct(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderProductPrototypeGetProduct");
-        }
-        const baseUrl = `/OrderProducts/{id}/product`
+        const baseUrl = `/Targets/{id}/account`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
@@ -12621,15 +7344,15 @@ export const OrderProductApiFetchParamCreator = {
     /**
      * 
      * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id OrderProduct id
+     * @param id Target id
      * @param data An object of model property name/value pairs
      */
-    orderProductPrototypePatchAttributes(params: {  "id": string; "data"?: OrderProduct; }, options?: any): FetchArgs {
+    targetPrototypePatchAttributes(params: {  "id": string; "data"?: Target; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderProductPrototypePatchAttributes");
+            throw new Error("Missing required parameter id when calling targetPrototypePatchAttributes");
         }
-        const baseUrl = `/OrderProducts/{id}`
+        const baseUrl = `/Targets/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
@@ -12653,12 +7376,12 @@ export const OrderProductApiFetchParamCreator = {
      * @param id Model id
      * @param data Model instance data
      */
-    orderProductReplaceByIdPostOrderProductsidReplace(params: {  "id": string; "data"?: OrderProduct; }, options?: any): FetchArgs {
+    targetReplaceByIdPostTargetsidReplace(params: {  "id": string; "data"?: Target; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderProductReplaceByIdPostOrderProductsidReplace");
+            throw new Error("Missing required parameter id when calling targetReplaceByIdPostTargetsidReplace");
         }
-        const baseUrl = `/OrderProducts/{id}/replace`
+        const baseUrl = `/Targets/{id}/replace`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
@@ -12682,12 +7405,12 @@ export const OrderProductApiFetchParamCreator = {
      * @param id Model id
      * @param data Model instance data
      */
-    orderProductReplaceByIdPutOrderProductsid(params: {  "id": string; "data"?: OrderProduct; }, options?: any): FetchArgs {
+    targetReplaceByIdPutTargetsid(params: {  "id": string; "data"?: Target; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling orderProductReplaceByIdPutOrderProductsid");
+            throw new Error("Missing required parameter id when calling targetReplaceByIdPutTargetsid");
         }
-        const baseUrl = `/OrderProducts/{id}`
+        const baseUrl = `/Targets/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
@@ -12710,8 +7433,8 @@ export const OrderProductApiFetchParamCreator = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    orderProductReplaceOrCreatePostOrderProductsReplaceOrCreate(params: {  "data"?: OrderProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts/replaceOrCreate`;
+    targetReplaceOrCreatePostTargetsReplaceOrCreate(params: {  "data"?: Target; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets/replaceOrCreate`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
 
@@ -12733,8 +7456,8 @@ export const OrderProductApiFetchParamCreator = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    orderProductReplaceOrCreatePutOrderProducts(params: {  "data"?: OrderProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts`;
+    targetReplaceOrCreatePutTargets(params: {  "data"?: Target; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
 
@@ -12757,8 +7480,8 @@ export const OrderProductApiFetchParamCreator = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    orderProductUpdateAll(params: {  "where"?: string; "data"?: OrderProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts/update`;
+    targetUpdateAll(params: {  "where"?: string; "data"?: Target; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets/update`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "where": params["where"],
@@ -12784,8 +7507,8 @@ export const OrderProductApiFetchParamCreator = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    orderProductUpsertWithWhere(params: {  "where"?: string; "data"?: OrderProduct; }, options?: any): FetchArgs {
-        const baseUrl = `/OrderProducts/upsertWithWhere`;
+    targetUpsertWithWhere(params: {  "where"?: string; "data"?: Target; }, options?: any): FetchArgs {
+        const baseUrl = `/Targets/upsertWithWhere`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "where": params["where"],
@@ -12808,16 +7531,16 @@ export const OrderProductApiFetchParamCreator = {
 };
 
 /**
- * OrderProductApi - functional programming interface
+ * TargetApi - functional programming interface
  */
-export const OrderProductApiFp = {
+export const TargetApiFp = {
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    orderProductCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductCount(params, options);
+    targetCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+        const fetchArgs = TargetApiFetchParamCreator.targetCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -12833,8 +7556,8 @@ export const OrderProductApiFp = {
      * @summary Create a new instance of the model and persist it into the data source.
      * @param data Model instance data
      */
-    orderProductCreate(params: { "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductCreate(params, options);
+    targetCreate(params: { "data"?: Target;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Target> {
+        const fetchArgs = TargetApiFetchParamCreator.targetCreate(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -12850,8 +7573,8 @@ export const OrderProductApiFp = {
      * @summary Create a change stream.
      * @param options 
      */
-    orderProductCreateChangeStreamGetOrderProductsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductCreateChangeStreamGetOrderProductsChangeStream(params, options);
+    targetCreateChangeStreamGetTargetsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = TargetApiFetchParamCreator.targetCreateChangeStreamGetTargetsChangeStream(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -12867,8 +7590,8 @@ export const OrderProductApiFp = {
      * @summary Create a change stream.
      * @param options 
      */
-    orderProductCreateChangeStreamPostOrderProductsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductCreateChangeStreamPostOrderProductsChangeStream(params, options);
+    targetCreateChangeStreamPostTargetsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = TargetApiFetchParamCreator.targetCreateChangeStreamPostTargetsChangeStream(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -12884,8 +7607,8 @@ export const OrderProductApiFp = {
      * @summary Delete a model instance by {{id}} from the data source.
      * @param id Model id
      */
-    orderProductDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductDeleteById(params, options);
+    targetDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = TargetApiFetchParamCreator.targetDeleteById(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -12901,8 +7624,8 @@ export const OrderProductApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    orderProductExistsGetOrderProductsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductExistsGetOrderProductsidExists(params, options);
+    targetExistsGetTargetsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+        const fetchArgs = TargetApiFetchParamCreator.targetExistsGetTargetsidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -12918,8 +7641,8 @@ export const OrderProductApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    orderProductExistsHeadOrderProductsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductExistsHeadOrderProductsid(params, options);
+    targetExistsHeadTargetsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+        const fetchArgs = TargetApiFetchParamCreator.targetExistsHeadTargetsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -12935,8 +7658,8 @@ export const OrderProductApiFp = {
      * @summary Find all instances of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    orderProductFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<OrderProduct>> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductFind(params, options);
+    targetFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Target>> {
+        const fetchArgs = TargetApiFetchParamCreator.targetFind(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -12953,8 +7676,8 @@ export const OrderProductApiFp = {
      * @param id Model id
      * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
      */
-    orderProductFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductFindById(params, options);
+    targetFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Target> {
+        const fetchArgs = TargetApiFetchParamCreator.targetFindById(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -12970,25 +7693,8 @@ export const OrderProductApiFp = {
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    orderProductFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductFindOne(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Get order product in cart by token
-     * @param user userId
-     */
-    orderProductGetOrder(params: { "user": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductGetOrder(params, options);
+    targetFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Target> {
+        const fetchArgs = TargetApiFetchParamCreator.targetFindOne(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -13004,8 +7710,8 @@ export const OrderProductApiFp = {
      * @summary Patch an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    orderProductPatchOrCreate(params: { "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductPatchOrCreate(params, options);
+    targetPatchOrCreate(params: { "data"?: Target;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Target> {
+        const fetchArgs = TargetApiFetchParamCreator.targetPatchOrCreate(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -13018,30 +7724,12 @@ export const OrderProductApiFp = {
     },
     /**
      * 
-     * @summary Fetches belongsTo relation order.
-     * @param id OrderProduct id
+     * @summary Fetches belongsTo relation account.
+     * @param id Target id
      * @param refresh 
      */
-    orderProductPrototypeGetOrder(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Order> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductPrototypeGetOrder(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Fetches belongsTo relation product.
-     * @param id OrderProduct id
-     * @param refresh 
-     */
-    orderProductPrototypeGetProduct(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductPrototypeGetProduct(params, options);
+    targetPrototypeGetAccount(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Account> {
+        const fetchArgs = TargetApiFetchParamCreator.targetPrototypeGetAccount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -13055,11 +7743,11 @@ export const OrderProductApiFp = {
     /**
      * 
      * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id OrderProduct id
+     * @param id Target id
      * @param data An object of model property name/value pairs
      */
-    orderProductPrototypePatchAttributes(params: { "id": string; "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductPrototypePatchAttributes(params, options);
+    targetPrototypePatchAttributes(params: { "id": string; "data"?: Target;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Target> {
+        const fetchArgs = TargetApiFetchParamCreator.targetPrototypePatchAttributes(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -13076,8 +7764,8 @@ export const OrderProductApiFp = {
      * @param id Model id
      * @param data Model instance data
      */
-    orderProductReplaceByIdPostOrderProductsidReplace(params: { "id": string; "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductReplaceByIdPostOrderProductsidReplace(params, options);
+    targetReplaceByIdPostTargetsidReplace(params: { "id": string; "data"?: Target;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Target> {
+        const fetchArgs = TargetApiFetchParamCreator.targetReplaceByIdPostTargetsidReplace(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -13094,8 +7782,8 @@ export const OrderProductApiFp = {
      * @param id Model id
      * @param data Model instance data
      */
-    orderProductReplaceByIdPutOrderProductsid(params: { "id": string; "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductReplaceByIdPutOrderProductsid(params, options);
+    targetReplaceByIdPutTargetsid(params: { "id": string; "data"?: Target;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Target> {
+        const fetchArgs = TargetApiFetchParamCreator.targetReplaceByIdPutTargetsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -13111,8 +7799,8 @@ export const OrderProductApiFp = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    orderProductReplaceOrCreatePostOrderProductsReplaceOrCreate(params: { "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductReplaceOrCreatePostOrderProductsReplaceOrCreate(params, options);
+    targetReplaceOrCreatePostTargetsReplaceOrCreate(params: { "data"?: Target;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Target> {
+        const fetchArgs = TargetApiFetchParamCreator.targetReplaceOrCreatePostTargetsReplaceOrCreate(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -13128,8 +7816,8 @@ export const OrderProductApiFp = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    orderProductReplaceOrCreatePutOrderProducts(params: { "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductReplaceOrCreatePutOrderProducts(params, options);
+    targetReplaceOrCreatePutTargets(params: { "data"?: Target;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Target> {
+        const fetchArgs = TargetApiFetchParamCreator.targetReplaceOrCreatePutTargets(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -13146,8 +7834,8 @@ export const OrderProductApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    orderProductUpdateAll(params: { "where"?: string; "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductUpdateAll(params, options);
+    targetUpdateAll(params: { "where"?: string; "data"?: Target;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+        const fetchArgs = TargetApiFetchParamCreator.targetUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -13164,8 +7852,8 @@ export const OrderProductApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    orderProductUpsertWithWhere(params: { "where"?: string; "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = OrderProductApiFetchParamCreator.orderProductUpsertWithWhere(params, options);
+    targetUpsertWithWhere(params: { "where"?: string; "data"?: Target;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Target> {
+        const fetchArgs = TargetApiFetchParamCreator.targetUpsertWithWhere(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -13179,72 +7867,72 @@ export const OrderProductApiFp = {
 };
 
 /**
- * OrderProductApi - object-oriented interface
+ * TargetApi - object-oriented interface
  */
-export class OrderProductApi extends BaseAPI {
+export class TargetApi extends BaseAPI {
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    orderProductCount(params: {  "where"?: string; }, options?: any) {
-        return OrderProductApiFp.orderProductCount(params, options)(this.fetch, this.basePath);
+    targetCount(params: {  "where"?: string; }, options?: any) {
+        return TargetApiFp.targetCount(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Create a new instance of the model and persist it into the data source.
      * @param data Model instance data
      */
-    orderProductCreate(params: {  "data"?: OrderProduct; }, options?: any) {
-        return OrderProductApiFp.orderProductCreate(params, options)(this.fetch, this.basePath);
+    targetCreate(params: {  "data"?: Target; }, options?: any) {
+        return TargetApiFp.targetCreate(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Create a change stream.
      * @param options 
      */
-    orderProductCreateChangeStreamGetOrderProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return OrderProductApiFp.orderProductCreateChangeStreamGetOrderProductsChangeStream(params, options)(this.fetch, this.basePath);
+    targetCreateChangeStreamGetTargetsChangeStream(params: {  "options"?: string; }, options?: any) {
+        return TargetApiFp.targetCreateChangeStreamGetTargetsChangeStream(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Create a change stream.
      * @param options 
      */
-    orderProductCreateChangeStreamPostOrderProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return OrderProductApiFp.orderProductCreateChangeStreamPostOrderProductsChangeStream(params, options)(this.fetch, this.basePath);
+    targetCreateChangeStreamPostTargetsChangeStream(params: {  "options"?: string; }, options?: any) {
+        return TargetApiFp.targetCreateChangeStreamPostTargetsChangeStream(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Delete a model instance by {{id}} from the data source.
      * @param id Model id
      */
-    orderProductDeleteById(params: {  "id": string; }, options?: any) {
-        return OrderProductApiFp.orderProductDeleteById(params, options)(this.fetch, this.basePath);
+    targetDeleteById(params: {  "id": string; }, options?: any) {
+        return TargetApiFp.targetDeleteById(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    orderProductExistsGetOrderProductsidExists(params: {  "id": string; }, options?: any) {
-        return OrderProductApiFp.orderProductExistsGetOrderProductsidExists(params, options)(this.fetch, this.basePath);
+    targetExistsGetTargetsidExists(params: {  "id": string; }, options?: any) {
+        return TargetApiFp.targetExistsGetTargetsidExists(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    orderProductExistsHeadOrderProductsid(params: {  "id": string; }, options?: any) {
-        return OrderProductApiFp.orderProductExistsHeadOrderProductsid(params, options)(this.fetch, this.basePath);
+    targetExistsHeadTargetsid(params: {  "id": string; }, options?: any) {
+        return TargetApiFp.targetExistsHeadTargetsid(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Find all instances of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    orderProductFind(params: {  "filter"?: string; }, options?: any) {
-        return OrderProductApiFp.orderProductFind(params, options)(this.fetch, this.basePath);
+    targetFind(params: {  "filter"?: string; }, options?: any) {
+        return TargetApiFp.targetFind(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -13252,59 +7940,42 @@ export class OrderProductApi extends BaseAPI {
      * @param id Model id
      * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
      */
-    orderProductFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-        return OrderProductApiFp.orderProductFindById(params, options)(this.fetch, this.basePath);
+    targetFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
+        return TargetApiFp.targetFindById(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    orderProductFindOne(params: {  "filter"?: string; }, options?: any) {
-        return OrderProductApiFp.orderProductFindOne(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Get order product in cart by token
-     * @param user userId
-     */
-    orderProductGetOrder(params: {  "user": string; }, options?: any) {
-        return OrderProductApiFp.orderProductGetOrder(params, options)(this.fetch, this.basePath);
+    targetFindOne(params: {  "filter"?: string; }, options?: any) {
+        return TargetApiFp.targetFindOne(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Patch an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    orderProductPatchOrCreate(params: {  "data"?: OrderProduct; }, options?: any) {
-        return OrderProductApiFp.orderProductPatchOrCreate(params, options)(this.fetch, this.basePath);
+    targetPatchOrCreate(params: {  "data"?: Target; }, options?: any) {
+        return TargetApiFp.targetPatchOrCreate(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Fetches belongsTo relation order.
-     * @param id OrderProduct id
+     * @summary Fetches belongsTo relation account.
+     * @param id Target id
      * @param refresh 
      */
-    orderProductPrototypeGetOrder(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-        return OrderProductApiFp.orderProductPrototypeGetOrder(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Fetches belongsTo relation product.
-     * @param id OrderProduct id
-     * @param refresh 
-     */
-    orderProductPrototypeGetProduct(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-        return OrderProductApiFp.orderProductPrototypeGetProduct(params, options)(this.fetch, this.basePath);
+    targetPrototypeGetAccount(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+        return TargetApiFp.targetPrototypeGetAccount(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id OrderProduct id
+     * @param id Target id
      * @param data An object of model property name/value pairs
      */
-    orderProductPrototypePatchAttributes(params: {  "id": string; "data"?: OrderProduct; }, options?: any) {
-        return OrderProductApiFp.orderProductPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
+    targetPrototypePatchAttributes(params: {  "id": string; "data"?: Target; }, options?: any) {
+        return TargetApiFp.targetPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -13312,8 +7983,8 @@ export class OrderProductApi extends BaseAPI {
      * @param id Model id
      * @param data Model instance data
      */
-    orderProductReplaceByIdPostOrderProductsidReplace(params: {  "id": string; "data"?: OrderProduct; }, options?: any) {
-        return OrderProductApiFp.orderProductReplaceByIdPostOrderProductsidReplace(params, options)(this.fetch, this.basePath);
+    targetReplaceByIdPostTargetsidReplace(params: {  "id": string; "data"?: Target; }, options?: any) {
+        return TargetApiFp.targetReplaceByIdPostTargetsidReplace(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -13321,24 +7992,24 @@ export class OrderProductApi extends BaseAPI {
      * @param id Model id
      * @param data Model instance data
      */
-    orderProductReplaceByIdPutOrderProductsid(params: {  "id": string; "data"?: OrderProduct; }, options?: any) {
-        return OrderProductApiFp.orderProductReplaceByIdPutOrderProductsid(params, options)(this.fetch, this.basePath);
+    targetReplaceByIdPutTargetsid(params: {  "id": string; "data"?: Target; }, options?: any) {
+        return TargetApiFp.targetReplaceByIdPutTargetsid(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    orderProductReplaceOrCreatePostOrderProductsReplaceOrCreate(params: {  "data"?: OrderProduct; }, options?: any) {
-        return OrderProductApiFp.orderProductReplaceOrCreatePostOrderProductsReplaceOrCreate(params, options)(this.fetch, this.basePath);
+    targetReplaceOrCreatePostTargetsReplaceOrCreate(params: {  "data"?: Target; }, options?: any) {
+        return TargetApiFp.targetReplaceOrCreatePostTargetsReplaceOrCreate(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    orderProductReplaceOrCreatePutOrderProducts(params: {  "data"?: OrderProduct; }, options?: any) {
-        return OrderProductApiFp.orderProductReplaceOrCreatePutOrderProducts(params, options)(this.fetch, this.basePath);
+    targetReplaceOrCreatePutTargets(params: {  "data"?: Target; }, options?: any) {
+        return TargetApiFp.targetReplaceOrCreatePutTargets(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -13346,8 +8017,8 @@ export class OrderProductApi extends BaseAPI {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    orderProductUpdateAll(params: {  "where"?: string; "data"?: OrderProduct; }, options?: any) {
-        return OrderProductApiFp.orderProductUpdateAll(params, options)(this.fetch, this.basePath);
+    targetUpdateAll(params: {  "where"?: string; "data"?: Target; }, options?: any) {
+        return TargetApiFp.targetUpdateAll(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -13355,79 +8026,79 @@ export class OrderProductApi extends BaseAPI {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    orderProductUpsertWithWhere(params: {  "where"?: string; "data"?: OrderProduct; }, options?: any) {
-        return OrderProductApiFp.orderProductUpsertWithWhere(params, options)(this.fetch, this.basePath);
+    targetUpsertWithWhere(params: {  "where"?: string; "data"?: Target; }, options?: any) {
+        return TargetApiFp.targetUpsertWithWhere(params, options)(this.fetch, this.basePath);
     }
 };
 
 /**
- * OrderProductApi - factory interface
+ * TargetApi - factory interface
  */
-export const OrderProductApiFactory = function (fetch?: FetchAPI, basePath?: string) {
+export const TargetApiFactory = function (fetch?: FetchAPI, basePath?: string) {
     return {
         /**
          * 
          * @summary Count instances of the model matched by where from the data source.
          * @param where Criteria to match model instances
          */
-        orderProductCount(params: {  "where"?: string; }, options?: any) {
-            return OrderProductApiFp.orderProductCount(params, options)(fetch, basePath);
+        targetCount(params: {  "where"?: string; }, options?: any) {
+            return TargetApiFp.targetCount(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Create a new instance of the model and persist it into the data source.
          * @param data Model instance data
          */
-        orderProductCreate(params: {  "data"?: OrderProduct; }, options?: any) {
-            return OrderProductApiFp.orderProductCreate(params, options)(fetch, basePath);
+        targetCreate(params: {  "data"?: Target; }, options?: any) {
+            return TargetApiFp.targetCreate(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Create a change stream.
          * @param options 
          */
-        orderProductCreateChangeStreamGetOrderProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return OrderProductApiFp.orderProductCreateChangeStreamGetOrderProductsChangeStream(params, options)(fetch, basePath);
+        targetCreateChangeStreamGetTargetsChangeStream(params: {  "options"?: string; }, options?: any) {
+            return TargetApiFp.targetCreateChangeStreamGetTargetsChangeStream(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Create a change stream.
          * @param options 
          */
-        orderProductCreateChangeStreamPostOrderProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return OrderProductApiFp.orderProductCreateChangeStreamPostOrderProductsChangeStream(params, options)(fetch, basePath);
+        targetCreateChangeStreamPostTargetsChangeStream(params: {  "options"?: string; }, options?: any) {
+            return TargetApiFp.targetCreateChangeStreamPostTargetsChangeStream(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Delete a model instance by {{id}} from the data source.
          * @param id Model id
          */
-        orderProductDeleteById(params: {  "id": string; }, options?: any) {
-            return OrderProductApiFp.orderProductDeleteById(params, options)(fetch, basePath);
+        targetDeleteById(params: {  "id": string; }, options?: any) {
+            return TargetApiFp.targetDeleteById(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Check whether a model instance exists in the data source.
          * @param id Model id
          */
-        orderProductExistsGetOrderProductsidExists(params: {  "id": string; }, options?: any) {
-            return OrderProductApiFp.orderProductExistsGetOrderProductsidExists(params, options)(fetch, basePath);
+        targetExistsGetTargetsidExists(params: {  "id": string; }, options?: any) {
+            return TargetApiFp.targetExistsGetTargetsidExists(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Check whether a model instance exists in the data source.
          * @param id Model id
          */
-        orderProductExistsHeadOrderProductsid(params: {  "id": string; }, options?: any) {
-            return OrderProductApiFp.orderProductExistsHeadOrderProductsid(params, options)(fetch, basePath);
+        targetExistsHeadTargetsid(params: {  "id": string; }, options?: any) {
+            return TargetApiFp.targetExistsHeadTargetsid(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Find all instances of the model matched by filter from the data source.
          * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
          */
-        orderProductFind(params: {  "filter"?: string; }, options?: any) {
-            return OrderProductApiFp.orderProductFind(params, options)(fetch, basePath);
+        targetFind(params: {  "filter"?: string; }, options?: any) {
+            return TargetApiFp.targetFind(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -13435,59 +8106,42 @@ export const OrderProductApiFactory = function (fetch?: FetchAPI, basePath?: str
          * @param id Model id
          * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
          */
-        orderProductFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-            return OrderProductApiFp.orderProductFindById(params, options)(fetch, basePath);
+        targetFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
+            return TargetApiFp.targetFindById(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Find first instance of the model matched by filter from the data source.
          * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
          */
-        orderProductFindOne(params: {  "filter"?: string; }, options?: any) {
-            return OrderProductApiFp.orderProductFindOne(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Get order product in cart by token
-         * @param user userId
-         */
-        orderProductGetOrder(params: {  "user": string; }, options?: any) {
-            return OrderProductApiFp.orderProductGetOrder(params, options)(fetch, basePath);
+        targetFindOne(params: {  "filter"?: string; }, options?: any) {
+            return TargetApiFp.targetFindOne(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Patch an existing model instance or insert a new one into the data source.
          * @param data Model instance data
          */
-        orderProductPatchOrCreate(params: {  "data"?: OrderProduct; }, options?: any) {
-            return OrderProductApiFp.orderProductPatchOrCreate(params, options)(fetch, basePath);
+        targetPatchOrCreate(params: {  "data"?: Target; }, options?: any) {
+            return TargetApiFp.targetPatchOrCreate(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Fetches belongsTo relation order.
-         * @param id OrderProduct id
+         * @summary Fetches belongsTo relation account.
+         * @param id Target id
          * @param refresh 
          */
-        orderProductPrototypeGetOrder(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-            return OrderProductApiFp.orderProductPrototypeGetOrder(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Fetches belongsTo relation product.
-         * @param id OrderProduct id
-         * @param refresh 
-         */
-        orderProductPrototypeGetProduct(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-            return OrderProductApiFp.orderProductPrototypeGetProduct(params, options)(fetch, basePath);
+        targetPrototypeGetAccount(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+            return TargetApiFp.targetPrototypeGetAccount(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Patch attributes for a model instance and persist it into the data source.
-         * @param id OrderProduct id
+         * @param id Target id
          * @param data An object of model property name/value pairs
          */
-        orderProductPrototypePatchAttributes(params: {  "id": string; "data"?: OrderProduct; }, options?: any) {
-            return OrderProductApiFp.orderProductPrototypePatchAttributes(params, options)(fetch, basePath);
+        targetPrototypePatchAttributes(params: {  "id": string; "data"?: Target; }, options?: any) {
+            return TargetApiFp.targetPrototypePatchAttributes(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -13495,8 +8149,8 @@ export const OrderProductApiFactory = function (fetch?: FetchAPI, basePath?: str
          * @param id Model id
          * @param data Model instance data
          */
-        orderProductReplaceByIdPostOrderProductsidReplace(params: {  "id": string; "data"?: OrderProduct; }, options?: any) {
-            return OrderProductApiFp.orderProductReplaceByIdPostOrderProductsidReplace(params, options)(fetch, basePath);
+        targetReplaceByIdPostTargetsidReplace(params: {  "id": string; "data"?: Target; }, options?: any) {
+            return TargetApiFp.targetReplaceByIdPostTargetsidReplace(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -13504,24 +8158,24 @@ export const OrderProductApiFactory = function (fetch?: FetchAPI, basePath?: str
          * @param id Model id
          * @param data Model instance data
          */
-        orderProductReplaceByIdPutOrderProductsid(params: {  "id": string; "data"?: OrderProduct; }, options?: any) {
-            return OrderProductApiFp.orderProductReplaceByIdPutOrderProductsid(params, options)(fetch, basePath);
+        targetReplaceByIdPutTargetsid(params: {  "id": string; "data"?: Target; }, options?: any) {
+            return TargetApiFp.targetReplaceByIdPutTargetsid(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Replace an existing model instance or insert a new one into the data source.
          * @param data Model instance data
          */
-        orderProductReplaceOrCreatePostOrderProductsReplaceOrCreate(params: {  "data"?: OrderProduct; }, options?: any) {
-            return OrderProductApiFp.orderProductReplaceOrCreatePostOrderProductsReplaceOrCreate(params, options)(fetch, basePath);
+        targetReplaceOrCreatePostTargetsReplaceOrCreate(params: {  "data"?: Target; }, options?: any) {
+            return TargetApiFp.targetReplaceOrCreatePostTargetsReplaceOrCreate(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Replace an existing model instance or insert a new one into the data source.
          * @param data Model instance data
          */
-        orderProductReplaceOrCreatePutOrderProducts(params: {  "data"?: OrderProduct; }, options?: any) {
-            return OrderProductApiFp.orderProductReplaceOrCreatePutOrderProducts(params, options)(fetch, basePath);
+        targetReplaceOrCreatePutTargets(params: {  "data"?: Target; }, options?: any) {
+            return TargetApiFp.targetReplaceOrCreatePutTargets(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -13529,8 +8183,8 @@ export const OrderProductApiFactory = function (fetch?: FetchAPI, basePath?: str
          * @param where Criteria to match model instances
          * @param data An object of model property name/value pairs
          */
-        orderProductUpdateAll(params: {  "where"?: string; "data"?: OrderProduct; }, options?: any) {
-            return OrderProductApiFp.orderProductUpdateAll(params, options)(fetch, basePath);
+        targetUpdateAll(params: {  "where"?: string; "data"?: Target; }, options?: any) {
+            return TargetApiFp.targetUpdateAll(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -13538,24 +8192,24 @@ export const OrderProductApiFactory = function (fetch?: FetchAPI, basePath?: str
          * @param where Criteria to match model instances
          * @param data An object of model property name/value pairs
          */
-        orderProductUpsertWithWhere(params: {  "where"?: string; "data"?: OrderProduct; }, options?: any) {
-            return OrderProductApiFp.orderProductUpsertWithWhere(params, options)(fetch, basePath);
+        targetUpsertWithWhere(params: {  "where"?: string; "data"?: Target; }, options?: any) {
+            return TargetApiFp.targetUpsertWithWhere(params, options)(fetch, basePath);
         },
     };
 };
 
 
 /**
- * ProductApi - fetch parameter creator
+ * TeamApi - fetch parameter creator
  */
-export const ProductApiFetchParamCreator = {
+export const TeamApiFetchParamCreator = {
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    productCount(params: {  "where"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Products/count`;
+    teamCount(params: {  "where"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams/count`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "where": params["where"],
@@ -13576,8 +8230,8 @@ export const ProductApiFetchParamCreator = {
      * @summary Create a new instance of the model and persist it into the data source.
      * @param data Model instance data
      */
-    productCreate(params: {  "data"?: Product; }, options?: any): FetchArgs {
-        const baseUrl = `/Products`;
+    teamCreate(params: {  "data"?: Team; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
 
@@ -13599,8 +8253,8 @@ export const ProductApiFetchParamCreator = {
      * @summary Create a change stream.
      * @param options 
      */
-    productCreateChangeStreamGetProductsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Products/change-stream`;
+    teamCreateChangeStreamGetTeamsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams/change-stream`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "options": params["options"],
@@ -13621,8 +8275,8 @@ export const ProductApiFetchParamCreator = {
      * @summary Create a change stream.
      * @param options 
      */
-    productCreateChangeStreamPostProductsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Products/change-stream`;
+    teamCreateChangeStreamPostTeamsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams/change-stream`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
 
@@ -13644,12 +8298,12 @@ export const ProductApiFetchParamCreator = {
      * @summary Delete a model instance by {{id}} from the data source.
      * @param id Model id
      */
-    productDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
+    teamDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productDeleteById");
+            throw new Error("Missing required parameter id when calling teamDeleteById");
         }
-        const baseUrl = `/Products/{id}`
+        const baseUrl = `/Teams/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
@@ -13668,12 +8322,12 @@ export const ProductApiFetchParamCreator = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    productExistsGetProductsidExists(params: {  "id": string; }, options?: any): FetchArgs {
+    teamExistsGetTeamsidExists(params: {  "id": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productExistsGetProductsidExists");
+            throw new Error("Missing required parameter id when calling teamExistsGetTeamsidExists");
         }
-        const baseUrl = `/Products/{id}/exists`
+        const baseUrl = `/Teams/{id}/exists`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
@@ -13692,12 +8346,12 @@ export const ProductApiFetchParamCreator = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    productExistsHeadProductsid(params: {  "id": string; }, options?: any): FetchArgs {
+    teamExistsHeadTeamsid(params: {  "id": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productExistsHeadProductsid");
+            throw new Error("Missing required parameter id when calling teamExistsHeadTeamsid");
         }
-        const baseUrl = `/Products/{id}`
+        const baseUrl = `/Teams/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "HEAD" }, options);
@@ -13716,8 +8370,8 @@ export const ProductApiFetchParamCreator = {
      * @summary Find all instances of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    productFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Products`;
+    teamFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "filter": params["filter"],
@@ -13739,12 +8393,12 @@ export const ProductApiFetchParamCreator = {
      * @param id Model id
      * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
      */
-    productFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
+    teamFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productFindById");
+            throw new Error("Missing required parameter id when calling teamFindById");
         }
-        const baseUrl = `/Products/{id}`
+        const baseUrl = `/Teams/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
@@ -13766,8 +8420,8 @@ export const ProductApiFetchParamCreator = {
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    productFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Products/findOne`;
+    teamFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams/findOne`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "filter": params["filter"],
@@ -13788,8 +8442,8 @@ export const ProductApiFetchParamCreator = {
      * @summary Patch an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    productPatchOrCreate(params: {  "data"?: Product; }, options?: any): FetchArgs {
-        const baseUrl = `/Products`;
+    teamPatchOrCreate(params: {  "data"?: Team; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
 
@@ -13808,16 +8462,16 @@ export const ProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Counts order of Product.
-     * @param id Product id
+     * @summary Counts members of Team.
+     * @param id Team id
      * @param where Criteria to match model instances
      */
-    productPrototypeCountOrder(params: {  "id": string; "where"?: string; }, options?: any): FetchArgs {
+    teamPrototypeCountMembers(params: {  "id": string; "where"?: string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeCountOrder");
+            throw new Error("Missing required parameter id when calling teamPrototypeCountMembers");
         }
-        const baseUrl = `/Products/{id}/order/count`
+        const baseUrl = `/Teams/{id}/members/count`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
@@ -13836,16 +8490,16 @@ export const ProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Creates a new instance in order of this model.
-     * @param id Product id
+     * @summary Creates a new instance in members of this model.
+     * @param id Team id
      * @param data 
      */
-    productPrototypeCreateOrder(params: {  "id": string; "data"?: Order; }, options?: any): FetchArgs {
+    teamPrototypeCreateMembers(params: {  "id": string; "data"?: Account; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeCreateOrder");
+            throw new Error("Missing required parameter id when calling teamPrototypeCreateMembers");
         }
-        const baseUrl = `/Products/{id}/order`
+        const baseUrl = `/Teams/{id}/members`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
@@ -13865,15 +8519,15 @@ export const ProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Deletes all order of this model.
-     * @param id Product id
+     * @summary Deletes all members of this model.
+     * @param id Team id
      */
-    productPrototypeDeleteOrder(params: {  "id": string; }, options?: any): FetchArgs {
+    teamPrototypeDeleteMembers(params: {  "id": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeDeleteOrder");
+            throw new Error("Missing required parameter id when calling teamPrototypeDeleteMembers");
         }
-        const baseUrl = `/Products/{id}/order`
+        const baseUrl = `/Teams/{id}/members`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
@@ -13889,20 +8543,20 @@ export const ProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Delete a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
+     * @summary Delete a related item by id for members.
+     * @param id Team id
+     * @param fk Foreign key for members
      */
-    productPrototypeDestroyByIdOrder(params: {  "id": string; "fk": string; }, options?: any): FetchArgs {
+    teamPrototypeDestroyByIdMembers(params: {  "id": string; "fk": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeDestroyByIdOrder");
+            throw new Error("Missing required parameter id when calling teamPrototypeDestroyByIdMembers");
         }
         // verify required parameter "fk" is set
         if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling productPrototypeDestroyByIdOrder");
+            throw new Error("Missing required parameter fk when calling teamPrototypeDestroyByIdMembers");
         }
-        const baseUrl = `/Products/{id}/order/{fk}`
+        const baseUrl = `/Teams/{id}/members/{fk}`
             .replace(`{${"id"}}`, `${ params["id"] }`)
             .replace(`{${"fk"}}`, `${ params["fk"] }`);
         let urlObj = url.parse(baseUrl, true);
@@ -13919,50 +8573,20 @@ export const ProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Check the existence of order relation to an item by id.
-     * @param id Product id
-     * @param fk Foreign key for order
+     * @summary Find a related item by id for members.
+     * @param id Team id
+     * @param fk Foreign key for members
      */
-    productPrototypeExistsOrder(params: {  "id": string; "fk": string; }, options?: any): FetchArgs {
+    teamPrototypeFindByIdMembers(params: {  "id": string; "fk": string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeExistsOrder");
+            throw new Error("Missing required parameter id when calling teamPrototypeFindByIdMembers");
         }
         // verify required parameter "fk" is set
         if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling productPrototypeExistsOrder");
+            throw new Error("Missing required parameter fk when calling teamPrototypeFindByIdMembers");
         }
-        const baseUrl = `/Products/{id}/order/rel/{fk}`
-            .replace(`{${"id"}}`, `${ params["id"] }`)
-            .replace(`{${"fk"}}`, `${ params["fk"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "HEAD" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
-     */
-    productPrototypeFindByIdOrder(params: {  "id": string; "fk": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeFindByIdOrder");
-        }
-        // verify required parameter "fk" is set
-        if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling productPrototypeFindByIdOrder");
-        }
-        const baseUrl = `/Products/{id}/order/{fk}`
+        const baseUrl = `/Teams/{id}/members/{fk}`
             .replace(`{${"id"}}`, `${ params["id"] }`)
             .replace(`{${"fk"}}`, `${ params["fk"] }`);
         let urlObj = url.parse(baseUrl, true);
@@ -13979,16 +8603,16 @@ export const ProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Fetches belongsTo relation categoryProduct.
-     * @param id Product id
+     * @summary Fetches belongsTo relation leader.
+     * @param id Team id
      * @param refresh 
      */
-    productPrototypeGetCategoryProduct(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
+    teamPrototypeGetLeader(params: {  "id": string; "refresh"?: boolean; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeGetCategoryProduct");
+            throw new Error("Missing required parameter id when calling teamPrototypeGetLeader");
         }
-        const baseUrl = `/Products/{id}/categoryProduct`
+        const baseUrl = `/Teams/{id}/leader`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
@@ -14007,16 +8631,16 @@ export const ProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Queries order of Product.
-     * @param id Product id
+     * @summary Queries members of Team.
+     * @param id Team id
      * @param filter 
      */
-    productPrototypeGetOrder(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
+    teamPrototypeGetMembers(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeGetOrder");
+            throw new Error("Missing required parameter id when calling teamPrototypeGetMembers");
         }
-        const baseUrl = `/Products/{id}/order`
+        const baseUrl = `/Teams/{id}/members`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
@@ -14035,51 +8659,16 @@ export const ProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Add a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
-     * @param data 
-     */
-    productPrototypeLinkOrder(params: {  "id": string; "fk": string; "data"?: OrderProduct; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeLinkOrder");
-        }
-        // verify required parameter "fk" is set
-        if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling productPrototypeLinkOrder");
-        }
-        const baseUrl = `/Products/{id}/order/rel/{fk}`
-            .replace(`{${"id"}}`, `${ params["id"] }`)
-            .replace(`{${"fk"}}`, `${ params["fk"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
      * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Product id
+     * @param id Team id
      * @param data An object of model property name/value pairs
      */
-    productPrototypePatchAttributes(params: {  "id": string; "data"?: Product; }, options?: any): FetchArgs {
+    teamPrototypePatchAttributes(params: {  "id": string; "data"?: Team; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypePatchAttributes");
+            throw new Error("Missing required parameter id when calling teamPrototypePatchAttributes");
         }
-        const baseUrl = `/Products/{id}`
+        const baseUrl = `/Teams/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
@@ -14099,51 +8688,21 @@ export const ProductApiFetchParamCreator = {
     },
     /**
      * 
-     * @summary Remove the order relation to an item by id.
-     * @param id Product id
-     * @param fk Foreign key for order
-     */
-    productPrototypeUnlinkOrder(params: {  "id": string; "fk": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeUnlinkOrder");
-        }
-        // verify required parameter "fk" is set
-        if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling productPrototypeUnlinkOrder");
-        }
-        const baseUrl = `/Products/{id}/order/rel/{fk}`
-            .replace(`{${"id"}}`, `${ params["id"] }`)
-            .replace(`{${"fk"}}`, `${ params["fk"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
+     * @summary Update a related item by id for members.
+     * @param id Team id
+     * @param fk Foreign key for members
      * @param data 
      */
-    productPrototypeUpdateByIdOrder(params: {  "id": string; "fk": string; "data"?: Order; }, options?: any): FetchArgs {
+    teamPrototypeUpdateByIdMembers(params: {  "id": string; "fk": string; "data"?: Account; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productPrototypeUpdateByIdOrder");
+            throw new Error("Missing required parameter id when calling teamPrototypeUpdateByIdMembers");
         }
         // verify required parameter "fk" is set
         if (params["fk"] == null) {
-            throw new Error("Missing required parameter fk when calling productPrototypeUpdateByIdOrder");
+            throw new Error("Missing required parameter fk when calling teamPrototypeUpdateByIdMembers");
         }
-        const baseUrl = `/Products/{id}/order/{fk}`
+        const baseUrl = `/Teams/{id}/members/{fk}`
             .replace(`{${"id"}}`, `${ params["id"] }`)
             .replace(`{${"fk"}}`, `${ params["fk"] }`);
         let urlObj = url.parse(baseUrl, true);
@@ -14168,12 +8727,12 @@ export const ProductApiFetchParamCreator = {
      * @param id Model id
      * @param data Model instance data
      */
-    productReplaceByIdPostProductsidReplace(params: {  "id": string; "data"?: Product; }, options?: any): FetchArgs {
+    teamReplaceByIdPostTeamsidReplace(params: {  "id": string; "data"?: Team; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productReplaceByIdPostProductsidReplace");
+            throw new Error("Missing required parameter id when calling teamReplaceByIdPostTeamsidReplace");
         }
-        const baseUrl = `/Products/{id}/replace`
+        const baseUrl = `/Teams/{id}/replace`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
@@ -14197,12 +8756,12 @@ export const ProductApiFetchParamCreator = {
      * @param id Model id
      * @param data Model instance data
      */
-    productReplaceByIdPutProductsid(params: {  "id": string; "data"?: Product; }, options?: any): FetchArgs {
+    teamReplaceByIdPutTeamsid(params: {  "id": string; "data"?: Team; }, options?: any): FetchArgs {
         // verify required parameter "id" is set
         if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling productReplaceByIdPutProductsid");
+            throw new Error("Missing required parameter id when calling teamReplaceByIdPutTeamsid");
         }
-        const baseUrl = `/Products/{id}`
+        const baseUrl = `/Teams/{id}`
             .replace(`{${"id"}}`, `${ params["id"] }`);
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
@@ -14225,8 +8784,8 @@ export const ProductApiFetchParamCreator = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    productReplaceOrCreatePostProductsReplaceOrCreate(params: {  "data"?: Product; }, options?: any): FetchArgs {
-        const baseUrl = `/Products/replaceOrCreate`;
+    teamReplaceOrCreatePostTeamsReplaceOrCreate(params: {  "data"?: Team; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams/replaceOrCreate`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
 
@@ -14248,8 +8807,8 @@ export const ProductApiFetchParamCreator = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    productReplaceOrCreatePutProducts(params: {  "data"?: Product; }, options?: any): FetchArgs {
-        const baseUrl = `/Products`;
+    teamReplaceOrCreatePutTeams(params: {  "data"?: Team; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams`;
         let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
 
@@ -14272,8 +8831,8 @@ export const ProductApiFetchParamCreator = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    productUpdateAll(params: {  "where"?: string; "data"?: Product; }, options?: any): FetchArgs {
-        const baseUrl = `/Products/update`;
+    teamUpdateAll(params: {  "where"?: string; "data"?: Team; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams/update`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "where": params["where"],
@@ -14299,8 +8858,8 @@ export const ProductApiFetchParamCreator = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    productUpsertWithWhere(params: {  "where"?: string; "data"?: Product; }, options?: any): FetchArgs {
-        const baseUrl = `/Products/upsertWithWhere`;
+    teamUpsertWithWhere(params: {  "where"?: string; "data"?: Team; }, options?: any): FetchArgs {
+        const baseUrl = `/Teams/upsertWithWhere`;
         let urlObj = url.parse(baseUrl, true);
         urlObj.query = assign({}, urlObj.query, {
             "where": params["where"],
@@ -14323,16 +8882,16 @@ export const ProductApiFetchParamCreator = {
 };
 
 /**
- * ProductApi - functional programming interface
+ * TeamApi - functional programming interface
  */
-export const ProductApiFp = {
+export const TeamApiFp = {
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    productCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
-        const fetchArgs = ProductApiFetchParamCreator.productCount(params, options);
+    teamCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+        const fetchArgs = TeamApiFetchParamCreator.teamCount(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14348,8 +8907,8 @@ export const ProductApiFp = {
      * @summary Create a new instance of the model and persist it into the data source.
      * @param data Model instance data
      */
-    productCreate(params: { "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = ProductApiFetchParamCreator.productCreate(params, options);
+    teamCreate(params: { "data"?: Team;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = TeamApiFetchParamCreator.teamCreate(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14365,8 +8924,8 @@ export const ProductApiFp = {
      * @summary Create a change stream.
      * @param options 
      */
-    productCreateChangeStreamGetProductsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ProductApiFetchParamCreator.productCreateChangeStreamGetProductsChangeStream(params, options);
+    teamCreateChangeStreamGetTeamsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = TeamApiFetchParamCreator.teamCreateChangeStreamGetTeamsChangeStream(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14382,8 +8941,8 @@ export const ProductApiFp = {
      * @summary Create a change stream.
      * @param options 
      */
-    productCreateChangeStreamPostProductsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ProductApiFetchParamCreator.productCreateChangeStreamPostProductsChangeStream(params, options);
+    teamCreateChangeStreamPostTeamsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = TeamApiFetchParamCreator.teamCreateChangeStreamPostTeamsChangeStream(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14399,8 +8958,8 @@ export const ProductApiFp = {
      * @summary Delete a model instance by {{id}} from the data source.
      * @param id Model id
      */
-    productDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ProductApiFetchParamCreator.productDeleteById(params, options);
+    teamDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = TeamApiFetchParamCreator.teamDeleteById(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14416,8 +8975,8 @@ export const ProductApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    productExistsGetProductsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = ProductApiFetchParamCreator.productExistsGetProductsidExists(params, options);
+    teamExistsGetTeamsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+        const fetchArgs = TeamApiFetchParamCreator.teamExistsGetTeamsidExists(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14433,8 +8992,8 @@ export const ProductApiFp = {
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    productExistsHeadProductsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = ProductApiFetchParamCreator.productExistsHeadProductsid(params, options);
+    teamExistsHeadTeamsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
+        const fetchArgs = TeamApiFetchParamCreator.teamExistsHeadTeamsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14450,8 +9009,8 @@ export const ProductApiFp = {
      * @summary Find all instances of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    productFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Product>> {
-        const fetchArgs = ProductApiFetchParamCreator.productFind(params, options);
+    teamFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Team>> {
+        const fetchArgs = TeamApiFetchParamCreator.teamFind(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14468,8 +9027,8 @@ export const ProductApiFp = {
      * @param id Model id
      * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
      */
-    productFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = ProductApiFetchParamCreator.productFindById(params, options);
+    teamFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = TeamApiFetchParamCreator.teamFindById(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14485,8 +9044,8 @@ export const ProductApiFp = {
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    productFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = ProductApiFetchParamCreator.productFindOne(params, options);
+    teamFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = TeamApiFetchParamCreator.teamFindOne(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14502,8 +9061,8 @@ export const ProductApiFp = {
      * @summary Patch an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    productPatchOrCreate(params: { "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = ProductApiFetchParamCreator.productPatchOrCreate(params, options);
+    teamPatchOrCreate(params: { "data"?: Team;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = TeamApiFetchParamCreator.teamPatchOrCreate(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14516,12 +9075,12 @@ export const ProductApiFp = {
     },
     /**
      * 
-     * @summary Counts order of Product.
-     * @param id Product id
+     * @summary Counts members of Team.
+     * @param id Team id
      * @param where Criteria to match model instances
      */
-    productPrototypeCountOrder(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeCountOrder(params, options);
+    teamPrototypeCountMembers(params: { "id": string; "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
+        const fetchArgs = TeamApiFetchParamCreator.teamPrototypeCountMembers(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14534,12 +9093,12 @@ export const ProductApiFp = {
     },
     /**
      * 
-     * @summary Creates a new instance in order of this model.
-     * @param id Product id
+     * @summary Creates a new instance in members of this model.
+     * @param id Team id
      * @param data 
      */
-    productPrototypeCreateOrder(params: { "id": string; "data"?: Order;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Order> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeCreateOrder(params, options);
+    teamPrototypeCreateMembers(params: { "id": string; "data"?: Account;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Account> {
+        const fetchArgs = TeamApiFetchParamCreator.teamPrototypeCreateMembers(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14552,11 +9111,11 @@ export const ProductApiFp = {
     },
     /**
      * 
-     * @summary Deletes all order of this model.
-     * @param id Product id
+     * @summary Deletes all members of this model.
+     * @param id Team id
      */
-    productPrototypeDeleteOrder(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeDeleteOrder(params, options);
+    teamPrototypeDeleteMembers(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = TeamApiFetchParamCreator.teamPrototypeDeleteMembers(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14569,12 +9128,12 @@ export const ProductApiFp = {
     },
     /**
      * 
-     * @summary Delete a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
+     * @summary Delete a related item by id for members.
+     * @param id Team id
+     * @param fk Foreign key for members
      */
-    productPrototypeDestroyByIdOrder(params: { "id": string; "fk": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeDestroyByIdOrder(params, options);
+    teamPrototypeDestroyByIdMembers(params: { "id": string; "fk": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = TeamApiFetchParamCreator.teamPrototypeDestroyByIdMembers(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14587,12 +9146,12 @@ export const ProductApiFp = {
     },
     /**
      * 
-     * @summary Check the existence of order relation to an item by id.
-     * @param id Product id
-     * @param fk Foreign key for order
+     * @summary Find a related item by id for members.
+     * @param id Team id
+     * @param fk Foreign key for members
      */
-    productPrototypeExistsOrder(params: { "id": string; "fk": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<boolean> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeExistsOrder(params, options);
+    teamPrototypeFindByIdMembers(params: { "id": string; "fk": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Account> {
+        const fetchArgs = TeamApiFetchParamCreator.teamPrototypeFindByIdMembers(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14605,30 +9164,12 @@ export const ProductApiFp = {
     },
     /**
      * 
-     * @summary Find a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
-     */
-    productPrototypeFindByIdOrder(params: { "id": string; "fk": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Order> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeFindByIdOrder(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Fetches belongsTo relation categoryProduct.
-     * @param id Product id
+     * @summary Fetches belongsTo relation leader.
+     * @param id Team id
      * @param refresh 
      */
-    productPrototypeGetCategoryProduct(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<CategoryProduct> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeGetCategoryProduct(params, options);
+    teamPrototypeGetLeader(params: { "id": string; "refresh"?: boolean;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Account> {
+        const fetchArgs = TeamApiFetchParamCreator.teamPrototypeGetLeader(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14641,31 +9182,12 @@ export const ProductApiFp = {
     },
     /**
      * 
-     * @summary Queries order of Product.
-     * @param id Product id
+     * @summary Queries members of Team.
+     * @param id Team id
      * @param filter 
      */
-    productPrototypeGetOrder(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Order>> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeGetOrder(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Add a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
-     * @param data 
-     */
-    productPrototypeLinkOrder(params: { "id": string; "fk": string; "data"?: OrderProduct;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<OrderProduct> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeLinkOrder(params, options);
+    teamPrototypeGetMembers(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Account>> {
+        const fetchArgs = TeamApiFetchParamCreator.teamPrototypeGetMembers(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14679,11 +9201,11 @@ export const ProductApiFp = {
     /**
      * 
      * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Product id
+     * @param id Team id
      * @param data An object of model property name/value pairs
      */
-    productPrototypePatchAttributes(params: { "id": string; "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypePatchAttributes(params, options);
+    teamPrototypePatchAttributes(params: { "id": string; "data"?: Team;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = TeamApiFetchParamCreator.teamPrototypePatchAttributes(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14696,31 +9218,13 @@ export const ProductApiFp = {
     },
     /**
      * 
-     * @summary Remove the order relation to an item by id.
-     * @param id Product id
-     * @param fk Foreign key for order
-     */
-    productPrototypeUnlinkOrder(params: { "id": string; "fk": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeUnlinkOrder(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response;
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
+     * @summary Update a related item by id for members.
+     * @param id Team id
+     * @param fk Foreign key for members
      * @param data 
      */
-    productPrototypeUpdateByIdOrder(params: { "id": string; "fk": string; "data"?: Order;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Order> {
-        const fetchArgs = ProductApiFetchParamCreator.productPrototypeUpdateByIdOrder(params, options);
+    teamPrototypeUpdateByIdMembers(params: { "id": string; "fk": string; "data"?: Account;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Account> {
+        const fetchArgs = TeamApiFetchParamCreator.teamPrototypeUpdateByIdMembers(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14737,8 +9241,8 @@ export const ProductApiFp = {
      * @param id Model id
      * @param data Model instance data
      */
-    productReplaceByIdPostProductsidReplace(params: { "id": string; "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = ProductApiFetchParamCreator.productReplaceByIdPostProductsidReplace(params, options);
+    teamReplaceByIdPostTeamsidReplace(params: { "id": string; "data"?: Team;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = TeamApiFetchParamCreator.teamReplaceByIdPostTeamsidReplace(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14755,8 +9259,8 @@ export const ProductApiFp = {
      * @param id Model id
      * @param data Model instance data
      */
-    productReplaceByIdPutProductsid(params: { "id": string; "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = ProductApiFetchParamCreator.productReplaceByIdPutProductsid(params, options);
+    teamReplaceByIdPutTeamsid(params: { "id": string; "data"?: Team;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = TeamApiFetchParamCreator.teamReplaceByIdPutTeamsid(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14772,8 +9276,8 @@ export const ProductApiFp = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    productReplaceOrCreatePostProductsReplaceOrCreate(params: { "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = ProductApiFetchParamCreator.productReplaceOrCreatePostProductsReplaceOrCreate(params, options);
+    teamReplaceOrCreatePostTeamsReplaceOrCreate(params: { "data"?: Team;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = TeamApiFetchParamCreator.teamReplaceOrCreatePostTeamsReplaceOrCreate(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14789,8 +9293,8 @@ export const ProductApiFp = {
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    productReplaceOrCreatePutProducts(params: { "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = ProductApiFetchParamCreator.productReplaceOrCreatePutProducts(params, options);
+    teamReplaceOrCreatePutTeams(params: { "data"?: Team;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = TeamApiFetchParamCreator.teamReplaceOrCreatePutTeams(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14807,8 +9311,8 @@ export const ProductApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    productUpdateAll(params: { "where"?: string; "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
-        const fetchArgs = ProductApiFetchParamCreator.productUpdateAll(params, options);
+    teamUpdateAll(params: { "where"?: string; "data"?: Team;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
+        const fetchArgs = TeamApiFetchParamCreator.teamUpdateAll(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14825,8 +9329,8 @@ export const ProductApiFp = {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    productUpsertWithWhere(params: { "where"?: string; "data"?: Product;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Product> {
-        const fetchArgs = ProductApiFetchParamCreator.productUpsertWithWhere(params, options);
+    teamUpsertWithWhere(params: { "where"?: string; "data"?: Team;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Team> {
+        const fetchArgs = TeamApiFetchParamCreator.teamUpsertWithWhere(params, options);
         return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
             return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
                 if (response.status >= 200 && response.status < 300) {
@@ -14840,72 +9344,72 @@ export const ProductApiFp = {
 };
 
 /**
- * ProductApi - object-oriented interface
+ * TeamApi - object-oriented interface
  */
-export class ProductApi extends BaseAPI {
+export class TeamApi extends BaseAPI {
     /**
      * 
      * @summary Count instances of the model matched by where from the data source.
      * @param where Criteria to match model instances
      */
-    productCount(params: {  "where"?: string; }, options?: any) {
-        return ProductApiFp.productCount(params, options)(this.fetch, this.basePath);
+    teamCount(params: {  "where"?: string; }, options?: any) {
+        return TeamApiFp.teamCount(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Create a new instance of the model and persist it into the data source.
      * @param data Model instance data
      */
-    productCreate(params: {  "data"?: Product; }, options?: any) {
-        return ProductApiFp.productCreate(params, options)(this.fetch, this.basePath);
+    teamCreate(params: {  "data"?: Team; }, options?: any) {
+        return TeamApiFp.teamCreate(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Create a change stream.
      * @param options 
      */
-    productCreateChangeStreamGetProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return ProductApiFp.productCreateChangeStreamGetProductsChangeStream(params, options)(this.fetch, this.basePath);
+    teamCreateChangeStreamGetTeamsChangeStream(params: {  "options"?: string; }, options?: any) {
+        return TeamApiFp.teamCreateChangeStreamGetTeamsChangeStream(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Create a change stream.
      * @param options 
      */
-    productCreateChangeStreamPostProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return ProductApiFp.productCreateChangeStreamPostProductsChangeStream(params, options)(this.fetch, this.basePath);
+    teamCreateChangeStreamPostTeamsChangeStream(params: {  "options"?: string; }, options?: any) {
+        return TeamApiFp.teamCreateChangeStreamPostTeamsChangeStream(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Delete a model instance by {{id}} from the data source.
      * @param id Model id
      */
-    productDeleteById(params: {  "id": string; }, options?: any) {
-        return ProductApiFp.productDeleteById(params, options)(this.fetch, this.basePath);
+    teamDeleteById(params: {  "id": string; }, options?: any) {
+        return TeamApiFp.teamDeleteById(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    productExistsGetProductsidExists(params: {  "id": string; }, options?: any) {
-        return ProductApiFp.productExistsGetProductsidExists(params, options)(this.fetch, this.basePath);
+    teamExistsGetTeamsidExists(params: {  "id": string; }, options?: any) {
+        return TeamApiFp.teamExistsGetTeamsidExists(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Check whether a model instance exists in the data source.
      * @param id Model id
      */
-    productExistsHeadProductsid(params: {  "id": string; }, options?: any) {
-        return ProductApiFp.productExistsHeadProductsid(params, options)(this.fetch, this.basePath);
+    teamExistsHeadTeamsid(params: {  "id": string; }, options?: any) {
+        return TeamApiFp.teamExistsHeadTeamsid(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Find all instances of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    productFind(params: {  "filter"?: string; }, options?: any) {
-        return ProductApiFp.productFind(params, options)(this.fetch, this.basePath);
+    teamFind(params: {  "filter"?: string; }, options?: any) {
+        return TeamApiFp.teamFind(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -14913,133 +9417,105 @@ export class ProductApi extends BaseAPI {
      * @param id Model id
      * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
      */
-    productFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-        return ProductApiFp.productFindById(params, options)(this.fetch, this.basePath);
+    teamFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
+        return TeamApiFp.teamFindById(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
-    productFindOne(params: {  "filter"?: string; }, options?: any) {
-        return ProductApiFp.productFindOne(params, options)(this.fetch, this.basePath);
+    teamFindOne(params: {  "filter"?: string; }, options?: any) {
+        return TeamApiFp.teamFindOne(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Patch an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    productPatchOrCreate(params: {  "data"?: Product; }, options?: any) {
-        return ProductApiFp.productPatchOrCreate(params, options)(this.fetch, this.basePath);
+    teamPatchOrCreate(params: {  "data"?: Team; }, options?: any) {
+        return TeamApiFp.teamPatchOrCreate(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Counts order of Product.
-     * @param id Product id
+     * @summary Counts members of Team.
+     * @param id Team id
      * @param where Criteria to match model instances
      */
-    productPrototypeCountOrder(params: {  "id": string; "where"?: string; }, options?: any) {
-        return ProductApiFp.productPrototypeCountOrder(params, options)(this.fetch, this.basePath);
+    teamPrototypeCountMembers(params: {  "id": string; "where"?: string; }, options?: any) {
+        return TeamApiFp.teamPrototypeCountMembers(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Creates a new instance in order of this model.
-     * @param id Product id
+     * @summary Creates a new instance in members of this model.
+     * @param id Team id
      * @param data 
      */
-    productPrototypeCreateOrder(params: {  "id": string; "data"?: Order; }, options?: any) {
-        return ProductApiFp.productPrototypeCreateOrder(params, options)(this.fetch, this.basePath);
+    teamPrototypeCreateMembers(params: {  "id": string; "data"?: Account; }, options?: any) {
+        return TeamApiFp.teamPrototypeCreateMembers(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Deletes all order of this model.
-     * @param id Product id
+     * @summary Deletes all members of this model.
+     * @param id Team id
      */
-    productPrototypeDeleteOrder(params: {  "id": string; }, options?: any) {
-        return ProductApiFp.productPrototypeDeleteOrder(params, options)(this.fetch, this.basePath);
+    teamPrototypeDeleteMembers(params: {  "id": string; }, options?: any) {
+        return TeamApiFp.teamPrototypeDeleteMembers(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Delete a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
+     * @summary Delete a related item by id for members.
+     * @param id Team id
+     * @param fk Foreign key for members
      */
-    productPrototypeDestroyByIdOrder(params: {  "id": string; "fk": string; }, options?: any) {
-        return ProductApiFp.productPrototypeDestroyByIdOrder(params, options)(this.fetch, this.basePath);
+    teamPrototypeDestroyByIdMembers(params: {  "id": string; "fk": string; }, options?: any) {
+        return TeamApiFp.teamPrototypeDestroyByIdMembers(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Check the existence of order relation to an item by id.
-     * @param id Product id
-     * @param fk Foreign key for order
+     * @summary Find a related item by id for members.
+     * @param id Team id
+     * @param fk Foreign key for members
      */
-    productPrototypeExistsOrder(params: {  "id": string; "fk": string; }, options?: any) {
-        return ProductApiFp.productPrototypeExistsOrder(params, options)(this.fetch, this.basePath);
+    teamPrototypeFindByIdMembers(params: {  "id": string; "fk": string; }, options?: any) {
+        return TeamApiFp.teamPrototypeFindByIdMembers(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Find a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
-     */
-    productPrototypeFindByIdOrder(params: {  "id": string; "fk": string; }, options?: any) {
-        return ProductApiFp.productPrototypeFindByIdOrder(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Fetches belongsTo relation categoryProduct.
-     * @param id Product id
+     * @summary Fetches belongsTo relation leader.
+     * @param id Team id
      * @param refresh 
      */
-    productPrototypeGetCategoryProduct(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-        return ProductApiFp.productPrototypeGetCategoryProduct(params, options)(this.fetch, this.basePath);
+    teamPrototypeGetLeader(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+        return TeamApiFp.teamPrototypeGetLeader(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Queries order of Product.
-     * @param id Product id
+     * @summary Queries members of Team.
+     * @param id Team id
      * @param filter 
      */
-    productPrototypeGetOrder(params: {  "id": string; "filter"?: string; }, options?: any) {
-        return ProductApiFp.productPrototypeGetOrder(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Add a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
-     * @param data 
-     */
-    productPrototypeLinkOrder(params: {  "id": string; "fk": string; "data"?: OrderProduct; }, options?: any) {
-        return ProductApiFp.productPrototypeLinkOrder(params, options)(this.fetch, this.basePath);
+    teamPrototypeGetMembers(params: {  "id": string; "filter"?: string; }, options?: any) {
+        return TeamApiFp.teamPrototypeGetMembers(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Product id
+     * @param id Team id
      * @param data An object of model property name/value pairs
      */
-    productPrototypePatchAttributes(params: {  "id": string; "data"?: Product; }, options?: any) {
-        return ProductApiFp.productPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
+    teamPrototypePatchAttributes(params: {  "id": string; "data"?: Team; }, options?: any) {
+        return TeamApiFp.teamPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
-     * @summary Remove the order relation to an item by id.
-     * @param id Product id
-     * @param fk Foreign key for order
-     */
-    productPrototypeUnlinkOrder(params: {  "id": string; "fk": string; }, options?: any) {
-        return ProductApiFp.productPrototypeUnlinkOrder(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update a related item by id for order.
-     * @param id Product id
-     * @param fk Foreign key for order
+     * @summary Update a related item by id for members.
+     * @param id Team id
+     * @param fk Foreign key for members
      * @param data 
      */
-    productPrototypeUpdateByIdOrder(params: {  "id": string; "fk": string; "data"?: Order; }, options?: any) {
-        return ProductApiFp.productPrototypeUpdateByIdOrder(params, options)(this.fetch, this.basePath);
+    teamPrototypeUpdateByIdMembers(params: {  "id": string; "fk": string; "data"?: Account; }, options?: any) {
+        return TeamApiFp.teamPrototypeUpdateByIdMembers(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -15047,8 +9523,8 @@ export class ProductApi extends BaseAPI {
      * @param id Model id
      * @param data Model instance data
      */
-    productReplaceByIdPostProductsidReplace(params: {  "id": string; "data"?: Product; }, options?: any) {
-        return ProductApiFp.productReplaceByIdPostProductsidReplace(params, options)(this.fetch, this.basePath);
+    teamReplaceByIdPostTeamsidReplace(params: {  "id": string; "data"?: Team; }, options?: any) {
+        return TeamApiFp.teamReplaceByIdPostTeamsidReplace(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -15056,24 +9532,24 @@ export class ProductApi extends BaseAPI {
      * @param id Model id
      * @param data Model instance data
      */
-    productReplaceByIdPutProductsid(params: {  "id": string; "data"?: Product; }, options?: any) {
-        return ProductApiFp.productReplaceByIdPutProductsid(params, options)(this.fetch, this.basePath);
+    teamReplaceByIdPutTeamsid(params: {  "id": string; "data"?: Team; }, options?: any) {
+        return TeamApiFp.teamReplaceByIdPutTeamsid(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    productReplaceOrCreatePostProductsReplaceOrCreate(params: {  "data"?: Product; }, options?: any) {
-        return ProductApiFp.productReplaceOrCreatePostProductsReplaceOrCreate(params, options)(this.fetch, this.basePath);
+    teamReplaceOrCreatePostTeamsReplaceOrCreate(params: {  "data"?: Team; }, options?: any) {
+        return TeamApiFp.teamReplaceOrCreatePostTeamsReplaceOrCreate(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
      * @summary Replace an existing model instance or insert a new one into the data source.
      * @param data Model instance data
      */
-    productReplaceOrCreatePutProducts(params: {  "data"?: Product; }, options?: any) {
-        return ProductApiFp.productReplaceOrCreatePutProducts(params, options)(this.fetch, this.basePath);
+    teamReplaceOrCreatePutTeams(params: {  "data"?: Team; }, options?: any) {
+        return TeamApiFp.teamReplaceOrCreatePutTeams(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -15081,8 +9557,8 @@ export class ProductApi extends BaseAPI {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    productUpdateAll(params: {  "where"?: string; "data"?: Product; }, options?: any) {
-        return ProductApiFp.productUpdateAll(params, options)(this.fetch, this.basePath);
+    teamUpdateAll(params: {  "where"?: string; "data"?: Team; }, options?: any) {
+        return TeamApiFp.teamUpdateAll(params, options)(this.fetch, this.basePath);
     }
     /**
      * 
@@ -15090,79 +9566,79 @@ export class ProductApi extends BaseAPI {
      * @param where Criteria to match model instances
      * @param data An object of model property name/value pairs
      */
-    productUpsertWithWhere(params: {  "where"?: string; "data"?: Product; }, options?: any) {
-        return ProductApiFp.productUpsertWithWhere(params, options)(this.fetch, this.basePath);
+    teamUpsertWithWhere(params: {  "where"?: string; "data"?: Team; }, options?: any) {
+        return TeamApiFp.teamUpsertWithWhere(params, options)(this.fetch, this.basePath);
     }
 };
 
 /**
- * ProductApi - factory interface
+ * TeamApi - factory interface
  */
-export const ProductApiFactory = function (fetch?: FetchAPI, basePath?: string) {
+export const TeamApiFactory = function (fetch?: FetchAPI, basePath?: string) {
     return {
         /**
          * 
          * @summary Count instances of the model matched by where from the data source.
          * @param where Criteria to match model instances
          */
-        productCount(params: {  "where"?: string; }, options?: any) {
-            return ProductApiFp.productCount(params, options)(fetch, basePath);
+        teamCount(params: {  "where"?: string; }, options?: any) {
+            return TeamApiFp.teamCount(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Create a new instance of the model and persist it into the data source.
          * @param data Model instance data
          */
-        productCreate(params: {  "data"?: Product; }, options?: any) {
-            return ProductApiFp.productCreate(params, options)(fetch, basePath);
+        teamCreate(params: {  "data"?: Team; }, options?: any) {
+            return TeamApiFp.teamCreate(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Create a change stream.
          * @param options 
          */
-        productCreateChangeStreamGetProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return ProductApiFp.productCreateChangeStreamGetProductsChangeStream(params, options)(fetch, basePath);
+        teamCreateChangeStreamGetTeamsChangeStream(params: {  "options"?: string; }, options?: any) {
+            return TeamApiFp.teamCreateChangeStreamGetTeamsChangeStream(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Create a change stream.
          * @param options 
          */
-        productCreateChangeStreamPostProductsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return ProductApiFp.productCreateChangeStreamPostProductsChangeStream(params, options)(fetch, basePath);
+        teamCreateChangeStreamPostTeamsChangeStream(params: {  "options"?: string; }, options?: any) {
+            return TeamApiFp.teamCreateChangeStreamPostTeamsChangeStream(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Delete a model instance by {{id}} from the data source.
          * @param id Model id
          */
-        productDeleteById(params: {  "id": string; }, options?: any) {
-            return ProductApiFp.productDeleteById(params, options)(fetch, basePath);
+        teamDeleteById(params: {  "id": string; }, options?: any) {
+            return TeamApiFp.teamDeleteById(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Check whether a model instance exists in the data source.
          * @param id Model id
          */
-        productExistsGetProductsidExists(params: {  "id": string; }, options?: any) {
-            return ProductApiFp.productExistsGetProductsidExists(params, options)(fetch, basePath);
+        teamExistsGetTeamsidExists(params: {  "id": string; }, options?: any) {
+            return TeamApiFp.teamExistsGetTeamsidExists(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Check whether a model instance exists in the data source.
          * @param id Model id
          */
-        productExistsHeadProductsid(params: {  "id": string; }, options?: any) {
-            return ProductApiFp.productExistsHeadProductsid(params, options)(fetch, basePath);
+        teamExistsHeadTeamsid(params: {  "id": string; }, options?: any) {
+            return TeamApiFp.teamExistsHeadTeamsid(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Find all instances of the model matched by filter from the data source.
          * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
          */
-        productFind(params: {  "filter"?: string; }, options?: any) {
-            return ProductApiFp.productFind(params, options)(fetch, basePath);
+        teamFind(params: {  "filter"?: string; }, options?: any) {
+            return TeamApiFp.teamFind(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -15170,133 +9646,105 @@ export const ProductApiFactory = function (fetch?: FetchAPI, basePath?: string) 
          * @param id Model id
          * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
          */
-        productFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-            return ProductApiFp.productFindById(params, options)(fetch, basePath);
+        teamFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
+            return TeamApiFp.teamFindById(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Find first instance of the model matched by filter from the data source.
          * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
          */
-        productFindOne(params: {  "filter"?: string; }, options?: any) {
-            return ProductApiFp.productFindOne(params, options)(fetch, basePath);
+        teamFindOne(params: {  "filter"?: string; }, options?: any) {
+            return TeamApiFp.teamFindOne(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Patch an existing model instance or insert a new one into the data source.
          * @param data Model instance data
          */
-        productPatchOrCreate(params: {  "data"?: Product; }, options?: any) {
-            return ProductApiFp.productPatchOrCreate(params, options)(fetch, basePath);
+        teamPatchOrCreate(params: {  "data"?: Team; }, options?: any) {
+            return TeamApiFp.teamPatchOrCreate(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Counts order of Product.
-         * @param id Product id
+         * @summary Counts members of Team.
+         * @param id Team id
          * @param where Criteria to match model instances
          */
-        productPrototypeCountOrder(params: {  "id": string; "where"?: string; }, options?: any) {
-            return ProductApiFp.productPrototypeCountOrder(params, options)(fetch, basePath);
+        teamPrototypeCountMembers(params: {  "id": string; "where"?: string; }, options?: any) {
+            return TeamApiFp.teamPrototypeCountMembers(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Creates a new instance in order of this model.
-         * @param id Product id
+         * @summary Creates a new instance in members of this model.
+         * @param id Team id
          * @param data 
          */
-        productPrototypeCreateOrder(params: {  "id": string; "data"?: Order; }, options?: any) {
-            return ProductApiFp.productPrototypeCreateOrder(params, options)(fetch, basePath);
+        teamPrototypeCreateMembers(params: {  "id": string; "data"?: Account; }, options?: any) {
+            return TeamApiFp.teamPrototypeCreateMembers(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Deletes all order of this model.
-         * @param id Product id
+         * @summary Deletes all members of this model.
+         * @param id Team id
          */
-        productPrototypeDeleteOrder(params: {  "id": string; }, options?: any) {
-            return ProductApiFp.productPrototypeDeleteOrder(params, options)(fetch, basePath);
+        teamPrototypeDeleteMembers(params: {  "id": string; }, options?: any) {
+            return TeamApiFp.teamPrototypeDeleteMembers(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Delete a related item by id for order.
-         * @param id Product id
-         * @param fk Foreign key for order
+         * @summary Delete a related item by id for members.
+         * @param id Team id
+         * @param fk Foreign key for members
          */
-        productPrototypeDestroyByIdOrder(params: {  "id": string; "fk": string; }, options?: any) {
-            return ProductApiFp.productPrototypeDestroyByIdOrder(params, options)(fetch, basePath);
+        teamPrototypeDestroyByIdMembers(params: {  "id": string; "fk": string; }, options?: any) {
+            return TeamApiFp.teamPrototypeDestroyByIdMembers(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Check the existence of order relation to an item by id.
-         * @param id Product id
-         * @param fk Foreign key for order
+         * @summary Find a related item by id for members.
+         * @param id Team id
+         * @param fk Foreign key for members
          */
-        productPrototypeExistsOrder(params: {  "id": string; "fk": string; }, options?: any) {
-            return ProductApiFp.productPrototypeExistsOrder(params, options)(fetch, basePath);
+        teamPrototypeFindByIdMembers(params: {  "id": string; "fk": string; }, options?: any) {
+            return TeamApiFp.teamPrototypeFindByIdMembers(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Find a related item by id for order.
-         * @param id Product id
-         * @param fk Foreign key for order
-         */
-        productPrototypeFindByIdOrder(params: {  "id": string; "fk": string; }, options?: any) {
-            return ProductApiFp.productPrototypeFindByIdOrder(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Fetches belongsTo relation categoryProduct.
-         * @param id Product id
+         * @summary Fetches belongsTo relation leader.
+         * @param id Team id
          * @param refresh 
          */
-        productPrototypeGetCategoryProduct(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
-            return ProductApiFp.productPrototypeGetCategoryProduct(params, options)(fetch, basePath);
+        teamPrototypeGetLeader(params: {  "id": string; "refresh"?: boolean; }, options?: any) {
+            return TeamApiFp.teamPrototypeGetLeader(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Queries order of Product.
-         * @param id Product id
+         * @summary Queries members of Team.
+         * @param id Team id
          * @param filter 
          */
-        productPrototypeGetOrder(params: {  "id": string; "filter"?: string; }, options?: any) {
-            return ProductApiFp.productPrototypeGetOrder(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Add a related item by id for order.
-         * @param id Product id
-         * @param fk Foreign key for order
-         * @param data 
-         */
-        productPrototypeLinkOrder(params: {  "id": string; "fk": string; "data"?: OrderProduct; }, options?: any) {
-            return ProductApiFp.productPrototypeLinkOrder(params, options)(fetch, basePath);
+        teamPrototypeGetMembers(params: {  "id": string; "filter"?: string; }, options?: any) {
+            return TeamApiFp.teamPrototypeGetMembers(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Patch attributes for a model instance and persist it into the data source.
-         * @param id Product id
+         * @param id Team id
          * @param data An object of model property name/value pairs
          */
-        productPrototypePatchAttributes(params: {  "id": string; "data"?: Product; }, options?: any) {
-            return ProductApiFp.productPrototypePatchAttributes(params, options)(fetch, basePath);
+        teamPrototypePatchAttributes(params: {  "id": string; "data"?: Team; }, options?: any) {
+            return TeamApiFp.teamPrototypePatchAttributes(params, options)(fetch, basePath);
         },
         /**
          * 
-         * @summary Remove the order relation to an item by id.
-         * @param id Product id
-         * @param fk Foreign key for order
-         */
-        productPrototypeUnlinkOrder(params: {  "id": string; "fk": string; }, options?: any) {
-            return ProductApiFp.productPrototypeUnlinkOrder(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update a related item by id for order.
-         * @param id Product id
-         * @param fk Foreign key for order
+         * @summary Update a related item by id for members.
+         * @param id Team id
+         * @param fk Foreign key for members
          * @param data 
          */
-        productPrototypeUpdateByIdOrder(params: {  "id": string; "fk": string; "data"?: Order; }, options?: any) {
-            return ProductApiFp.productPrototypeUpdateByIdOrder(params, options)(fetch, basePath);
+        teamPrototypeUpdateByIdMembers(params: {  "id": string; "fk": string; "data"?: Account; }, options?: any) {
+            return TeamApiFp.teamPrototypeUpdateByIdMembers(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -15304,8 +9752,8 @@ export const ProductApiFactory = function (fetch?: FetchAPI, basePath?: string) 
          * @param id Model id
          * @param data Model instance data
          */
-        productReplaceByIdPostProductsidReplace(params: {  "id": string; "data"?: Product; }, options?: any) {
-            return ProductApiFp.productReplaceByIdPostProductsidReplace(params, options)(fetch, basePath);
+        teamReplaceByIdPostTeamsidReplace(params: {  "id": string; "data"?: Team; }, options?: any) {
+            return TeamApiFp.teamReplaceByIdPostTeamsidReplace(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -15313,24 +9761,24 @@ export const ProductApiFactory = function (fetch?: FetchAPI, basePath?: string) 
          * @param id Model id
          * @param data Model instance data
          */
-        productReplaceByIdPutProductsid(params: {  "id": string; "data"?: Product; }, options?: any) {
-            return ProductApiFp.productReplaceByIdPutProductsid(params, options)(fetch, basePath);
+        teamReplaceByIdPutTeamsid(params: {  "id": string; "data"?: Team; }, options?: any) {
+            return TeamApiFp.teamReplaceByIdPutTeamsid(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Replace an existing model instance or insert a new one into the data source.
          * @param data Model instance data
          */
-        productReplaceOrCreatePostProductsReplaceOrCreate(params: {  "data"?: Product; }, options?: any) {
-            return ProductApiFp.productReplaceOrCreatePostProductsReplaceOrCreate(params, options)(fetch, basePath);
+        teamReplaceOrCreatePostTeamsReplaceOrCreate(params: {  "data"?: Team; }, options?: any) {
+            return TeamApiFp.teamReplaceOrCreatePostTeamsReplaceOrCreate(params, options)(fetch, basePath);
         },
         /**
          * 
          * @summary Replace an existing model instance or insert a new one into the data source.
          * @param data Model instance data
          */
-        productReplaceOrCreatePutProducts(params: {  "data"?: Product; }, options?: any) {
-            return ProductApiFp.productReplaceOrCreatePutProducts(params, options)(fetch, basePath);
+        teamReplaceOrCreatePutTeams(params: {  "data"?: Team; }, options?: any) {
+            return TeamApiFp.teamReplaceOrCreatePutTeams(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -15338,8 +9786,8 @@ export const ProductApiFactory = function (fetch?: FetchAPI, basePath?: string) 
          * @param where Criteria to match model instances
          * @param data An object of model property name/value pairs
          */
-        productUpdateAll(params: {  "where"?: string; "data"?: Product; }, options?: any) {
-            return ProductApiFp.productUpdateAll(params, options)(fetch, basePath);
+        teamUpdateAll(params: {  "where"?: string; "data"?: Team; }, options?: any) {
+            return TeamApiFp.teamUpdateAll(params, options)(fetch, basePath);
         },
         /**
          * 
@@ -15347,1091 +9795,8 @@ export const ProductApiFactory = function (fetch?: FetchAPI, basePath?: string) 
          * @param where Criteria to match model instances
          * @param data An object of model property name/value pairs
          */
-        productUpsertWithWhere(params: {  "where"?: string; "data"?: Product; }, options?: any) {
-            return ProductApiFp.productUpsertWithWhere(params, options)(fetch, basePath);
-        },
-    };
-};
-
-
-/**
- * TagApi - fetch parameter creator
- */
-export const TagApiFetchParamCreator = {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    tagCount(params: {  "where"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags/count`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    tagCreate(params: {  "data"?: Tag; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    tagCreateChangeStreamGetTagsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags/change-stream`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "options": params["options"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    tagCreateChangeStreamPostTagsChangeStream(params: {  "options"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags/change-stream`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/x-www-form-urlencoded" };
-        fetchOptions.body = querystring.stringify({
-            "options": params["options"],
-        });
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    tagDeleteById(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling tagDeleteById");
-        }
-        const baseUrl = `/Tags/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "DELETE" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    tagExistsGetTagsidExists(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling tagExistsGetTagsidExists");
-        }
-        const baseUrl = `/Tags/{id}/exists`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    tagExistsHeadTagsid(params: {  "id": string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling tagExistsHeadTagsid");
-        }
-        const baseUrl = `/Tags/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "HEAD" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    tagFind(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    tagFindById(params: {  "id": string; "filter"?: string; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling tagFindById");
-        }
-        const baseUrl = `/Tags/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    tagFindOne(params: {  "filter"?: string; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags/findOne`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "filter": params["filter"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    tagPatchOrCreate(params: {  "data"?: Tag; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Tag id
-     * @param data An object of model property name/value pairs
-     */
-    tagPrototypePatchAttributes(params: {  "id": string; "data"?: Tag; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling tagPrototypePatchAttributes");
-        }
-        const baseUrl = `/Tags/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PATCH" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    tagReplaceByIdPostTagsidReplace(params: {  "id": string; "data"?: Tag; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling tagReplaceByIdPostTagsidReplace");
-        }
-        const baseUrl = `/Tags/{id}/replace`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    tagReplaceByIdPutTagsid(params: {  "id": string; "data"?: Tag; }, options?: any): FetchArgs {
-        // verify required parameter "id" is set
-        if (params["id"] == null) {
-            throw new Error("Missing required parameter id when calling tagReplaceByIdPutTagsid");
-        }
-        const baseUrl = `/Tags/{id}`
-            .replace(`{${"id"}}`, `${ params["id"] }`);
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    tagReplaceOrCreatePostTagsReplaceOrCreate(params: {  "data"?: Tag; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags/replaceOrCreate`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    tagReplaceOrCreatePutTags(params: {  "data"?: Tag; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags`;
-        let urlObj = url.parse(baseUrl, true);
-        let fetchOptions: RequestInit = assign({}, { method: "PUT" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    tagUpdateAll(params: {  "where"?: string; "data"?: Tag; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags/update`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    tagUpsertWithWhere(params: {  "where"?: string; "data"?: Tag; }, options?: any): FetchArgs {
-        const baseUrl = `/Tags/upsertWithWhere`;
-        let urlObj = url.parse(baseUrl, true);
-        urlObj.query = assign({}, urlObj.query, {
-            "where": params["where"],
-        });
-        let fetchOptions: RequestInit = assign({}, { method: "POST" }, options);
-
-        let contentTypeHeader: Dictionary<string> = {};
-        contentTypeHeader = { "Content-Type": "application/json" };
-        if (params["data"]) {
-            fetchOptions.body = JSON.stringify(params["data"] || {});
-        }
-        if (contentTypeHeader) {
-            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
-        }
-        return {
-            url: url.format(urlObj),
-            options: fetchOptions,
-        };
-    },
-};
-
-/**
- * TagApi - functional programming interface
- */
-export const TagApiFp = {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    tagCount(params: { "where"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2002> {
-        const fetchArgs = TagApiFetchParamCreator.tagCount(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    tagCreate(params: { "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = TagApiFetchParamCreator.tagCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    tagCreateChangeStreamGetTagsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = TagApiFetchParamCreator.tagCreateChangeStreamGetTagsChangeStream(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    tagCreateChangeStreamPostTagsChangeStream(params: { "options"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = TagApiFetchParamCreator.tagCreateChangeStreamPostTagsChangeStream(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    tagDeleteById(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
-        const fetchArgs = TagApiFetchParamCreator.tagDeleteById(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    tagExistsGetTagsidExists(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = TagApiFetchParamCreator.tagExistsGetTagsidExists(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    tagExistsHeadTagsid(params: { "id": string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2003> {
-        const fetchArgs = TagApiFetchParamCreator.tagExistsHeadTagsid(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    tagFind(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Array<Tag>> {
-        const fetchArgs = TagApiFetchParamCreator.tagFind(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    tagFindById(params: { "id": string; "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = TagApiFetchParamCreator.tagFindById(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    tagFindOne(params: { "filter"?: string;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = TagApiFetchParamCreator.tagFindOne(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    tagPatchOrCreate(params: { "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = TagApiFetchParamCreator.tagPatchOrCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Tag id
-     * @param data An object of model property name/value pairs
-     */
-    tagPrototypePatchAttributes(params: { "id": string; "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = TagApiFetchParamCreator.tagPrototypePatchAttributes(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    tagReplaceByIdPostTagsidReplace(params: { "id": string; "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = TagApiFetchParamCreator.tagReplaceByIdPostTagsidReplace(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    tagReplaceByIdPutTagsid(params: { "id": string; "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = TagApiFetchParamCreator.tagReplaceByIdPutTagsid(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    tagReplaceOrCreatePostTagsReplaceOrCreate(params: { "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = TagApiFetchParamCreator.tagReplaceOrCreatePostTagsReplaceOrCreate(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    tagReplaceOrCreatePutTags(params: { "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = TagApiFetchParamCreator.tagReplaceOrCreatePutTags(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    tagUpdateAll(params: { "where"?: string; "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2004> {
-        const fetchArgs = TagApiFetchParamCreator.tagUpdateAll(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    tagUpsertWithWhere(params: { "where"?: string; "data"?: Tag;  }, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Tag> {
-        const fetchArgs = TagApiFetchParamCreator.tagUpsertWithWhere(params, options);
-        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
-            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json();
-                } else {
-                    throw response;
-                }
-            });
-        };
-    },
-};
-
-/**
- * TagApi - object-oriented interface
- */
-export class TagApi extends BaseAPI {
-    /**
-     * 
-     * @summary Count instances of the model matched by where from the data source.
-     * @param where Criteria to match model instances
-     */
-    tagCount(params: {  "where"?: string; }, options?: any) {
-        return TagApiFp.tagCount(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a new instance of the model and persist it into the data source.
-     * @param data Model instance data
-     */
-    tagCreate(params: {  "data"?: Tag; }, options?: any) {
-        return TagApiFp.tagCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    tagCreateChangeStreamGetTagsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return TagApiFp.tagCreateChangeStreamGetTagsChangeStream(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Create a change stream.
-     * @param options 
-     */
-    tagCreateChangeStreamPostTagsChangeStream(params: {  "options"?: string; }, options?: any) {
-        return TagApiFp.tagCreateChangeStreamPostTagsChangeStream(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Delete a model instance by {{id}} from the data source.
-     * @param id Model id
-     */
-    tagDeleteById(params: {  "id": string; }, options?: any) {
-        return TagApiFp.tagDeleteById(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    tagExistsGetTagsidExists(params: {  "id": string; }, options?: any) {
-        return TagApiFp.tagExistsGetTagsidExists(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Check whether a model instance exists in the data source.
-     * @param id Model id
-     */
-    tagExistsHeadTagsid(params: {  "id": string; }, options?: any) {
-        return TagApiFp.tagExistsHeadTagsid(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find all instances of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    tagFind(params: {  "filter"?: string; }, options?: any) {
-        return TagApiFp.tagFind(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find a model instance by {{id}} from the data source.
-     * @param id Model id
-     * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-     */
-    tagFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-        return TagApiFp.tagFindById(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Find first instance of the model matched by filter from the data source.
-     * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-     */
-    tagFindOne(params: {  "filter"?: string; }, options?: any) {
-        return TagApiFp.tagFindOne(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Patch an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    tagPatchOrCreate(params: {  "data"?: Tag; }, options?: any) {
-        return TagApiFp.tagPatchOrCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Patch attributes for a model instance and persist it into the data source.
-     * @param id Tag id
-     * @param data An object of model property name/value pairs
-     */
-    tagPrototypePatchAttributes(params: {  "id": string; "data"?: Tag; }, options?: any) {
-        return TagApiFp.tagPrototypePatchAttributes(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    tagReplaceByIdPostTagsidReplace(params: {  "id": string; "data"?: Tag; }, options?: any) {
-        return TagApiFp.tagReplaceByIdPostTagsidReplace(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace attributes for a model instance and persist it into the data source.
-     * @param id Model id
-     * @param data Model instance data
-     */
-    tagReplaceByIdPutTagsid(params: {  "id": string; "data"?: Tag; }, options?: any) {
-        return TagApiFp.tagReplaceByIdPutTagsid(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    tagReplaceOrCreatePostTagsReplaceOrCreate(params: {  "data"?: Tag; }, options?: any) {
-        return TagApiFp.tagReplaceOrCreatePostTagsReplaceOrCreate(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Replace an existing model instance or insert a new one into the data source.
-     * @param data Model instance data
-     */
-    tagReplaceOrCreatePutTags(params: {  "data"?: Tag; }, options?: any) {
-        return TagApiFp.tagReplaceOrCreatePutTags(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update instances of the model matched by {{where}} from the data source.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    tagUpdateAll(params: {  "where"?: string; "data"?: Tag; }, options?: any) {
-        return TagApiFp.tagUpdateAll(params, options)(this.fetch, this.basePath);
-    }
-    /**
-     * 
-     * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-     * @param where Criteria to match model instances
-     * @param data An object of model property name/value pairs
-     */
-    tagUpsertWithWhere(params: {  "where"?: string; "data"?: Tag; }, options?: any) {
-        return TagApiFp.tagUpsertWithWhere(params, options)(this.fetch, this.basePath);
-    }
-};
-
-/**
- * TagApi - factory interface
- */
-export const TagApiFactory = function (fetch?: FetchAPI, basePath?: string) {
-    return {
-        /**
-         * 
-         * @summary Count instances of the model matched by where from the data source.
-         * @param where Criteria to match model instances
-         */
-        tagCount(params: {  "where"?: string; }, options?: any) {
-            return TagApiFp.tagCount(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a new instance of the model and persist it into the data source.
-         * @param data Model instance data
-         */
-        tagCreate(params: {  "data"?: Tag; }, options?: any) {
-            return TagApiFp.tagCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a change stream.
-         * @param options 
-         */
-        tagCreateChangeStreamGetTagsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return TagApiFp.tagCreateChangeStreamGetTagsChangeStream(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Create a change stream.
-         * @param options 
-         */
-        tagCreateChangeStreamPostTagsChangeStream(params: {  "options"?: string; }, options?: any) {
-            return TagApiFp.tagCreateChangeStreamPostTagsChangeStream(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Delete a model instance by {{id}} from the data source.
-         * @param id Model id
-         */
-        tagDeleteById(params: {  "id": string; }, options?: any) {
-            return TagApiFp.tagDeleteById(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check whether a model instance exists in the data source.
-         * @param id Model id
-         */
-        tagExistsGetTagsidExists(params: {  "id": string; }, options?: any) {
-            return TagApiFp.tagExistsGetTagsidExists(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Check whether a model instance exists in the data source.
-         * @param id Model id
-         */
-        tagExistsHeadTagsid(params: {  "id": string; }, options?: any) {
-            return TagApiFp.tagExistsHeadTagsid(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find all instances of the model matched by filter from the data source.
-         * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-         */
-        tagFind(params: {  "filter"?: string; }, options?: any) {
-            return TagApiFp.tagFind(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find a model instance by {{id}} from the data source.
-         * @param id Model id
-         * @param filter Filter defining fields and include - must be a JSON-encoded string ({\&quot;something\&quot;:\&quot;value\&quot;})
-         */
-        tagFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
-            return TagApiFp.tagFindById(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Find first instance of the model matched by filter from the data source.
-         * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
-         */
-        tagFindOne(params: {  "filter"?: string; }, options?: any) {
-            return TagApiFp.tagFindOne(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Patch an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        tagPatchOrCreate(params: {  "data"?: Tag; }, options?: any) {
-            return TagApiFp.tagPatchOrCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Patch attributes for a model instance and persist it into the data source.
-         * @param id Tag id
-         * @param data An object of model property name/value pairs
-         */
-        tagPrototypePatchAttributes(params: {  "id": string; "data"?: Tag; }, options?: any) {
-            return TagApiFp.tagPrototypePatchAttributes(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace attributes for a model instance and persist it into the data source.
-         * @param id Model id
-         * @param data Model instance data
-         */
-        tagReplaceByIdPostTagsidReplace(params: {  "id": string; "data"?: Tag; }, options?: any) {
-            return TagApiFp.tagReplaceByIdPostTagsidReplace(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace attributes for a model instance and persist it into the data source.
-         * @param id Model id
-         * @param data Model instance data
-         */
-        tagReplaceByIdPutTagsid(params: {  "id": string; "data"?: Tag; }, options?: any) {
-            return TagApiFp.tagReplaceByIdPutTagsid(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        tagReplaceOrCreatePostTagsReplaceOrCreate(params: {  "data"?: Tag; }, options?: any) {
-            return TagApiFp.tagReplaceOrCreatePostTagsReplaceOrCreate(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Replace an existing model instance or insert a new one into the data source.
-         * @param data Model instance data
-         */
-        tagReplaceOrCreatePutTags(params: {  "data"?: Tag; }, options?: any) {
-            return TagApiFp.tagReplaceOrCreatePutTags(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update instances of the model matched by {{where}} from the data source.
-         * @param where Criteria to match model instances
-         * @param data An object of model property name/value pairs
-         */
-        tagUpdateAll(params: {  "where"?: string; "data"?: Tag; }, options?: any) {
-            return TagApiFp.tagUpdateAll(params, options)(fetch, basePath);
-        },
-        /**
-         * 
-         * @summary Update an existing model instance or insert a new one into the data source based on the where criteria.
-         * @param where Criteria to match model instances
-         * @param data An object of model property name/value pairs
-         */
-        tagUpsertWithWhere(params: {  "where"?: string; "data"?: Tag; }, options?: any) {
-            return TagApiFp.tagUpsertWithWhere(params, options)(fetch, basePath);
+        teamUpsertWithWhere(params: {  "where"?: string; "data"?: Team; }, options?: any) {
+            return TeamApiFp.teamUpsertWithWhere(params, options)(fetch, basePath);
         },
     };
 };

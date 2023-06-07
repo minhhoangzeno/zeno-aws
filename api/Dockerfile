@@ -1,6 +1,6 @@
 FROM node:14-alpine
 RUN apk add g++ make py3-pip
-WORKDIR /backend
+WORKDIR /app
 
 COPY package*.json ./
 

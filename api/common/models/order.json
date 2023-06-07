@@ -12,52 +12,41 @@
     }
   },
   "properties": {
-    "code": {
-      "type": "string"
-    },
-    "firstName": {
-      "type": "string"
-    },
-    "lastName": {
-      "type": "string"
-    },
-    "phoneNumber": {
+    "numberOfCall": {
       "type": "number"
     },
-    "email": {
-      "type": "string"
-    },
-    "address": {
-      "type": "string"
-    },
-    "city": {
+    "numberOfAdvise": {
       "type": "number"
     },
-    "district": {
+    "numberOfOrder": {
       "type": "number"
     },
-    "note": {
-      "type": "string"
+    "numberOfAccepted": {
+      "type": "number"
     },
-    "status": {
-      "type": "string"
+    "revenueOfOrder": {
+      "type": "number"
     },
-    "price": {
+    "revenueOfAccepted": {
       "type": "number"
     }
   },
   "validations": [],
   "relations": {
+    "team": {
+      "type": "belongsTo",
+      "model": "Team",
+      "foreignKey": ""
+    },
     "account": {
       "type": "belongsTo",
       "model": "Account",
       "foreignKey": ""
     },
-    "product": {
-      "type": "hasMany",
-      "model": "Product",
-      "foreignKey": "",
-      "through": "OrderProduct"
+    "durationTime": {
+      "type": "belongsTo",
+      "model": "DurationTime",
+      "foreignKey": ""
     }
   },
   "acls": [
@@ -80,144 +69,11 @@
       "permission": "ALLOW"
     },
     {
-      "accessType": "*",
+      "accessType": "READ",
       "principalType": "ROLE",
-      "principalId": "$authenticated",
+      "principalId": "$everyone",
       "permission": "ALLOW"
     }
   ],
-  "methods": {
-    "addToCart": {
-      "accepts": [
-        {
-          "arg": "ctx",
-          "type": "any",
-          "required": true,
-          "description": "context of request",
-          "http": {
-            "source": "context"
-          }
-        },
-        {
-          "arg": "product",
-          "type": "object",
-          "required": true,
-          "description": "product",
-          "http": {
-            "source": "query"
-          }
-        }
-      ],
-      "returns": {
-        "root": true,
-        "type": "string"
-      },
-      "description": "check order by account token and product",
-      "http": [
-        {
-          "path": "/add-to-cart",
-          "verb": "post"
-        }
-      ]
-    },
-    "statisticByAmount": {
-      "accepts": [
-        {
-          "arg": "ctx",
-          "type": "any",
-          "required": true,
-          "description": "context of request",
-          "http": {
-            "source": "context"
-          }
-        },
-        {
-          "arg": "year",
-          "type": "number",
-          "required": true,
-          "description": "year",
-          "http": {
-            "source": "query"
-          }
-        }
-      ],
-      "returns": {
-        "root": true,
-        "type": "any"
-      },
-      "description": "statistic order by year",
-      "http": [
-        {
-          "path": "/statistic-amount",
-          "verb": "get"
-        }
-      ]
-    },
-    "statisticByRevenue": {
-      "accepts": [
-        {
-          "arg": "ctx",
-          "type": "any",
-          "required": true,
-          "description": "context of request",
-          "http": {
-            "source": "context"
-          }
-        },
-        {
-          "arg": "year",
-          "type": "number",
-          "required": true,
-          "description": "year",
-          "http": {
-            "source": "query"
-          }
-        }
-      ],
-      "returns": {
-        "root": true,
-        "type": "any"
-      },
-      "description": "statistic order by year",
-      "http": [
-        {
-          "path": "/statistic-revenue",
-          "verb": "get"
-        }
-      ]
-    },
-    "paymentOrder": {
-      "accepts": [
-        {
-          "arg": "ctx",
-          "type": "any",
-          "required": true,
-          "description": "context of request",
-          "http": {
-            "source": "context"
-          }
-        },
-        {
-          "arg": "data",
-          "type": "any",
-          "required": true,
-          "description": "information payment",
-          "http": {
-            "source": "body"
-          }
-        }
-      ],
-      "returns": {
-        "root": true,
-        "type": "string"
-      },
-      "description": "payment online",
-      "http": [
-        {
-          "path": "/payment-order",
-          "verb": "post"
-        }
-      ]
-    }
-  }
+  "methods": {}
 }

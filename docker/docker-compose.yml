@@ -1,17 +1,18 @@
 version: '3'
 services:
   postgres:
-    image: postgres:14.1-alpine
+    image: postgres:14.8
     container_name: postgresql
     restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=dbpsql
+      - POSTGRES_DB=dreambuilder
     ports:
       - '5432:5432'
   backend:
     restart: always
+    container_name: api
     build: 
       context: ../api
       dockerfile: Dockerfile
@@ -20,23 +21,20 @@ services:
     environment:
       - NODE_ENV=production
 
-      # API Config
-      - EXPLORER_ROOT_PATH=/api
-      - EXPLORER_MOUNT_PATH=/explorer
-
       # DB Config
-      - DB_HOST=postgresql # `mysql` là tên của service mysql phía trên
-      - DB_PORT=5432 # port mặc định của mysql
-      - DB_NAME=dbpsql # giống phía trên
-      - DB_PASSWORD=postgres # giống phía trên
-      - DB_USER=postgres # mặc định là root
+      - DB_HOST=postgresql 
+      - DB_PORT=5432 
+      - DB_NAME=dreambuilder 
+      - DB_PASSWORD=postgres 
+      - DB_USER=postgres 
 
     depends_on:
       - postgres
   admin: 
     image: nginx:1.25.0
+    container_name: admin
     ports:
-      - 3001:80
+      - 80:80
     volumes:
       - ../admin/build:/usr/share/nginx/html
       - ./default.conf:/etc/nginx/conf.d/default.conf

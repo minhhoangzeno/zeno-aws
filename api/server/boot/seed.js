@@ -25,25 +25,20 @@ module.exports = function (app) {
     //return;
     // auto update
     (async () => {
-        const [ACL, AccountToken, RoleMapping, Role, Account, Tag, Blog, Contact, Feedback, CategoryProduct, Product, Order, OrderProduct, Banner,] = await Promise.all([
+        const [ACL, AccountToken, RoleMapping, Role, Account, DurationTime, Order, Target, Team,] = await Promise.all([
             'ACL',
             'AccountToken',
             'RoleMapping',
             'Role',
             'Account',
-            'Tag',
-            'Blog',
-            'Contact',
-            'Feedback',
-            'CategoryProduct',
-            'Product',
+            'DurationTime',
             'Order',
-            'OrderProduct',
-            'Banner',
+            'Target',
+            'Team',
         ].map(process.env.NODE_ENV === 'production'
             ? automigrate('postgres')
             : autoupdate('postgres')));
-        // return;
+        return;
         if (process.env.NODE_ENV === 'production') {
             return;
         }
@@ -54,7 +49,6 @@ module.exports = function (app) {
             { id: 3, name: 'USER', description: '' },
             { id: 4, name: 'UNKNOWN', description: '' },
         ];
-        return;
         for (const role of roles) {
             await Role.create(withoutId(role));
         }

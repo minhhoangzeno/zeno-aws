@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: plan-de-transport-api
+  title: api
   description: plan-de-transport-api
 basePath: /api
 paths:
@@ -393,6 +393,29 @@ paths:
           description: Request was successful
           schema:
             $ref: '#/definitions/AccountToken'
+      deprecated: false
+  '/Accounts/{id}/team':
+    get:
+      tags:
+        - Account
+      summary: Fetches belongsTo relation team.
+      operationId: Account.prototype.__get__team
+      parameters:
+        - name: id
+          in: path
+          description: Account id
+          required: true
+          type: string
+          format: JSON
+        - name: refresh
+          in: query
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
       deprecated: false
   '/Accounts/{id}/roles':
     get:
@@ -1615,858 +1638,16 @@ paths:
           schema:
             type: file
       deprecated: false
-  /Contacts:
-    post:
-      tags:
-        - Contact
-      summary: Create a new instance of the model and persist it into the data source.
-      operationId: Contact.create
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Contact'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Contact'
-      deprecated: false
-    patch:
-      tags:
-        - Contact
-      summary: >-
-        Patch an existing model instance or insert a new one into the data
-        source.
-      operationId: Contact.patchOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Contact'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Contact'
-      deprecated: false
-    put:
-      tags:
-        - Contact
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: Contact.replaceOrCreate__put_Contacts
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Contact'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Contact'
-      deprecated: false
+  '/DurationTimes/{id}/leader':
     get:
       tags:
-        - Contact
-      summary: Find all instances of the model matched by filter from the data source.
-      operationId: Contact.find
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Contact'
-      deprecated: false
-  /Contacts/replaceOrCreate:
-    post:
-      tags:
-        - Contact
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: Contact.replaceOrCreate__post_Contacts_replaceOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Contact'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Contact'
-      deprecated: false
-  /Contacts/upsertWithWhere:
-    post:
-      tags:
-        - Contact
-      summary: >-
-        Update an existing model instance or insert a new one into the data
-        source based on the where criteria.
-      operationId: Contact.upsertWithWhere
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Contact'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Contact'
-      deprecated: false
-  '/Contacts/{id}/exists':
-    get:
-      tags:
-        - Contact
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'Contact.exists__get_Contacts_{id}_exists'
+        - DurationTime
+      summary: Fetches belongsTo relation leader.
+      operationId: DurationTime.prototype.__get__leader
       parameters:
         - name: id
           in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-  '/Contacts/{id}':
-    head:
-      tags:
-        - Contact
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'Contact.exists__head_Contacts_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-    get:
-      tags:
-        - Contact
-      summary: 'Find a model instance by {{id}} from the data source.'
-      operationId: Contact.findById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields and include - must be a JSON-encoded string
-            ({"something":"value"})
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Contact'
-      deprecated: false
-    put:
-      tags:
-        - Contact
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'Contact.replaceById__put_Contacts_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Contact'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Contact'
-      deprecated: false
-    delete:
-      tags:
-        - Contact
-      summary: 'Delete a model instance by {{id}} from the data source.'
-      operationId: Contact.deleteById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-      deprecated: false
-    patch:
-      tags:
-        - Contact
-      summary: >-
-        Patch attributes for a model instance and persist it into the data
-        source.
-      operationId: Contact.prototype.patchAttributes
-      parameters:
-        - name: id
-          in: path
-          description: Contact id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Contact'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Contact'
-      deprecated: false
-  '/Contacts/{id}/replace':
-    post:
-      tags:
-        - Contact
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'Contact.replaceById__post_Contacts_{id}_replace'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Contact'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Contact'
-      deprecated: false
-  /Contacts/findOne:
-    get:
-      tags:
-        - Contact
-      summary: Find first instance of the model matched by filter from the data source.
-      operationId: Contact.findOne
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Contact'
-      deprecated: false
-  /Contacts/update:
-    post:
-      tags:
-        - Contact
-      summary: 'Update instances of the model matched by {{where}} from the data source.'
-      operationId: Contact.updateAll
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Contact'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            description: Information related to the outcome of the operation
-            type: object
-            properties:
-              count:
-                description: The number of instances updated
-                type: number
-                format: double
-      deprecated: false
-  /Contacts/count:
-    get:
-      tags:
-        - Contact
-      summary: Count instances of the model matched by where from the data source.
-      operationId: Contact.count
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              count:
-                type: number
-                format: double
-      deprecated: false
-  /Contacts/change-stream:
-    post:
-      tags:
-        - Contact
-      summary: Create a change stream.
-      operationId: Contact.createChangeStream__post_Contacts_change-stream
-      parameters:
-        - name: options
-          in: formData
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-    get:
-      tags:
-        - Contact
-      summary: Create a change stream.
-      operationId: Contact.createChangeStream__get_Contacts_change-stream
-      parameters:
-        - name: options
-          in: query
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-  /Tags:
-    post:
-      tags:
-        - Tag
-      summary: Create a new instance of the model and persist it into the data source.
-      operationId: Tag.create
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Tag'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-    patch:
-      tags:
-        - Tag
-      summary: >-
-        Patch an existing model instance or insert a new one into the data
-        source.
-      operationId: Tag.patchOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Tag'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-    put:
-      tags:
-        - Tag
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: Tag.replaceOrCreate__put_Tags
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Tag'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-    get:
-      tags:
-        - Tag
-      summary: Find all instances of the model matched by filter from the data source.
-      operationId: Tag.find
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Tag'
-      deprecated: false
-  /Tags/replaceOrCreate:
-    post:
-      tags:
-        - Tag
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: Tag.replaceOrCreate__post_Tags_replaceOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Tag'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-  /Tags/upsertWithWhere:
-    post:
-      tags:
-        - Tag
-      summary: >-
-        Update an existing model instance or insert a new one into the data
-        source based on the where criteria.
-      operationId: Tag.upsertWithWhere
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Tag'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-  '/Tags/{id}/exists':
-    get:
-      tags:
-        - Tag
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'Tag.exists__get_Tags_{id}_exists'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-  '/Tags/{id}':
-    head:
-      tags:
-        - Tag
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'Tag.exists__head_Tags_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-    get:
-      tags:
-        - Tag
-      summary: 'Find a model instance by {{id}} from the data source.'
-      operationId: Tag.findById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields and include - must be a JSON-encoded string
-            ({"something":"value"})
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-    put:
-      tags:
-        - Tag
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'Tag.replaceById__put_Tags_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Tag'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-    delete:
-      tags:
-        - Tag
-      summary: 'Delete a model instance by {{id}} from the data source.'
-      operationId: Tag.deleteById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-      deprecated: false
-    patch:
-      tags:
-        - Tag
-      summary: >-
-        Patch attributes for a model instance and persist it into the data
-        source.
-      operationId: Tag.prototype.patchAttributes
-      parameters:
-        - name: id
-          in: path
-          description: Tag id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Tag'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-  '/Tags/{id}/replace':
-    post:
-      tags:
-        - Tag
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'Tag.replaceById__post_Tags_{id}_replace'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Tag'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-  /Tags/findOne:
-    get:
-      tags:
-        - Tag
-      summary: Find first instance of the model matched by filter from the data source.
-      operationId: Tag.findOne
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-  /Tags/update:
-    post:
-      tags:
-        - Tag
-      summary: 'Update instances of the model matched by {{where}} from the data source.'
-      operationId: Tag.updateAll
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Tag'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            description: Information related to the outcome of the operation
-            type: object
-            properties:
-              count:
-                description: The number of instances updated
-                type: number
-                format: double
-      deprecated: false
-  /Tags/count:
-    get:
-      tags:
-        - Tag
-      summary: Count instances of the model matched by where from the data source.
-      operationId: Tag.count
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              count:
-                type: number
-                format: double
-      deprecated: false
-  /Tags/change-stream:
-    post:
-      tags:
-        - Tag
-      summary: Create a change stream.
-      operationId: Tag.createChangeStream__post_Tags_change-stream
-      parameters:
-        - name: options
-          in: formData
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-    get:
-      tags:
-        - Tag
-      summary: Create a change stream.
-      operationId: Tag.createChangeStream__get_Tags_change-stream
-      parameters:
-        - name: options
-          in: query
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-  '/Blogs/{id}/account':
-    get:
-      tags:
-        - Blog
-      summary: Fetches belongsTo relation account.
-      operationId: Blog.prototype.__get__account
-      parameters:
-        - name: id
-          in: path
-          description: Blog id
+          description: DurationTime id
           required: true
           type: string
           format: JSON
@@ -2480,35 +1661,12 @@ paths:
           schema:
             $ref: '#/definitions/Account'
       deprecated: false
-  '/Blogs/{id}/tag':
-    get:
-      tags:
-        - Blog
-      summary: Fetches belongsTo relation tag.
-      operationId: Blog.prototype.__get__tag
-      parameters:
-        - name: id
-          in: path
-          description: Blog id
-          required: true
-          type: string
-          format: JSON
-        - name: refresh
-          in: query
-          required: false
-          type: boolean
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Tag'
-      deprecated: false
-  /Blogs:
+  /DurationTimes:
     post:
       tags:
-        - Blog
+        - DurationTime
       summary: Create a new instance of the model and persist it into the data source.
-      operationId: Blog.create
+      operationId: DurationTime.create
       parameters:
         - name: data
           in: body
@@ -2516,20 +1674,20 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
     patch:
       tags:
-        - Blog
+        - DurationTime
       summary: >-
         Patch an existing model instance or insert a new one into the data
         source.
-      operationId: Blog.patchOrCreate
+      operationId: DurationTime.patchOrCreate
       parameters:
         - name: data
           in: body
@@ -2537,20 +1695,20 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
     put:
       tags:
-        - Blog
+        - DurationTime
       summary: >-
         Replace an existing model instance or insert a new one into the data
         source.
-      operationId: Blog.replaceOrCreate__put_Blogs
+      operationId: DurationTime.replaceOrCreate__put_DurationTimes
       parameters:
         - name: data
           in: body
@@ -2558,18 +1716,18 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
     get:
       tags:
-        - Blog
+        - DurationTime
       summary: Find all instances of the model matched by filter from the data source.
-      operationId: Blog.find
+      operationId: DurationTime.find
       parameters:
         - name: filter
           in: query
@@ -2588,16 +1746,16 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Blog'
+              $ref: '#/definitions/DurationTime'
       deprecated: false
-  /Blogs/replaceOrCreate:
+  /DurationTimes/replaceOrCreate:
     post:
       tags:
-        - Blog
+        - DurationTime
       summary: >-
         Replace an existing model instance or insert a new one into the data
         source.
-      operationId: Blog.replaceOrCreate__post_Blogs_replaceOrCreate
+      operationId: DurationTime.replaceOrCreate__post_DurationTimes_replaceOrCreate
       parameters:
         - name: data
           in: body
@@ -2605,21 +1763,21 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
-  /Blogs/upsertWithWhere:
+  /DurationTimes/upsertWithWhere:
     post:
       tags:
-        - Blog
+        - DurationTime
       summary: >-
         Update an existing model instance or insert a new one into the data
         source based on the where criteria.
-      operationId: Blog.upsertWithWhere
+      operationId: DurationTime.upsertWithWhere
       parameters:
         - name: where
           in: query
@@ -2633,19 +1791,19 @@ paths:
           required: false
           schema:
             description: An object of model property name/value pairs
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
-  '/Blogs/{id}/exists':
+  '/DurationTimes/{id}/exists':
     get:
       tags:
-        - Blog
+        - DurationTime
       summary: Check whether a model instance exists in the data source.
-      operationId: 'Blog.exists__get_Blogs_{id}_exists'
+      operationId: 'DurationTime.exists__get_DurationTimes_{id}_exists'
       parameters:
         - name: id
           in: path
@@ -2662,12 +1820,12 @@ paths:
               exists:
                 type: boolean
       deprecated: false
-  '/Blogs/{id}':
+  '/DurationTimes/{id}':
     head:
       tags:
-        - Blog
+        - DurationTime
       summary: Check whether a model instance exists in the data source.
-      operationId: 'Blog.exists__head_Blogs_{id}'
+      operationId: 'DurationTime.exists__head_DurationTimes_{id}'
       parameters:
         - name: id
           in: path
@@ -2686,9 +1844,9 @@ paths:
       deprecated: false
     get:
       tags:
-        - Blog
+        - DurationTime
       summary: 'Find a model instance by {{id}} from the data source.'
-      operationId: Blog.findById
+      operationId: DurationTime.findById
       parameters:
         - name: id
           in: path
@@ -2708,15 +1866,15 @@ paths:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
     put:
       tags:
-        - Blog
+        - DurationTime
       summary: >-
         Replace attributes for a model instance and persist it into the data
         source.
-      operationId: 'Blog.replaceById__put_Blogs_{id}'
+      operationId: 'DurationTime.replaceById__put_DurationTimes_{id}'
       parameters:
         - name: id
           in: path
@@ -2730,18 +1888,18 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
     delete:
       tags:
-        - Blog
+        - DurationTime
       summary: 'Delete a model instance by {{id}} from the data source.'
-      operationId: Blog.deleteById
+      operationId: DurationTime.deleteById
       parameters:
         - name: id
           in: path
@@ -2757,15 +1915,15 @@ paths:
       deprecated: false
     patch:
       tags:
-        - Blog
+        - DurationTime
       summary: >-
         Patch attributes for a model instance and persist it into the data
         source.
-      operationId: Blog.prototype.patchAttributes
+      operationId: DurationTime.prototype.patchAttributes
       parameters:
         - name: id
           in: path
-          description: Blog id
+          description: DurationTime id
           required: true
           type: string
           format: JSON
@@ -2775,21 +1933,21 @@ paths:
           required: false
           schema:
             description: An object of model property name/value pairs
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
-  '/Blogs/{id}/replace':
+  '/DurationTimes/{id}/replace':
     post:
       tags:
-        - Blog
+        - DurationTime
       summary: >-
         Replace attributes for a model instance and persist it into the data
         source.
-      operationId: 'Blog.replaceById__post_Blogs_{id}_replace'
+      operationId: 'DurationTime.replaceById__post_DurationTimes_{id}_replace'
       parameters:
         - name: id
           in: path
@@ -2803,19 +1961,19 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
-  /Blogs/findOne:
+  /DurationTimes/findOne:
     get:
       tags:
-        - Blog
+        - DurationTime
       summary: Find first instance of the model matched by filter from the data source.
-      operationId: Blog.findOne
+      operationId: DurationTime.findOne
       parameters:
         - name: filter
           in: query
@@ -2832,14 +1990,14 @@ paths:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
-  /Blogs/update:
+  /DurationTimes/update:
     post:
       tags:
-        - Blog
+        - DurationTime
       summary: 'Update instances of the model matched by {{where}} from the data source.'
-      operationId: Blog.updateAll
+      operationId: DurationTime.updateAll
       parameters:
         - name: where
           in: query
@@ -2853,7 +2011,7 @@ paths:
           required: false
           schema:
             description: An object of model property name/value pairs
-            $ref: '#/definitions/Blog'
+            $ref: '#/definitions/DurationTime'
       responses:
         '200':
           description: Request was successful
@@ -2866,12 +2024,12 @@ paths:
                 type: number
                 format: double
       deprecated: false
-  /Blogs/count:
+  /DurationTimes/count:
     get:
       tags:
-        - Blog
+        - DurationTime
       summary: Count instances of the model matched by where from the data source.
-      operationId: Blog.count
+      operationId: DurationTime.count
       parameters:
         - name: where
           in: query
@@ -2889,12 +2047,12 @@ paths:
                 type: number
                 format: double
       deprecated: false
-  /Blogs/change-stream:
+  /DurationTimes/change-stream:
     post:
       tags:
-        - Blog
+        - DurationTime
       summary: Create a change stream.
-      operationId: Blog.createChangeStream__post_Blogs_change-stream
+      operationId: DurationTime.createChangeStream__post_DurationTimes_change-stream
       parameters:
         - name: options
           in: formData
@@ -2909,9 +2067,9 @@ paths:
       deprecated: false
     get:
       tags:
-        - Blog
+        - DurationTime
       summary: Create a change stream.
-      operationId: Blog.createChangeStream__get_Blogs_change-stream
+      operationId: DurationTime.createChangeStream__get_DurationTimes_change-stream
       parameters:
         - name: options
           in: query
@@ -2923,2047 +2081,6 @@ paths:
           description: Request was successful
           schema:
             type: file
-      deprecated: false
-  '/Feedbacks/{id}/account':
-    get:
-      tags:
-        - Feedback
-      summary: Fetches belongsTo relation account.
-      operationId: Feedback.prototype.__get__account
-      parameters:
-        - name: id
-          in: path
-          description: Feedback id
-          required: true
-          type: string
-          format: JSON
-        - name: refresh
-          in: query
-          required: false
-          type: boolean
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Account'
-      deprecated: false
-  /Feedbacks:
-    post:
-      tags:
-        - Feedback
-      summary: Create a new instance of the model and persist it into the data source.
-      operationId: Feedback.create
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Feedback'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Feedback'
-      deprecated: false
-    patch:
-      tags:
-        - Feedback
-      summary: >-
-        Patch an existing model instance or insert a new one into the data
-        source.
-      operationId: Feedback.patchOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Feedback'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Feedback'
-      deprecated: false
-    put:
-      tags:
-        - Feedback
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: Feedback.replaceOrCreate__put_Feedbacks
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Feedback'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Feedback'
-      deprecated: false
-    get:
-      tags:
-        - Feedback
-      summary: Find all instances of the model matched by filter from the data source.
-      operationId: Feedback.find
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Feedback'
-      deprecated: false
-  /Feedbacks/replaceOrCreate:
-    post:
-      tags:
-        - Feedback
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: Feedback.replaceOrCreate__post_Feedbacks_replaceOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Feedback'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Feedback'
-      deprecated: false
-  /Feedbacks/upsertWithWhere:
-    post:
-      tags:
-        - Feedback
-      summary: >-
-        Update an existing model instance or insert a new one into the data
-        source based on the where criteria.
-      operationId: Feedback.upsertWithWhere
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Feedback'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Feedback'
-      deprecated: false
-  '/Feedbacks/{id}/exists':
-    get:
-      tags:
-        - Feedback
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'Feedback.exists__get_Feedbacks_{id}_exists'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-  '/Feedbacks/{id}':
-    head:
-      tags:
-        - Feedback
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'Feedback.exists__head_Feedbacks_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-    get:
-      tags:
-        - Feedback
-      summary: 'Find a model instance by {{id}} from the data source.'
-      operationId: Feedback.findById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields and include - must be a JSON-encoded string
-            ({"something":"value"})
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Feedback'
-      deprecated: false
-    put:
-      tags:
-        - Feedback
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'Feedback.replaceById__put_Feedbacks_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Feedback'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Feedback'
-      deprecated: false
-    delete:
-      tags:
-        - Feedback
-      summary: 'Delete a model instance by {{id}} from the data source.'
-      operationId: Feedback.deleteById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-      deprecated: false
-    patch:
-      tags:
-        - Feedback
-      summary: >-
-        Patch attributes for a model instance and persist it into the data
-        source.
-      operationId: Feedback.prototype.patchAttributes
-      parameters:
-        - name: id
-          in: path
-          description: Feedback id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Feedback'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Feedback'
-      deprecated: false
-  '/Feedbacks/{id}/replace':
-    post:
-      tags:
-        - Feedback
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'Feedback.replaceById__post_Feedbacks_{id}_replace'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Feedback'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Feedback'
-      deprecated: false
-  /Feedbacks/findOne:
-    get:
-      tags:
-        - Feedback
-      summary: Find first instance of the model matched by filter from the data source.
-      operationId: Feedback.findOne
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Feedback'
-      deprecated: false
-  /Feedbacks/update:
-    post:
-      tags:
-        - Feedback
-      summary: 'Update instances of the model matched by {{where}} from the data source.'
-      operationId: Feedback.updateAll
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Feedback'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            description: Information related to the outcome of the operation
-            type: object
-            properties:
-              count:
-                description: The number of instances updated
-                type: number
-                format: double
-      deprecated: false
-  /Feedbacks/count:
-    get:
-      tags:
-        - Feedback
-      summary: Count instances of the model matched by where from the data source.
-      operationId: Feedback.count
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              count:
-                type: number
-                format: double
-      deprecated: false
-  /Feedbacks/change-stream:
-    post:
-      tags:
-        - Feedback
-      summary: Create a change stream.
-      operationId: Feedback.createChangeStream__post_Feedbacks_change-stream
-      parameters:
-        - name: options
-          in: formData
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-    get:
-      tags:
-        - Feedback
-      summary: Create a change stream.
-      operationId: Feedback.createChangeStream__get_Feedbacks_change-stream
-      parameters:
-        - name: options
-          in: query
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-  /CategoryProducts:
-    post:
-      tags:
-        - CategoryProduct
-      summary: Create a new instance of the model and persist it into the data source.
-      operationId: CategoryProduct.create
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/CategoryProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-    patch:
-      tags:
-        - CategoryProduct
-      summary: >-
-        Patch an existing model instance or insert a new one into the data
-        source.
-      operationId: CategoryProduct.patchOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/CategoryProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-    put:
-      tags:
-        - CategoryProduct
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: CategoryProduct.replaceOrCreate__put_CategoryProducts
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/CategoryProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-    get:
-      tags:
-        - CategoryProduct
-      summary: Find all instances of the model matched by filter from the data source.
-      operationId: CategoryProduct.find
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-  /CategoryProducts/replaceOrCreate:
-    post:
-      tags:
-        - CategoryProduct
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: CategoryProduct.replaceOrCreate__post_CategoryProducts_replaceOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/CategoryProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-  /CategoryProducts/upsertWithWhere:
-    post:
-      tags:
-        - CategoryProduct
-      summary: >-
-        Update an existing model instance or insert a new one into the data
-        source based on the where criteria.
-      operationId: CategoryProduct.upsertWithWhere
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/CategoryProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-  '/CategoryProducts/{id}/exists':
-    get:
-      tags:
-        - CategoryProduct
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'CategoryProduct.exists__get_CategoryProducts_{id}_exists'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-  '/CategoryProducts/{id}':
-    head:
-      tags:
-        - CategoryProduct
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'CategoryProduct.exists__head_CategoryProducts_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-    get:
-      tags:
-        - CategoryProduct
-      summary: 'Find a model instance by {{id}} from the data source.'
-      operationId: CategoryProduct.findById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields and include - must be a JSON-encoded string
-            ({"something":"value"})
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-    put:
-      tags:
-        - CategoryProduct
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'CategoryProduct.replaceById__put_CategoryProducts_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/CategoryProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-    delete:
-      tags:
-        - CategoryProduct
-      summary: 'Delete a model instance by {{id}} from the data source.'
-      operationId: CategoryProduct.deleteById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-      deprecated: false
-    patch:
-      tags:
-        - CategoryProduct
-      summary: >-
-        Patch attributes for a model instance and persist it into the data
-        source.
-      operationId: CategoryProduct.prototype.patchAttributes
-      parameters:
-        - name: id
-          in: path
-          description: CategoryProduct id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/CategoryProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-  '/CategoryProducts/{id}/replace':
-    post:
-      tags:
-        - CategoryProduct
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'CategoryProduct.replaceById__post_CategoryProducts_{id}_replace'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/CategoryProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-  /CategoryProducts/findOne:
-    get:
-      tags:
-        - CategoryProduct
-      summary: Find first instance of the model matched by filter from the data source.
-      operationId: CategoryProduct.findOne
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-  /CategoryProducts/update:
-    post:
-      tags:
-        - CategoryProduct
-      summary: 'Update instances of the model matched by {{where}} from the data source.'
-      operationId: CategoryProduct.updateAll
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/CategoryProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            description: Information related to the outcome of the operation
-            type: object
-            properties:
-              count:
-                description: The number of instances updated
-                type: number
-                format: double
-      deprecated: false
-  /CategoryProducts/count:
-    get:
-      tags:
-        - CategoryProduct
-      summary: Count instances of the model matched by where from the data source.
-      operationId: CategoryProduct.count
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              count:
-                type: number
-                format: double
-      deprecated: false
-  /CategoryProducts/change-stream:
-    post:
-      tags:
-        - CategoryProduct
-      summary: Create a change stream.
-      operationId: CategoryProduct.createChangeStream__post_CategoryProducts_change-stream
-      parameters:
-        - name: options
-          in: formData
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-    get:
-      tags:
-        - CategoryProduct
-      summary: Create a change stream.
-      operationId: CategoryProduct.createChangeStream__get_CategoryProducts_change-stream
-      parameters:
-        - name: options
-          in: query
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-  '/Products/{id}/categoryProduct':
-    get:
-      tags:
-        - Product
-      summary: Fetches belongsTo relation categoryProduct.
-      operationId: Product.prototype.__get__categoryProduct
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: refresh
-          in: query
-          required: false
-          type: boolean
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/CategoryProduct'
-      deprecated: false
-  '/Products/{id}/order/{fk}':
-    get:
-      tags:
-        - Product
-      summary: Find a related item by id for order.
-      operationId: Product.prototype.__findById__order
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for order
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Order'
-      deprecated: false
-    delete:
-      tags:
-        - Product
-      summary: Delete a related item by id for order.
-      operationId: Product.prototype.__destroyById__order
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for order
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '204':
-          description: Request was successful
-      deprecated: false
-    put:
-      tags:
-        - Product
-      summary: Update a related item by id for order.
-      operationId: Product.prototype.__updateById__order
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for order
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          required: false
-          schema:
-            $ref: '#/definitions/Order'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Order'
-      deprecated: false
-  '/Products/{id}/order/rel/{fk}':
-    put:
-      tags:
-        - Product
-      summary: Add a related item by id for order.
-      operationId: Product.prototype.__link__order
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for order
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          required: false
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-    delete:
-      tags:
-        - Product
-      summary: Remove the order relation to an item by id.
-      operationId: Product.prototype.__unlink__order
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for order
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '204':
-          description: Request was successful
-      deprecated: false
-    head:
-      tags:
-        - Product
-      summary: Check the existence of order relation to an item by id.
-      operationId: Product.prototype.__exists__order
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for order
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: boolean
-      deprecated: false
-  '/Products/{id}/order':
-    get:
-      tags:
-        - Product
-      summary: Queries order of Product.
-      operationId: Product.prototype.__get__order
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: filter
-          in: query
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Order'
-      deprecated: false
-    post:
-      tags:
-        - Product
-      summary: Creates a new instance in order of this model.
-      operationId: Product.prototype.__create__order
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          required: false
-          schema:
-            $ref: '#/definitions/Order'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Order'
-      deprecated: false
-    delete:
-      tags:
-        - Product
-      summary: Deletes all order of this model.
-      operationId: Product.prototype.__delete__order
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '204':
-          description: Request was successful
-      deprecated: false
-  '/Products/{id}/order/count':
-    get:
-      tags:
-        - Product
-      summary: Counts order of Product.
-      operationId: Product.prototype.__count__order
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              count:
-                type: number
-                format: double
-      deprecated: false
-  /Products:
-    post:
-      tags:
-        - Product
-      summary: Create a new instance of the model and persist it into the data source.
-      operationId: Product.create
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-    patch:
-      tags:
-        - Product
-      summary: >-
-        Patch an existing model instance or insert a new one into the data
-        source.
-      operationId: Product.patchOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-    put:
-      tags:
-        - Product
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: Product.replaceOrCreate__put_Products
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-    get:
-      tags:
-        - Product
-      summary: Find all instances of the model matched by filter from the data source.
-      operationId: Product.find
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Product'
-      deprecated: false
-  /Products/replaceOrCreate:
-    post:
-      tags:
-        - Product
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: Product.replaceOrCreate__post_Products_replaceOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-  /Products/upsertWithWhere:
-    post:
-      tags:
-        - Product
-      summary: >-
-        Update an existing model instance or insert a new one into the data
-        source based on the where criteria.
-      operationId: Product.upsertWithWhere
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-  '/Products/{id}/exists':
-    get:
-      tags:
-        - Product
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'Product.exists__get_Products_{id}_exists'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-  '/Products/{id}':
-    head:
-      tags:
-        - Product
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'Product.exists__head_Products_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-    get:
-      tags:
-        - Product
-      summary: 'Find a model instance by {{id}} from the data source.'
-      operationId: Product.findById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields and include - must be a JSON-encoded string
-            ({"something":"value"})
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-    put:
-      tags:
-        - Product
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'Product.replaceById__put_Products_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-    delete:
-      tags:
-        - Product
-      summary: 'Delete a model instance by {{id}} from the data source.'
-      operationId: Product.deleteById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-      deprecated: false
-    patch:
-      tags:
-        - Product
-      summary: >-
-        Patch attributes for a model instance and persist it into the data
-        source.
-      operationId: Product.prototype.patchAttributes
-      parameters:
-        - name: id
-          in: path
-          description: Product id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-  '/Products/{id}/replace':
-    post:
-      tags:
-        - Product
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'Product.replaceById__post_Products_{id}_replace'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-  /Products/findOne:
-    get:
-      tags:
-        - Product
-      summary: Find first instance of the model matched by filter from the data source.
-      operationId: Product.findOne
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-  /Products/update:
-    post:
-      tags:
-        - Product
-      summary: 'Update instances of the model matched by {{where}} from the data source.'
-      operationId: Product.updateAll
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            description: Information related to the outcome of the operation
-            type: object
-            properties:
-              count:
-                description: The number of instances updated
-                type: number
-                format: double
-      deprecated: false
-  /Products/count:
-    get:
-      tags:
-        - Product
-      summary: Count instances of the model matched by where from the data source.
-      operationId: Product.count
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              count:
-                type: number
-                format: double
-      deprecated: false
-  /Products/change-stream:
-    post:
-      tags:
-        - Product
-      summary: Create a change stream.
-      operationId: Product.createChangeStream__post_Products_change-stream
-      parameters:
-        - name: options
-          in: formData
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-    get:
-      tags:
-        - Product
-      summary: Create a change stream.
-      operationId: Product.createChangeStream__get_Products_change-stream
-      parameters:
-        - name: options
-          in: query
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-  '/OrderProducts/{id}/product':
-    get:
-      tags:
-        - OrderProduct
-      summary: Fetches belongsTo relation product.
-      operationId: OrderProduct.prototype.__get__product
-      parameters:
-        - name: id
-          in: path
-          description: OrderProduct id
-          required: true
-          type: string
-          format: JSON
-        - name: refresh
-          in: query
-          required: false
-          type: boolean
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-  '/OrderProducts/{id}/order':
-    get:
-      tags:
-        - OrderProduct
-      summary: Fetches belongsTo relation order.
-      operationId: OrderProduct.prototype.__get__order
-      parameters:
-        - name: id
-          in: path
-          description: OrderProduct id
-          required: true
-          type: string
-          format: JSON
-        - name: refresh
-          in: query
-          required: false
-          type: boolean
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Order'
-      deprecated: false
-  /OrderProducts:
-    post:
-      tags:
-        - OrderProduct
-      summary: Create a new instance of the model and persist it into the data source.
-      operationId: OrderProduct.create
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-    patch:
-      tags:
-        - OrderProduct
-      summary: >-
-        Patch an existing model instance or insert a new one into the data
-        source.
-      operationId: OrderProduct.patchOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-    put:
-      tags:
-        - OrderProduct
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: OrderProduct.replaceOrCreate__put_OrderProducts
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-    get:
-      tags:
-        - OrderProduct
-      summary: Find all instances of the model matched by filter from the data source.
-      operationId: OrderProduct.find
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/OrderProduct'
-      deprecated: false
-  /OrderProducts/replaceOrCreate:
-    post:
-      tags:
-        - OrderProduct
-      summary: >-
-        Replace an existing model instance or insert a new one into the data
-        source.
-      operationId: OrderProduct.replaceOrCreate__post_OrderProducts_replaceOrCreate
-      parameters:
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-  /OrderProducts/upsertWithWhere:
-    post:
-      tags:
-        - OrderProduct
-      summary: >-
-        Update an existing model instance or insert a new one into the data
-        source based on the where criteria.
-      operationId: OrderProduct.upsertWithWhere
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-  '/OrderProducts/{id}/exists':
-    get:
-      tags:
-        - OrderProduct
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'OrderProduct.exists__get_OrderProducts_{id}_exists'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-  '/OrderProducts/{id}':
-    head:
-      tags:
-        - OrderProduct
-      summary: Check whether a model instance exists in the data source.
-      operationId: 'OrderProduct.exists__head_OrderProducts_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-      deprecated: false
-    get:
-      tags:
-        - OrderProduct
-      summary: 'Find a model instance by {{id}} from the data source.'
-      operationId: OrderProduct.findById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields and include - must be a JSON-encoded string
-            ({"something":"value"})
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-    put:
-      tags:
-        - OrderProduct
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'OrderProduct.replaceById__put_OrderProducts_{id}'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-    delete:
-      tags:
-        - OrderProduct
-      summary: 'Delete a model instance by {{id}} from the data source.'
-      operationId: OrderProduct.deleteById
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-      deprecated: false
-    patch:
-      tags:
-        - OrderProduct
-      summary: >-
-        Patch attributes for a model instance and persist it into the data
-        source.
-      operationId: OrderProduct.prototype.patchAttributes
-      parameters:
-        - name: id
-          in: path
-          description: OrderProduct id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-  '/OrderProducts/{id}/replace':
-    post:
-      tags:
-        - OrderProduct
-      summary: >-
-        Replace attributes for a model instance and persist it into the data
-        source.
-      operationId: 'OrderProduct.replaceById__post_OrderProducts_{id}_replace'
-      parameters:
-        - name: id
-          in: path
-          description: Model id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: Model instance data
-          required: false
-          schema:
-            description: Model instance data
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-  /OrderProducts/findOne:
-    get:
-      tags:
-        - OrderProduct
-      summary: Find first instance of the model matched by filter from the data source.
-      operationId: OrderProduct.findOne
-      parameters:
-        - name: filter
-          in: query
-          description: >-
-            Filter defining fields, where, include, order, offset, and limit -
-            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
-            See
-            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
-            for more details.
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-  /OrderProducts/update:
-    post:
-      tags:
-        - OrderProduct
-      summary: 'Update instances of the model matched by {{where}} from the data source.'
-      operationId: OrderProduct.updateAll
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          description: An object of model property name/value pairs
-          required: false
-          schema:
-            description: An object of model property name/value pairs
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            description: Information related to the outcome of the operation
-            type: object
-            properties:
-              count:
-                description: The number of instances updated
-                type: number
-                format: double
-      deprecated: false
-  /OrderProducts/count:
-    get:
-      tags:
-        - OrderProduct
-      summary: Count instances of the model matched by where from the data source.
-      operationId: OrderProduct.count
-      parameters:
-        - name: where
-          in: query
-          description: Criteria to match model instances
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
-            properties:
-              count:
-                type: number
-                format: double
-      deprecated: false
-  /OrderProducts/change-stream:
-    post:
-      tags:
-        - OrderProduct
-      summary: Create a change stream.
-      operationId: OrderProduct.createChangeStream__post_OrderProducts_change-stream
-      parameters:
-        - name: options
-          in: formData
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-    get:
-      tags:
-        - OrderProduct
-      summary: Create a change stream.
-      operationId: OrderProduct.createChangeStream__get_OrderProducts_change-stream
-      parameters:
-        - name: options
-          in: query
-          required: false
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: file
-      deprecated: false
-  /OrderProducts/get-order-cart:
-    get:
-      tags:
-        - OrderProduct
-      summary: Get order product in cart by token
-      operationId: OrderProduct.getOrder
-      parameters:
-        - name: user
-          in: query
-          description: userId
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: object
       deprecated: false
   '/Orders/{id}/account':
     get:
@@ -4988,12 +2105,12 @@ paths:
           schema:
             $ref: '#/definitions/Account'
       deprecated: false
-  '/Orders/{id}/product/{fk}':
+  '/Orders/{id}/durationTime':
     get:
       tags:
         - Order
-      summary: Find a related item by id for product.
-      operationId: Order.prototype.__findById__product
+      summary: Fetches belongsTo relation durationTime.
+      operationId: Order.prototype.__get__durationTime
       parameters:
         - name: id
           in: path
@@ -5001,216 +2118,22 @@ paths:
           required: true
           type: string
           format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for product
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-    delete:
-      tags:
-        - Order
-      summary: Delete a related item by id for product.
-      operationId: Order.prototype.__destroyById__product
-      parameters:
-        - name: id
-          in: path
-          description: Order id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for product
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '204':
-          description: Request was successful
-      deprecated: false
-    put:
-      tags:
-        - Order
-      summary: Update a related item by id for product.
-      operationId: Order.prototype.__updateById__product
-      parameters:
-        - name: id
-          in: path
-          description: Order id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for product
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          required: false
-          schema:
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-  '/Orders/{id}/product/rel/{fk}':
-    put:
-      tags:
-        - Order
-      summary: Add a related item by id for product.
-      operationId: Order.prototype.__link__product
-      parameters:
-        - name: id
-          in: path
-          description: Order id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for product
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          required: false
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/OrderProduct'
-      deprecated: false
-    delete:
-      tags:
-        - Order
-      summary: Remove the product relation to an item by id.
-      operationId: Order.prototype.__unlink__product
-      parameters:
-        - name: id
-          in: path
-          description: Order id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for product
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '204':
-          description: Request was successful
-      deprecated: false
-    head:
-      tags:
-        - Order
-      summary: Check the existence of product relation to an item by id.
-      operationId: Order.prototype.__exists__product
-      parameters:
-        - name: id
-          in: path
-          description: Order id
-          required: true
-          type: string
-          format: JSON
-        - name: fk
-          in: path
-          description: Foreign key for product
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: boolean
-      deprecated: false
-  '/Orders/{id}/product':
-    get:
-      tags:
-        - Order
-      summary: Queries product of Order.
-      operationId: Order.prototype.__get__product
-      parameters:
-        - name: id
-          in: path
-          description: Order id
-          required: true
-          type: string
-          format: JSON
-        - name: filter
+        - name: refresh
           in: query
           required: false
-          type: string
-          format: JSON
+          type: boolean
       responses:
         '200':
           description: Request was successful
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Product'
+            $ref: '#/definitions/DurationTime'
       deprecated: false
-    post:
-      tags:
-        - Order
-      summary: Creates a new instance in product of this model.
-      operationId: Order.prototype.__create__product
-      parameters:
-        - name: id
-          in: path
-          description: Order id
-          required: true
-          type: string
-          format: JSON
-        - name: data
-          in: body
-          required: false
-          schema:
-            $ref: '#/definitions/Product'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/Product'
-      deprecated: false
-    delete:
-      tags:
-        - Order
-      summary: Deletes all product of this model.
-      operationId: Order.prototype.__delete__product
-      parameters:
-        - name: id
-          in: path
-          description: Order id
-          required: true
-          type: string
-          format: JSON
-      responses:
-        '204':
-          description: Request was successful
-      deprecated: false
-  '/Orders/{id}/product/count':
+  '/Orders/{id}/team':
     get:
       tags:
         - Order
-      summary: Counts product of Order.
-      operationId: Order.prototype.__count__product
+      summary: Fetches belongsTo relation team.
+      operationId: Order.prototype.__get__team
       parameters:
         - name: id
           in: path
@@ -5218,21 +2141,15 @@ paths:
           required: true
           type: string
           format: JSON
-        - name: where
+        - name: refresh
           in: query
-          description: Criteria to match model instances
           required: false
-          type: string
-          format: JSON
+          type: boolean
       responses:
         '200':
           description: Request was successful
           schema:
-            type: object
-            properties:
-              count:
-                type: number
-                format: double
+            $ref: '#/definitions/Team'
       deprecated: false
   /Orders:
     post:
@@ -5655,89 +2572,35 @@ paths:
           schema:
             type: file
       deprecated: false
-  /Orders/add-to-cart:
-    post:
+  '/Targets/{id}/account':
+    get:
       tags:
-        - Order
-      summary: check order by account token and product
-      operationId: Order.addToCart
+        - Target
+      summary: Fetches belongsTo relation account.
+      operationId: Target.prototype.__get__account
       parameters:
-        - name: product
-          in: query
-          description: product
+        - name: id
+          in: path
+          description: Target id
           required: true
           type: string
           format: JSON
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: string
-      deprecated: false
-  /Orders/statistic-amount:
-    get:
-      tags:
-        - Order
-      summary: statistic order by year
-      operationId: Order.statisticByAmount
-      parameters:
-        - name: year
+        - name: refresh
           in: query
-          description: year
-          required: true
-          type: number
-          format: double
+          required: false
+          type: boolean
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/x-any'
+            $ref: '#/definitions/Account'
       deprecated: false
-  /Orders/statistic-revenue:
-    get:
-      tags:
-        - Order
-      summary: statistic order by year
-      operationId: Order.statisticByRevenue
-      parameters:
-        - name: year
-          in: query
-          description: year
-          required: true
-          type: number
-          format: double
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            $ref: '#/definitions/x-any'
-      deprecated: false
-  /Orders/payment-order:
+  /Targets:
     post:
       tags:
-        - Order
-      summary: payment online
-      operationId: Order.paymentOrder
-      parameters:
-        - name: data
-          in: body
-          description: information payment
-          required: true
-          schema:
-            description: information payment
-            $ref: '#/definitions/x-any'
-      responses:
-        '200':
-          description: Request was successful
-          schema:
-            type: string
-      deprecated: false
-  /Banners:
-    post:
-      tags:
-        - Banner
+        - Target
       summary: Create a new instance of the model and persist it into the data source.
-      operationId: Banner.create
+      operationId: Target.create
       parameters:
         - name: data
           in: body
@@ -5745,20 +2608,20 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       deprecated: false
     patch:
       tags:
-        - Banner
+        - Target
       summary: >-
         Patch an existing model instance or insert a new one into the data
         source.
-      operationId: Banner.patchOrCreate
+      operationId: Target.patchOrCreate
       parameters:
         - name: data
           in: body
@@ -5766,20 +2629,20 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       deprecated: false
     put:
       tags:
-        - Banner
+        - Target
       summary: >-
         Replace an existing model instance or insert a new one into the data
         source.
-      operationId: Banner.replaceOrCreate__put_Banners
+      operationId: Target.replaceOrCreate__put_Targets
       parameters:
         - name: data
           in: body
@@ -5787,18 +2650,18 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       deprecated: false
     get:
       tags:
-        - Banner
+        - Target
       summary: Find all instances of the model matched by filter from the data source.
-      operationId: Banner.find
+      operationId: Target.find
       parameters:
         - name: filter
           in: query
@@ -5817,16 +2680,16 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Banner'
+              $ref: '#/definitions/Target'
       deprecated: false
-  /Banners/replaceOrCreate:
+  /Targets/replaceOrCreate:
     post:
       tags:
-        - Banner
+        - Target
       summary: >-
         Replace an existing model instance or insert a new one into the data
         source.
-      operationId: Banner.replaceOrCreate__post_Banners_replaceOrCreate
+      operationId: Target.replaceOrCreate__post_Targets_replaceOrCreate
       parameters:
         - name: data
           in: body
@@ -5834,21 +2697,21 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       deprecated: false
-  /Banners/upsertWithWhere:
+  /Targets/upsertWithWhere:
     post:
       tags:
-        - Banner
+        - Target
       summary: >-
         Update an existing model instance or insert a new one into the data
         source based on the where criteria.
-      operationId: Banner.upsertWithWhere
+      operationId: Target.upsertWithWhere
       parameters:
         - name: where
           in: query
@@ -5862,19 +2725,19 @@ paths:
           required: false
           schema:
             description: An object of model property name/value pairs
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       deprecated: false
-  '/Banners/{id}/exists':
+  '/Targets/{id}/exists':
     get:
       tags:
-        - Banner
+        - Target
       summary: Check whether a model instance exists in the data source.
-      operationId: 'Banner.exists__get_Banners_{id}_exists'
+      operationId: 'Target.exists__get_Targets_{id}_exists'
       parameters:
         - name: id
           in: path
@@ -5891,12 +2754,12 @@ paths:
               exists:
                 type: boolean
       deprecated: false
-  '/Banners/{id}':
+  '/Targets/{id}':
     head:
       tags:
-        - Banner
+        - Target
       summary: Check whether a model instance exists in the data source.
-      operationId: 'Banner.exists__head_Banners_{id}'
+      operationId: 'Target.exists__head_Targets_{id}'
       parameters:
         - name: id
           in: path
@@ -5915,9 +2778,9 @@ paths:
       deprecated: false
     get:
       tags:
-        - Banner
+        - Target
       summary: 'Find a model instance by {{id}} from the data source.'
-      operationId: Banner.findById
+      operationId: Target.findById
       parameters:
         - name: id
           in: path
@@ -5937,15 +2800,15 @@ paths:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       deprecated: false
     put:
       tags:
-        - Banner
+        - Target
       summary: >-
         Replace attributes for a model instance and persist it into the data
         source.
-      operationId: 'Banner.replaceById__put_Banners_{id}'
+      operationId: 'Target.replaceById__put_Targets_{id}'
       parameters:
         - name: id
           in: path
@@ -5959,18 +2822,18 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       deprecated: false
     delete:
       tags:
-        - Banner
+        - Target
       summary: 'Delete a model instance by {{id}} from the data source.'
-      operationId: Banner.deleteById
+      operationId: Target.deleteById
       parameters:
         - name: id
           in: path
@@ -5986,15 +2849,15 @@ paths:
       deprecated: false
     patch:
       tags:
-        - Banner
+        - Target
       summary: >-
         Patch attributes for a model instance and persist it into the data
         source.
-      operationId: Banner.prototype.patchAttributes
+      operationId: Target.prototype.patchAttributes
       parameters:
         - name: id
           in: path
-          description: Banner id
+          description: Target id
           required: true
           type: string
           format: JSON
@@ -6004,21 +2867,21 @@ paths:
           required: false
           schema:
             description: An object of model property name/value pairs
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       deprecated: false
-  '/Banners/{id}/replace':
+  '/Targets/{id}/replace':
     post:
       tags:
-        - Banner
+        - Target
       summary: >-
         Replace attributes for a model instance and persist it into the data
         source.
-      operationId: 'Banner.replaceById__post_Banners_{id}_replace'
+      operationId: 'Target.replaceById__post_Targets_{id}_replace'
       parameters:
         - name: id
           in: path
@@ -6032,19 +2895,19 @@ paths:
           required: false
           schema:
             description: Model instance data
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       responses:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       deprecated: false
-  /Banners/findOne:
+  /Targets/findOne:
     get:
       tags:
-        - Banner
+        - Target
       summary: Find first instance of the model matched by filter from the data source.
-      operationId: Banner.findOne
+      operationId: Target.findOne
       parameters:
         - name: filter
           in: query
@@ -6061,14 +2924,14 @@ paths:
         '200':
           description: Request was successful
           schema:
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       deprecated: false
-  /Banners/update:
+  /Targets/update:
     post:
       tags:
-        - Banner
+        - Target
       summary: 'Update instances of the model matched by {{where}} from the data source.'
-      operationId: Banner.updateAll
+      operationId: Target.updateAll
       parameters:
         - name: where
           in: query
@@ -6082,7 +2945,7 @@ paths:
           required: false
           schema:
             description: An object of model property name/value pairs
-            $ref: '#/definitions/Banner'
+            $ref: '#/definitions/Target'
       responses:
         '200':
           description: Request was successful
@@ -6095,12 +2958,12 @@ paths:
                 type: number
                 format: double
       deprecated: false
-  /Banners/count:
+  /Targets/count:
     get:
       tags:
-        - Banner
+        - Target
       summary: Count instances of the model matched by where from the data source.
-      operationId: Banner.count
+      operationId: Target.count
       parameters:
         - name: where
           in: query
@@ -6118,12 +2981,12 @@ paths:
                 type: number
                 format: double
       deprecated: false
-  /Banners/change-stream:
+  /Targets/change-stream:
     post:
       tags:
-        - Banner
+        - Target
       summary: Create a change stream.
-      operationId: Banner.createChangeStream__post_Banners_change-stream
+      operationId: Target.createChangeStream__post_Targets_change-stream
       parameters:
         - name: options
           in: formData
@@ -6138,9 +3001,623 @@ paths:
       deprecated: false
     get:
       tags:
-        - Banner
+        - Target
       summary: Create a change stream.
-      operationId: Banner.createChangeStream__get_Banners_change-stream
+      operationId: Target.createChangeStream__get_Targets_change-stream
+      parameters:
+        - name: options
+          in: query
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: file
+      deprecated: false
+  '/Teams/{id}/leader':
+    get:
+      tags:
+        - Team
+      summary: Fetches belongsTo relation leader.
+      operationId: Team.prototype.__get__leader
+      parameters:
+        - name: id
+          in: path
+          description: Team id
+          required: true
+          type: string
+          format: JSON
+        - name: refresh
+          in: query
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Account'
+      deprecated: false
+  '/Teams/{id}/members/{fk}':
+    get:
+      tags:
+        - Team
+      summary: Find a related item by id for members.
+      operationId: Team.prototype.__findById__members
+      parameters:
+        - name: id
+          in: path
+          description: Team id
+          required: true
+          type: string
+          format: JSON
+        - name: fk
+          in: path
+          description: Foreign key for members
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Account'
+      deprecated: false
+    delete:
+      tags:
+        - Team
+      summary: Delete a related item by id for members.
+      operationId: Team.prototype.__destroyById__members
+      parameters:
+        - name: id
+          in: path
+          description: Team id
+          required: true
+          type: string
+          format: JSON
+        - name: fk
+          in: path
+          description: Foreign key for members
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '204':
+          description: Request was successful
+      deprecated: false
+    put:
+      tags:
+        - Team
+      summary: Update a related item by id for members.
+      operationId: Team.prototype.__updateById__members
+      parameters:
+        - name: id
+          in: path
+          description: Team id
+          required: true
+          type: string
+          format: JSON
+        - name: fk
+          in: path
+          description: Foreign key for members
+          required: true
+          type: string
+          format: JSON
+        - name: data
+          in: body
+          required: false
+          schema:
+            $ref: '#/definitions/Account'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Account'
+      deprecated: false
+  '/Teams/{id}/members':
+    get:
+      tags:
+        - Team
+      summary: Queries members of Team.
+      operationId: Team.prototype.__get__members
+      parameters:
+        - name: id
+          in: path
+          description: Team id
+          required: true
+          type: string
+          format: JSON
+        - name: filter
+          in: query
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Account'
+      deprecated: false
+    post:
+      tags:
+        - Team
+      summary: Creates a new instance in members of this model.
+      operationId: Team.prototype.__create__members
+      parameters:
+        - name: id
+          in: path
+          description: Team id
+          required: true
+          type: string
+          format: JSON
+        - name: data
+          in: body
+          required: false
+          schema:
+            $ref: '#/definitions/Account'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Account'
+      deprecated: false
+    delete:
+      tags:
+        - Team
+      summary: Deletes all members of this model.
+      operationId: Team.prototype.__delete__members
+      parameters:
+        - name: id
+          in: path
+          description: Team id
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '204':
+          description: Request was successful
+      deprecated: false
+  '/Teams/{id}/members/count':
+    get:
+      tags:
+        - Team
+      summary: Counts members of Team.
+      operationId: Team.prototype.__count__members
+      parameters:
+        - name: id
+          in: path
+          description: Team id
+          required: true
+          type: string
+          format: JSON
+        - name: where
+          in: query
+          description: Criteria to match model instances
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: object
+            properties:
+              count:
+                type: number
+                format: double
+      deprecated: false
+  /Teams:
+    post:
+      tags:
+        - Team
+      summary: Create a new instance of the model and persist it into the data source.
+      operationId: Team.create
+      parameters:
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/Team'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
+      deprecated: false
+    patch:
+      tags:
+        - Team
+      summary: >-
+        Patch an existing model instance or insert a new one into the data
+        source.
+      operationId: Team.patchOrCreate
+      parameters:
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/Team'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
+      deprecated: false
+    put:
+      tags:
+        - Team
+      summary: >-
+        Replace an existing model instance or insert a new one into the data
+        source.
+      operationId: Team.replaceOrCreate__put_Teams
+      parameters:
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/Team'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
+      deprecated: false
+    get:
+      tags:
+        - Team
+      summary: Find all instances of the model matched by filter from the data source.
+      operationId: Team.find
+      parameters:
+        - name: filter
+          in: query
+          description: >-
+            Filter defining fields, where, include, order, offset, and limit -
+            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
+            See
+            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
+            for more details.
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team'
+      deprecated: false
+  /Teams/replaceOrCreate:
+    post:
+      tags:
+        - Team
+      summary: >-
+        Replace an existing model instance or insert a new one into the data
+        source.
+      operationId: Team.replaceOrCreate__post_Teams_replaceOrCreate
+      parameters:
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/Team'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
+      deprecated: false
+  /Teams/upsertWithWhere:
+    post:
+      tags:
+        - Team
+      summary: >-
+        Update an existing model instance or insert a new one into the data
+        source based on the where criteria.
+      operationId: Team.upsertWithWhere
+      parameters:
+        - name: where
+          in: query
+          description: Criteria to match model instances
+          required: false
+          type: string
+          format: JSON
+        - name: data
+          in: body
+          description: An object of model property name/value pairs
+          required: false
+          schema:
+            description: An object of model property name/value pairs
+            $ref: '#/definitions/Team'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
+      deprecated: false
+  '/Teams/{id}/exists':
+    get:
+      tags:
+        - Team
+      summary: Check whether a model instance exists in the data source.
+      operationId: 'Team.exists__get_Teams_{id}_exists'
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: object
+            properties:
+              exists:
+                type: boolean
+      deprecated: false
+  '/Teams/{id}':
+    head:
+      tags:
+        - Team
+      summary: Check whether a model instance exists in the data source.
+      operationId: 'Team.exists__head_Teams_{id}'
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: object
+            properties:
+              exists:
+                type: boolean
+      deprecated: false
+    get:
+      tags:
+        - Team
+      summary: 'Find a model instance by {{id}} from the data source.'
+      operationId: Team.findById
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+        - name: filter
+          in: query
+          description: >-
+            Filter defining fields and include - must be a JSON-encoded string
+            ({"something":"value"})
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
+      deprecated: false
+    put:
+      tags:
+        - Team
+      summary: >-
+        Replace attributes for a model instance and persist it into the data
+        source.
+      operationId: 'Team.replaceById__put_Teams_{id}'
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/Team'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
+      deprecated: false
+    delete:
+      tags:
+        - Team
+      summary: 'Delete a model instance by {{id}} from the data source.'
+      operationId: Team.deleteById
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: object
+      deprecated: false
+    patch:
+      tags:
+        - Team
+      summary: >-
+        Patch attributes for a model instance and persist it into the data
+        source.
+      operationId: Team.prototype.patchAttributes
+      parameters:
+        - name: id
+          in: path
+          description: Team id
+          required: true
+          type: string
+          format: JSON
+        - name: data
+          in: body
+          description: An object of model property name/value pairs
+          required: false
+          schema:
+            description: An object of model property name/value pairs
+            $ref: '#/definitions/Team'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
+      deprecated: false
+  '/Teams/{id}/replace':
+    post:
+      tags:
+        - Team
+      summary: >-
+        Replace attributes for a model instance and persist it into the data
+        source.
+      operationId: 'Team.replaceById__post_Teams_{id}_replace'
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/Team'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
+      deprecated: false
+  /Teams/findOne:
+    get:
+      tags:
+        - Team
+      summary: Find first instance of the model matched by filter from the data source.
+      operationId: Team.findOne
+      parameters:
+        - name: filter
+          in: query
+          description: >-
+            Filter defining fields, where, include, order, offset, and limit -
+            must be a JSON-encoded string (`{"where":{"something":"value"}}`). 
+            See
+            https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries
+            for more details.
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/Team'
+      deprecated: false
+  /Teams/update:
+    post:
+      tags:
+        - Team
+      summary: 'Update instances of the model matched by {{where}} from the data source.'
+      operationId: Team.updateAll
+      parameters:
+        - name: where
+          in: query
+          description: Criteria to match model instances
+          required: false
+          type: string
+          format: JSON
+        - name: data
+          in: body
+          description: An object of model property name/value pairs
+          required: false
+          schema:
+            description: An object of model property name/value pairs
+            $ref: '#/definitions/Team'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            description: Information related to the outcome of the operation
+            type: object
+            properties:
+              count:
+                description: The number of instances updated
+                type: number
+                format: double
+      deprecated: false
+  /Teams/count:
+    get:
+      tags:
+        - Team
+      summary: Count instances of the model matched by where from the data source.
+      operationId: Team.count
+      parameters:
+        - name: where
+          in: query
+          description: Criteria to match model instances
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: object
+            properties:
+              count:
+                type: number
+                format: double
+      deprecated: false
+  /Teams/change-stream:
+    post:
+      tags:
+        - Team
+      summary: Create a change stream.
+      operationId: Team.createChangeStream__post_Teams_change-stream
+      parameters:
+        - name: options
+          in: formData
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: file
+      deprecated: false
+    get:
+      tags:
+        - Team
+      summary: Create a change stream.
+      operationId: Team.createChangeStream__get_Teams_change-stream
       parameters:
         - name: options
           in: query
@@ -6157,15 +3634,10 @@ tags:
   - name: Container
   - name: Account
   - name: AccountToken
-  - name: Contact
-  - name: Tag
-  - name: Blog
-  - name: Feedback
-  - name: CategoryProduct
-  - name: Product
-  - name: OrderProduct
+  - name: DurationTime
   - name: Order
-  - name: Banner
+  - name: Target
+  - name: Team
 consumes:
   - application/json
   - application/x-www-form-urlencoded
@@ -6244,23 +3716,31 @@ definitions:
     required:
       - id
     additionalProperties: false
+  Team:
+    properties:
+      name:
+        type: string
+      id:
+        type: number
+        format: double
+      leaderId:
+        type: number
+        format: double
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+    additionalProperties: false
   Account:
     properties:
-      firstName:
-        type: string
-      lastName:
+      name:
         type: string
       avatar:
         type: string
-      city:
-        type: number
-        format: double
-      district:
-        type: number
-        format: double
-      phoneNumber:
-        type: number
-        format: double
+      phone:
+        type: string
       realm:
         type: string
       username:
@@ -6278,93 +3758,20 @@ definitions:
       updatedAt:
         type: string
         format: date-time
+      teamId:
+        type: number
+        format: double
     required:
       - email
     additionalProperties: false
-  Contact:
-    properties:
-      name:
-        type: string
-      email:
-        type: string
-      subject:
-        type: string
-      message:
-        type: string
-      id:
-        type: number
-        format: double
-      createdAt:
-        type: string
-        format: date-time
-      updatedAt:
-        type: string
-        format: date-time
-    additionalProperties: false
-  Tag:
+  DurationTime:
     properties:
       title:
         type: string
       id:
         type: number
         format: double
-      createdAt:
-        type: string
-        format: date-time
-      updatedAt:
-        type: string
-        format: date-time
-    additionalProperties: false
-  Blog:
-    properties:
-      title:
-        type: string
-      metaDescription:
-        type: string
-      content:
-        type: string
-      photoURL:
-        type: string
-      id:
-        type: number
-        format: double
-      accountId:
-        type: number
-        format: double
-      tagId:
-        type: number
-        format: double
-      createdAt:
-        type: string
-        format: date-time
-      updatedAt:
-        type: string
-        format: date-time
-    additionalProperties: false
-  Feedback:
-    properties:
-      content:
-        type: string
-      id:
-        type: number
-        format: double
-      accountId:
-        type: number
-        format: double
-      createdAt:
-        type: string
-        format: date-time
-      updatedAt:
-        type: string
-        format: date-time
-    additionalProperties: false
-  CategoryProduct:
-    properties:
-      title:
-        type: string
-      photoURL:
-        type: string
-      id:
+      leaderId:
         type: number
         format: double
       createdAt:
@@ -6376,30 +3783,22 @@ definitions:
     additionalProperties: false
   Order:
     properties:
-      code:
-        type: string
-      firstName:
-        type: string
-      lastName:
-        type: string
-      phoneNumber:
+      numberOfCall:
         type: number
         format: double
-      email:
-        type: string
-      address:
-        type: string
-      city:
+      numberOfAdvise:
         type: number
         format: double
-      district:
+      numberOfOrder:
         type: number
         format: double
-      note:
-        type: string
-      status:
-        type: string
-      price:
+      numberOfAccepted:
+        type: number
+        format: double
+      revenueOfOrder:
+        type: number
+        format: double
+      revenueOfAccepted:
         type: number
         format: double
       id:
@@ -6408,25 +3807,7 @@ definitions:
       accountId:
         type: number
         format: double
-      createdAt:
-        type: string
-        format: date-time
-      updatedAt:
-        type: string
-        format: date-time
-    additionalProperties: false
-  OrderProduct:
-    properties:
-      amount:
-        type: number
-        format: double
-      price:
-        type: number
-        format: double
-      id:
-        type: number
-        format: double
-      productId:
+      durationTimeId:
         type: number
         format: double
       createdAt:
@@ -6435,48 +3816,25 @@ definitions:
       updatedAt:
         type: string
         format: date-time
-      orderId:
+      teamId:
         type: number
         format: double
     additionalProperties: false
-  Product:
+  Target:
     properties:
-      title:
-        type: string
-      price:
+      revenue:
         type: number
         format: double
-      color:
-        type: string
-      origin:
-        type: string
-      photoURL:
-        type: string
-      content:
-        type: string
-      metaDescription:
-        type: string
-      record:
+      worksday:
         type: number
         format: double
+      month:
+        type: string
+        format: date-time
       id:
         type: number
         format: double
-      categoryProductId:
-        type: number
-        format: double
-      createdAt:
-        type: string
-        format: date-time
-      updatedAt:
-        type: string
-        format: date-time
-    additionalProperties: false
-  Banner:
-    properties:
-      photoURL:
-        type: string
-      id:
+      accountId:
         type: number
         format: double
       createdAt:

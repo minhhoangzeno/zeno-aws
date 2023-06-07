@@ -1,5 +1,5 @@
 {
-  "name": "Tag",
+  "name": "Team",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
@@ -12,13 +12,22 @@
     }
   },
   "properties": {
-    "title": {
+    "name": {
       "type": "string"
     }
   },
   "validations": [],
   "relations": {
-    
+    "leader": {
+      "type": "belongsTo",
+      "model": "Account",
+      "foreignKey": ""
+    },
+    "members": {
+      "type": "hasMany",
+      "model": "Account",
+      "foreignKey": "teamId"
+    }
   },
   "acls": [
     {

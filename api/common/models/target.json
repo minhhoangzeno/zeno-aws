@@ -1,5 +1,5 @@
 {
-  "name": "Blog",
+  "name": "Target",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
@@ -12,17 +12,14 @@
     }
   },
   "properties": {
-    "title": {
-      "type": "string"
+    "revenue": {
+      "type": "number"
     },
-    "metaDescription": {
-      "type": "string"
+    "worksday": {
+      "type": "number"
     },
-    "content": {
-      "type": "string"
-    },
-    "photoURL": {
-      "type": "string"
+    "month": {
+      "type": "date"
     }
   },
   "validations": [],
@@ -30,11 +27,6 @@
     "account": {
       "type": "belongsTo",
       "model": "Account",
-      "foreignKey": ""
-    },
-    "tag": {
-      "type": "belongsTo",
-      "model": "Tag",
       "foreignKey": ""
     }
   },
