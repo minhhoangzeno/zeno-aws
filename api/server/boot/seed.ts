@@ -66,10 +66,7 @@ module.exports = function (app: App) {
       ),
     );
 
-    return;
-    if (process.env.NODE_ENV === 'production') {
-      return;
-    }
+   
 
     console.log('Seeding start...');
 
