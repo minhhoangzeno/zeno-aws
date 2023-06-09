@@ -1,1 +1,1 @@
-{"version":3,"file":"static/css/680.3fda9073.chunk.css","mappings":"AAAA,WACE,oBACF","sources":["pages/blog/index.css"],"sourcesContent":[".ant-modal{\n  width: 60vw !important;\n}"],"names":[],"sourceRoot":""}
+{"version":3,"file":"static/css/680.3fda9073.chunk.css","mappings":"AAAA,WACE,oBACF","sources":["pages/blog/index.css"],"sourcesContent":[".ant-modal{\r\n  width: 60vw !important;\r\n}"],"names":[],"sourceRoot":""}

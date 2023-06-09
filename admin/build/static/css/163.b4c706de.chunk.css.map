@@ -1,1 +1,1 @@
-{"version":3,"file":"static/css/163.b4c706de.chunk.css","mappings":"AAAA,kBACE,UACF,CAEA,qBACE,WACF","sources":["pages/account/index.css"],"sourcesContent":[".ant-input-number{\n  width: 100%;\n}\n\n.ant-select-selector{\n  width:150px;\n}"],"names":[],"sourceRoot":""}
+{"version":3,"file":"static/css/163.b4c706de.chunk.css","mappings":"AAAA,kBACE,UACF,CAEA,qBACE,WACF","sources":["pages/account/index.css"],"sourcesContent":[".ant-input-number{\r\n  width: 100%;\r\n}\r\n\r\n.ant-select-selector{\r\n  width:150px;\r\n}"],"names":[],"sourceRoot":""}

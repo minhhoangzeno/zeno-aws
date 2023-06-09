@@ -1,8 +1,8 @@
 /** @format */
 
-import { IBase } from "./Base.interface";
-import { UserLevels } from "./constants/UserLevels.const";
-import { IRole } from "./Role.interface";
+import { IBase } from './Base.interface';
+import { UserLevels } from './constants/UserLevels.const';
+import { IRole } from './Role.interface';
 
 export interface IAccount extends IBase {
   id?: number;
@@ -11,11 +11,12 @@ export interface IAccount extends IBase {
   name?: string;
   firstName?: string;
   lastName?: string;
-  phoneNumber?:string;
+  phoneNumber?: string;
   city?: number;
   district?: number;
   email?: string;
   password?: string;
+  teamId?: number;
   avatar?: string;
   typeRole?: UserLevels;
   roles?: IRole[];
