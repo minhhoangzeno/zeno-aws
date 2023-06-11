@@ -6,8 +6,5 @@ module.exports = function (app) {
     Order.createChangeStream(function (err, changes) {
         changes.pipe(es.stringify()).pipe(process.stdout);
     });
-    Order.create({
-        numberOfCall: 20
-    });
 };
 //# sourceMappingURL=realtime.js.map

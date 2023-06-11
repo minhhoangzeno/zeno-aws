@@ -80,19 +80,7 @@ export default function Account() {
     //   dataIndex: 'phone',
     //   width: '10%',
     // },
-    {
-      title: 'Địa chỉ',
-      width: '10%',
-      render: (_: null, record: IAccount) => {
-        const city = location.find((el) => el.code === record.city);
-        const district = city?.districts.find((el) => el.code === record.district);
-        return (
-          <>
-            {district?.name} - {city?.name}
-          </>
-        );
-      },
-    },
+   
     {
       title: 'Avatar',
       width: '10%',

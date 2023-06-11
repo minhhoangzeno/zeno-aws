@@ -1,5 +1,5 @@
 export enum UserLevels {
-  SUPER_ADMIN = "SUPERADMIN",
-  ADMIN = "ADMIN",
+  SUPER_ADMIN = "ADMIN",
+  ADMIN = "LEADER",
   USER = "USER",
 }

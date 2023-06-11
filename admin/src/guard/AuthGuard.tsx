@@ -57,12 +57,10 @@ const AuthGuard: FunctionComponent<
   }
 
   if (userToken) {
-    if (levels && !levels.includes(currentUser?.typeRole as string)) {
-      return <Navigate to="/layout-guard-roles" />;
-    }
-    if (currentUser?.activation === false) {
-      dispatch(UserLogout());
-    }
+    // if (levels && !levels.includes(currentUser?.typeRole as string)) {
+    //   return <Navigate to="/layout-guard-roles" />;
+    // }
+
 
     return children as ReactElement;
   }

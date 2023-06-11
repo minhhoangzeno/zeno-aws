@@ -8,6 +8,8 @@ import {
   ProjectOutlined,
   MoneyCollectOutlined,
   UserOutlined,
+  FieldTimeOutlined,
+  GroupOutlined,
 } from "@ant-design/icons";
 import { Avatar, Layout, Menu, Row } from "antd";
 import { useEffect, useState } from "react";
@@ -28,46 +30,56 @@ const menuItems = [
     label: "Người dùng",
   },
   {
-    key: "/category-blog",
-    icon: <BookOutlined />,
-    label: "Danh mục bài viết",
+    key: "/team",
+    icon: <GroupOutlined />,
+    label: "Nhóm",
   },
   {
-    key: "/product",
-    icon: <ProjectOutlined />,
-    label: "Sản phẩm",
+    key: "/duration-time",
+    icon: <FieldTimeOutlined />,
+    label: "Khung giờ",
   },
-  {
-    key: "/category-product",
-    icon: <BookOutlined />,
-    label: "Danh mục sản phẩm",
-  },
-  {
-    key: "/feedback",
-    icon: <MessageOutlined />,
-    label: "Phản hồi",
-  },
-  {
-    key: "/contact",
-    icon: <ContactsOutlined />,
-    label: "Liên hệ",
-  },
-  {
-    key: "/banner",
-    icon: <FileImageOutlined />,
-    label: "Background sale",
-  },
-  {
-    key: "/blog",
-    icon: <PaperClipOutlined />,
-    label: "Blog",
-  },
-  {
-    key: "/order",
-    icon: <MoneyCollectOutlined
-     />,
-    label: "Order",
-  },
+  // {
+  //   key: "/category-blog",
+  //   icon: <BookOutlined />,
+  //   label: "Danh mục bài viết",
+  // },
+  // {
+  //   key: "/product",
+  //   icon: <ProjectOutlined />,
+  //   label: "Sản phẩm",
+  // },
+  // {
+  //   key: "/category-product",
+  //   icon: <BookOutlined />,
+  //   label: "Danh mục sản phẩm",
+  // },
+  // {
+  //   key: "/feedback",
+  //   icon: <MessageOutlined />,
+  //   label: "Phản hồi",
+  // },
+  // {
+  //   key: "/contact",
+  //   icon: <ContactsOutlined />,
+  //   label: "Liên hệ",
+  // },
+  // {
+  //   key: "/banner",
+  //   icon: <FileImageOutlined />,
+  //   label: "Background sale",
+  // },
+  // {
+  //   key: "/blog",
+  //   icon: <PaperClipOutlined />,
+  //   label: "Blog",
+  // },
+  // {
+  //   key: "/order",
+  //   icon: <MoneyCollectOutlined
+  //    />,
+  //   label: "Order",
+  // },
 ];
 export default function SiderbarComponent() {
   const location = useLocation();

@@ -12,7 +12,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function Dashboard() {
   const [data, setData] = useState<ITarget[]>([]);
-  const [showModal, setShowModal] = useState<boolean>(true);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   useEffect(() => {
     search();

@@ -1,35 +1,41 @@
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-  Avatar, message,
+  Avatar,
+  Button,
+  Form,
+  Input,
+  message,
+  Modal,
   Popconfirm,
   Row,
   Table,
   Tooltip,
-  Typography
+  Typography,
 } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FeedbackAPI } from "../../apis/feedback.api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   DeleteFeedback,
   GetFeedback,
-  SetFeedback
+  SetFeedback,
 } from "../../app/reducers/Feedback/Feedback.reducer";
 import productPNG from "../../assets/images/product.png";
 import { IFeedback } from "../../interface/Feedback.interface";
 
 const { Title, Paragraph, Text } = Typography;
 
-export default function Feedback() {
+export default function DurationTime() {
   const data = useAppSelector(GetFeedback);
   const dispatch = useAppDispatch();
-  
 
-  useEffect(() => {
-    FeedbackAPI.fetchAll().then((result) => {
-      dispatch(SetFeedback(result.data));
-    });
-  }, [dispatch]);
+  const [form] = Form.useForm();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  // useEffect(() => {
+  //   FeedbackAPI.fetchAll().then((result) => {
+  //     dispatch(SetFeedback(result.data));
+  //   });
+  // }, [dispatch]);
 
   const columns = [
     {
@@ -75,11 +81,7 @@ export default function Feedback() {
       width: "13%",
       editable: true,
       render: (_: null, record: IFeedback) => {
-        return (
-          <Text>
-            {record.account?.name}
-          </Text>
-        );
+        return <Text>{record.account?.name}</Text>;
       },
     },
     {
@@ -104,14 +106,20 @@ export default function Feedback() {
       title: "Thiết lập",
       render: (_: null, record: IFeedback) => {
         return (
-          <Popconfirm
-            title="Bạn có chắc chắn muốn xóa không?"
-            onConfirm={() => deleteRecord(record)}
-          >
+          <>
+            <Popconfirm
+              title="Bạn có chắc chắn muốn xóa không?"
+              onConfirm={() => deleteRecord(record)}
+            >
+              <Typography.Link className="mr-4">
+                <DeleteOutlined style={{ fontSize: "130%" }} />
+              </Typography.Link>
+            </Popconfirm>
+
             <Typography.Link className="mr-4">
-              <DeleteOutlined style={{ fontSize: "130%" }} />
+              <EditOutlined style={{ fontSize: "130%" }} />
             </Typography.Link>
-          </Popconfirm>
+          </>
         );
       },
     },
@@ -131,9 +139,22 @@ export default function Feedback() {
 
   return (
     <>
-      <Row>
-        <Title level={3}>Phản hồi</Title>
+      <Row className="mb-4">
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          className="mr-4"
+          onClick={() => setIsModalOpen(true)}
+        ></Button>
       </Row>
+
+      <Modal open={isModalOpen} destroyOnClose={true}>
+        <Form form={form} colon={false} autoComplete="off">
+          <Form.Item label="Tiêu đề" name="title" required>
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
 
       <Table columns={columns} dataSource={data} bordered rowKey="id" />
     </>

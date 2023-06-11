@@ -7,7 +7,4 @@ module.exports = function (app: App) {
   Order.createChangeStream(function (err: any, changes: any) {
     changes.pipe(es.stringify()).pipe(process.stdout);
   });
-  Order.create({
-    numberOfCall: 20
-  })
 };

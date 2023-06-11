@@ -20,16 +20,16 @@ import { IFeedback } from "../../interface/Feedback.interface";
 
 const { Title, Paragraph, Text } = Typography;
 
-export default function Feedback() {
+export default function Team() {
   const data = useAppSelector(GetFeedback);
   const dispatch = useAppDispatch();
   
 
-  useEffect(() => {
-    FeedbackAPI.fetchAll().then((result) => {
-      dispatch(SetFeedback(result.data));
-    });
-  }, [dispatch]);
+  // useEffect(() => {
+  //   FeedbackAPI.fetchAll().then((result) => {
+  //     dispatch(SetFeedback(result.data));
+  //   });
+  // }, [dispatch]);
 
   const columns = [
     {
@@ -132,7 +132,7 @@ export default function Feedback() {
   return (
     <>
       <Row>
-        <Title level={3}>Phản hồi</Title>
+        <Title level={3}>Nhóm</Title>
       </Row>
 
       <Table columns={columns} dataSource={data} bordered rowKey="id" />

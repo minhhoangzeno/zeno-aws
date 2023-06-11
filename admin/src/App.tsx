@@ -11,18 +11,10 @@ import NotAuthorized from "./pages/401";
 import NotFound from "./pages/404";
 
 const Dashboard = loadable(() => import("./pages/dashboard"));
-const CategoryBlog = loadable(() => import("./pages/category-blog"));
-const CategoryProduct = loadable(() => import("./pages/category-product"));
 const Account = loadable(() => import("./pages/account"));
-const Product = loadable(() => import("./pages/product"));
-const Feedback = loadable(() => import("./pages/feedback"));
-const Contact = loadable(() => import("./pages/contact"));
-const Banner = loadable(() => import("./pages/banner"));
-const Blog = loadable(() => import("./pages/blog"));
 const Login = loadable(() => import("./pages/login"));
-const Register = loadable(()=>import("./pages/register"));
-const Order = loadable(() => import("./pages/order"));
-
+const Team = loadable(() => import("./pages/team"));
+const DurationTime = loadable(() => import("./pages/duration-time"));
 function App() {
   return (
     <div className="App">
@@ -54,82 +46,23 @@ function App() {
                 </AuthGuard>
               }
             />
+
             <Route
-              path="/product"
+              path="/team"
               element={
                 <AuthGuard>
                   <DashBoardLayout>
-                    <Product />
+                    <Team />
                   </DashBoardLayout>
                 </AuthGuard>
               }
             />
             <Route
-              path="/feedback"
+              path="/duration-time"
               element={
                 <AuthGuard>
                   <DashBoardLayout>
-                    <Feedback />
-                  </DashBoardLayout>
-                </AuthGuard>
-              }
-            />
-            <Route
-              path="/order"
-              element={
-                <AuthGuard>
-                  <DashBoardLayout>
-                    <Order />
-                  </DashBoardLayout>
-                </AuthGuard>
-              }
-            />
-            <Route
-              path="/category-blog"
-              element={
-                <AuthGuard>
-                  <DashBoardLayout>
-                    <CategoryBlog />
-                  </DashBoardLayout>
-                </AuthGuard>
-              }
-            />
-            <Route
-              path="/category-product"
-              element={
-                <AuthGuard>
-                  <DashBoardLayout>
-                    <CategoryProduct />
-                  </DashBoardLayout>
-                </AuthGuard>
-              }
-            />
-            <Route
-              path="/contact"
-              element={
-                <AuthGuard>
-                  <DashBoardLayout>
-                    <Contact />
-                  </DashBoardLayout>
-                </AuthGuard>
-              }
-            />
-            <Route
-              path="/banner"
-              element={
-                <AuthGuard>
-                  <DashBoardLayout>
-                    <Banner />
-                  </DashBoardLayout>
-                </AuthGuard>
-              }
-            />
-            <Route
-              path="/blog"
-              element={
-                <AuthGuard>
-                  <DashBoardLayout>
-                    <Blog />
+                    <DurationTime />
                   </DashBoardLayout>
                 </AuthGuard>
               }
@@ -139,14 +72,6 @@ function App() {
               element={
                 <GuestGuard>
                   <Login />
-                </GuestGuard>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <GuestGuard>
-                  <Register />
                 </GuestGuard>
               }
             />
