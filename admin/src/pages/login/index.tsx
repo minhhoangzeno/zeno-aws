@@ -9,7 +9,7 @@ import {
   Row,
   Typography,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AccountAPI } from "../../apis/account.api";
 import SingleLoading from "../../components/loading/Loading";
@@ -78,6 +78,15 @@ export default function Login() {
   const onFinishFailed = () => {
     message.error("Error").then((r) => console.log(r));
   };
+
+  let urlToChangeStream =
+    "http://localhost:3000/api/Orders/change-stream?_format=event-stream";
+  let src = new EventSource(urlToChangeStream);
+  src.addEventListener("data", function (msg) {
+    let data = JSON.parse(msg.data);
+    message.info(data.type)
+   
+  });
   return (
     <>
       {loading && <SingleLoading />}

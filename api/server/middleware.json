@@ -3,7 +3,9 @@
     "loopback#favicon": {}
   },
   "initial": {
-    "compression": {},
+    "compression": {
+      "enabled":false
+    },
     "helmet#xssFilter": {},
     "helmet#frameguard": {
       "params": { "action": "deny" }

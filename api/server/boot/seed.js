@@ -39,15 +39,11 @@ module.exports = function (app) {
             ? automigrate('postgres')
             : autoupdate('postgres')));
         return;
-        if (process.env.NODE_ENV === 'production') {
-            return;
-        }
         console.log('Seeding start...');
         const roles = [
-            { id: 1, name: 'SUPERADMIN', description: '' },
-            { id: 2, name: 'ADMIN', description: '' },
+            { id: 1, name: 'ADMIN', description: '' },
+            { id: 2, name: 'LEADER', description: '' },
             { id: 3, name: 'USER', description: '' },
-            { id: 4, name: 'UNKNOWN', description: '' },
         ];
         for (const role of roles) {
             await Role.create(withoutId(role));
@@ -55,58 +51,35 @@ module.exports = function (app) {
         const accounts = [];
         accounts.push({
             id: 1,
-            username: `super-admin`,
-            email: 'super-admin@bfast-vn.net',
+            username: `admin`,
+            email: 'admin@dreambuilder.net',
             password: '1',
-            firstName: 'Adams',
-            lastName: 'Ansel',
-            city: 1,
-            district: 1,
-            phoneNumber: 123456789,
+            name: 'Admin',
+            phone: '123456789',
         });
         accounts.push({
             id: 2,
-            username: `admin`,
-            email: 'admin@bfast-vn.net',
+            username: `leader`,
+            email: 'leader@dreambuilder.net',
             password: '1',
-            firstName: 'Elizabeth',
-            lastName: 'Queen',
-            city: 1,
-            district: 1,
-            phoneNumber: 123456789,
+            name: 'Leader',
+            phone: '123456789',
         });
         accounts.push({
             id: 3,
-            username: `userstandard`,
-            email: 'userstandard@bfast-vn.net',
+            username: `user`,
+            email: 'user@dreambuilder.net',
             password: '1',
-            firstName: 'Great',
-            lastName: 'Britain',
-            city: 1,
-            district: 1,
-            phoneNumber: 123456789,
+            name: 'User',
+            phone: '123456789',
         });
         accounts.push({
             id: 4,
             username: `hoangminh`,
-            email: 'hoangminh@bfast-vn.net',
+            email: 'hoangminh@dreambuilder.net',
             password: '1',
-            firstName: 'Hoang',
-            lastName: 'Minh',
-            city: 1,
-            district: 1,
-            phoneNumber: 123456789,
-        });
-        accounts.push({
-            id: 5,
-            username: `minhhoang`,
-            email: 'minhhoang@bfast-vn.net',
-            password: '1',
-            firstName: 'Minh',
-            lastName: 'Hoang',
-            city: 1,
-            district: 1,
-            phoneNumber: 123456789,
+            name: 'Hoang Minh',
+            phone: '123456789',
         });
         for (let account of accounts) {
             const item = await Account.create(withoutId(account));
@@ -116,9 +89,9 @@ module.exports = function (app) {
                         return 1;
                     case 2:
                         return 2;
+                    case 3:
+                        return 3;
                     case 4:
-                        return 1;
-                    case 5:
                         return 1;
                     default:
                         return 3;
