@@ -1,11 +1,11 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IAccount } from "../../../interface/Account.interface";
-import { RootState } from "../../store";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IAccount } from '../../../interface/Account.interface';
+import { RootState } from '../../store';
 
 const initialState: IAccount[] = [];
 
 export const AccountSlice = createSlice({
-  name: "account",
+  name: 'account',
   initialState,
   reducers: {
     SetAccount: (state, action: PayloadAction<IAccount[]>) => {
@@ -19,6 +19,7 @@ export const AccountSlice = createSlice({
         state[index] = {
           ...state[index],
           avatar: action.payload.avatar,
+          teamId: action.payload.teamId,
         };
         return state;
       }
@@ -32,7 +33,6 @@ export const AccountSlice = createSlice({
     },
   },
 });
-export const { SetAccount, UpdateAccount, DeleteAccount } =
-  AccountSlice.actions;
+export const { SetAccount, UpdateAccount, DeleteAccount } = AccountSlice.actions;
 export const GetAccount = (state: RootState) => state.account;
 export default AccountSlice.reducer;

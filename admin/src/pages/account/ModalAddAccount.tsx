@@ -69,7 +69,6 @@ export default function ModalAddAccount(props: IModalAddAccountProps) {
 
   const onValuesChange = () => {
     const getFieldsValue = form.getFieldsValue();
-    console.log('getFieldsValue', getFieldsValue);
 
     setFormValue(getFieldsValue);
   };
