@@ -1,14 +1,14 @@
-import { PlusOutlined } from "@ant-design/icons";
-import { Avatar, Button, Row, Table, Typography } from "antd";
-import { useEffect, useState } from "react";
-import { BlogAPI } from "../../apis/blog.api";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { GetBlog, SetBlog } from "../../app/reducers/Blog/Blog.reducer";
-import { DeleteCategoryBlog } from "../../app/reducers/CategoryBlog/CategoryBlog.reducer";
-import { EditableCell } from "../../components/edit-table-cell";
-import { IBlog } from "../../interface/Blog.interface";
-import ModalBlog from "./ModalBlog";
-import TableSettingItem from "./TableSettingItem";
+import { PlusOutlined } from '@ant-design/icons';
+import { Avatar, Button, Row, Table, Typography } from 'antd';
+import { useEffect, useState } from 'react';
+import { BlogAPI } from '../../apis/blog.api';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { GetBlog, SetBlog } from '../../app/reducers/Blog/Blog.reducer';
+import { DeleteCategoryBlog } from '../../app/reducers/CategoryBlog/CategoryBlog.reducer';
+import { EditableCell } from '../../components/edit-table-cell';
+import { IBlog } from '../../interface/Blog.interface';
+import ModalBlog from './ModalBlog';
+import TableSettingItem from './TableSettingItem';
 
 const { Title } = Typography;
 
@@ -32,44 +32,50 @@ export default function Blog() {
   };
   const columns = [
     {
-      title: "STT",
-      dataIndex: "id",
+      title: 'STT',
+      dataIndex: 'id',
       render: (_: null, record: IBlog) => {
         const idx = data.findIndex((el: IBlog) => el.id === record.id);
         return <Typography.Title level={5}>{idx + 1}</Typography.Title>;
       },
     },
     {
-      title: "Tiêu đề",
-      dataIndex: "title",
-      width: "30%",
+      title: 'Tiêu đề',
+      dataIndex: 'title',
+      width: '30%',
       editable: true,
     },
     {
-      title: "Mô tả",
-      dataIndex: "metaDescription",
-      width: "30%",
+      title: 'Mô tả',
+      dataIndex: 'metaDescription',
+      width: '30%',
       editable: true,
     },
     {
-      title: "Hình ảnh",
-      dataIndex: "photoURL",
-      width: "10%",
+      title: 'Hình ảnh',
+      dataIndex: 'photoURL',
+      width: '10%',
       editable: true,
       render: (_: null, record: IBlog) => {
         return (
           <>
-            <Avatar src={record.photoURL} size="large" />
+            <Avatar
+              src={record.photoURL}
+              size="large"
+            />
           </>
         );
       },
     },
     {
-      title: "Thiết lập",
+      title: 'Thiết lập',
       render: (_: null, record: IBlog) => {
         return (
           <>
-            <TableSettingItem blog={record} remove={remove} />
+            <TableSettingItem
+              blog={record}
+              remove={remove}
+            />
           </>
         );
       },
@@ -84,7 +90,7 @@ export default function Blog() {
       ...col,
       onCell: (record: IBlog) => ({
         record: record,
-        inputType: col.dataIndex === "price" ? "number" : "text",
+        inputType: col.dataIndex === 'price' ? 'number' : 'text',
         dataIndex: col.dataIndex,
         title: col.title,
       }),
@@ -94,7 +100,10 @@ export default function Blog() {
   return (
     <>
       {showModal && (
-        <ModalBlog modalOpen={showModal} setModalOpen={setShowModal} />
+        <ModalBlog
+          modalOpen={showModal}
+          setModalOpen={setShowModal}
+        />
       )}
       <Row>
         <Title level={3}>Danh mục bài viết</Title>
@@ -106,8 +115,7 @@ export default function Blog() {
           className="mr-4"
           onClick={() => {
             setShowModal(true);
-          }}
-        >
+          }}>
           Thêm mới
         </Button>
       </Row>

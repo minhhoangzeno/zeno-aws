@@ -46,14 +46,14 @@ export class AccountAPI {
       },
     });
   };
-  static fetchWhereNoTeam = () => {
+  static fetchWhereTeam = (number: number) => {
     return request({
       method: Method.GET,
       url: `/${this.COMPONENT_NAME}`,
       params: {
         filter: {
           where: {
-            teamId: 0,
+            teamId: number,
           },
           order: 'updatedAt ASC',
         },

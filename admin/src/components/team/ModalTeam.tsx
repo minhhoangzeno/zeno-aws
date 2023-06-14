@@ -36,10 +36,14 @@ export default function ModalTeam(props: IModalTeam) {
   }, [dispatch]);
 
   const search = async () => {
-    await AccountAPI.fetchWhereNoTeam().then((res) => setUserInfo(res.data.data));
+    await AccountAPI.fetchWhereTeam(team?.id ? team.id : 0).then((res) => setUserInfo(res.data.data));
   };
   useEffect(() => {
-    setFormValue((fValues) => ({}));
+    setFormValue((fValues) => ({
+      ...fValues,
+      name: team?.name,
+      leaderId: team?.leaderId,
+    }));
 
     form.setFieldsValue({
       ...form.getFieldsValue(),
@@ -54,7 +58,7 @@ export default function ModalTeam(props: IModalTeam) {
   };
 
   const onFinish = () => {
-    TeamAPI.put(formValue)
+    TeamAPI.put(team?.id ? { ...formValue, id: team.id } : formValue)
       .then((result) => {
         dispatch(PutTeam(result.data));
         message.success('Success!');
