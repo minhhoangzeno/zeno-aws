@@ -3741,6 +3741,8 @@ definitions:
         type: string
       phone:
         type: string
+      typeRole:
+        type: string
       realm:
         type: string
       username:

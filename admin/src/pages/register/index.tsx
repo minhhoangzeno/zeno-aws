@@ -1,21 +1,20 @@
 import {
-    Button,
-    Checkbox,
-    Col,
-    Form,
-    Input,
-    Layout,
-    message,
-    Row,
-    Select,
-    Typography
+  Button,
+  Checkbox,
+  Col,
+  Form,
+  Input,
+  Layout,
+  message,
+  Row,
+  Select,
+  Typography
 } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SingleLoading from "../../components/loading/Loading";
-import { getAddress } from "../../helper/getAddress.helper";
 import { IAccount } from "../../interface/Account.interface";
-import { ICity, IDistrict } from "../../interface/Address.interface";
+
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -35,9 +34,9 @@ interface IRegister {
 export default function Register() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [citys, setCitys] = useState<ICity[]>([]);
+  
 
-  const [districts, setDistricts] = useState<IDistrict[]>([]);
+  
   const [formValue, setFormValue] = useState<IRegister>({
     city: 1,
     district: 1,
@@ -45,30 +44,8 @@ export default function Register() {
   });
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    searchAddress();
-  }, []);
 
-  useEffect(() => {
-    // changeCity();
-  }, [formValue.city]);
-  const searchAddress = async () => {
-    const result = await getAddress();
-    setCitys(result);
-    setDistricts(result[0].districts);
-  };
-//   const changeCity = () => {
-//     const index = citys.findIndex((el) => el.code === formValue.city);
-//     if (index > -1) {
-//       const data = citys[index].districts;
-//       setDistricts(citys[index].districts);
-//       form.setFieldValue("district", data[0].code);
-//       setFormValue((f) => ({
-//         ...f,
-//         district: data[0].code,
-//       }));
-//     }
-//   };
+ 
   const onFinish = (values: IAccount) => {
     setLoading(true);
     console.log("values", values);
@@ -124,30 +101,7 @@ export default function Register() {
               >
                 <Input.Password size="large" />
               </Form.Item>
-              <Form.Item label="Tỉnh" required name="city">
-                <Select style={{ width: 180 }}>
-                  {citys.length > 0 &&
-                    citys.map((city: ICity, index: number) => {
-                      return (
-                        <Option key={index} value={city.code}>
-                          {city.name}
-                        </Option>
-                      );
-                    })}
-                </Select>
-              </Form.Item>
-              <Form.Item label="Huyện" required name="district">
-                <Select style={{ width: 180 }}>
-                  {districts.length > 0 &&
-                    districts.map((district: IDistrict, index: number) => {
-                      return (
-                        <Option key={index} value={district.code}>
-                          {district.name}
-                        </Option>
-                      );
-                    })}
-                </Select>
-              </Form.Item>
+              
               <Form.Item label="" name="checkRead" valuePropName="checked">
                 <Checkbox>Ban da doc va dong y</Checkbox>
               </Form.Item>

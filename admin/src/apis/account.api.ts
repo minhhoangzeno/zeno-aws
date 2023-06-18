@@ -15,6 +15,14 @@ export class AccountAPI {
     });
   };
 
+  static add = (data: IAccount) => {
+    return request({
+      method: Method.POST,
+      url: `/${this.COMPONENT_NAME}`,
+      data: data,
+    });
+  };
+
   static getMe = () => {
     return request({
       method: Method.GET,

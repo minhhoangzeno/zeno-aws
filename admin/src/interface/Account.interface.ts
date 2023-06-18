@@ -12,6 +12,8 @@ export interface IAccount extends IBase {
   email?: string;
   password?: string;
   teamId?: number;
+  roleId?: number;
   avatar?: string;
+  typeRole?: string;
   roles?: IRole[];
 }

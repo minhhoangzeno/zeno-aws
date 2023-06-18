@@ -97,7 +97,8 @@ module.exports = function (Account: PersistedModelStatic<Account>) {
       throw new LoopbackError("Error not user", 401);
     }
     const query = ctx.req.query;
-    const { accountId, roleId } = JSON.parse(query.data);
+    
+    const { accountId, roleId } = query.data;
     const CHANGE_ROLE = `
     UPDATE rolemapping
     SET roleid = ${roleId}

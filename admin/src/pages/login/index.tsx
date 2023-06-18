@@ -6,8 +6,7 @@ import {
   Input,
   Layout,
   message,
-  Row,
-  Typography,
+  Row
 } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,7 @@ import { IAccount } from "../../interface/Account.interface";
 import { UserLevels } from "../../interface/constants/UserLevels.const";
 import "./index.css";
 const { Content } = Layout;
-const { Title } = Typography;
+
 
 interface ILoginData {
   email: string;

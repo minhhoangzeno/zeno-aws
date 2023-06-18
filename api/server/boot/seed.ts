@@ -65,6 +65,7 @@ module.exports = function (app: App) {
           : autoupdate('postgres'),
       ),
     );
+    
     return;
     console.log('Seeding start...');
 
@@ -84,7 +85,8 @@ module.exports = function (app: App) {
       email: 'admin@dreambuilder.net',
       password: '1',
       name: 'Admin',
-      phone: '123456789',
+      phone: '0123456789',
+      typeRole: 'ADMIN'
     } as Account);
 
     accounts.push({
@@ -94,6 +96,7 @@ module.exports = function (app: App) {
       password: '1',
       name: 'Leader',
       phone: '123456789',
+      typeRole: 'LEADER'
     } as Account);
 
     accounts.push({
@@ -103,6 +106,7 @@ module.exports = function (app: App) {
       password: '1',
       name: 'User',
       phone: '123456789',
+      typeRole: 'USER'
     } as Account);
 
     accounts.push({
@@ -112,6 +116,7 @@ module.exports = function (app: App) {
       password: '1',
       name: 'Hoang Minh',
       phone: '123456789',
+      typeRole: 'ADMIN'
     } as Account);
 
     for (let account of accounts) {

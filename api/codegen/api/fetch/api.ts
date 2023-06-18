@@ -40,6 +40,7 @@ export interface Account {
     "name"?: string;
     "avatar"?: string;
     "phone"?: string;
+    "typeRole"?: string;
     "realm"?: string;
     "username"?: string;
     "email": string;

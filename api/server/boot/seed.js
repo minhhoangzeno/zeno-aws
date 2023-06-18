@@ -55,7 +55,8 @@ module.exports = function (app) {
             email: 'admin@dreambuilder.net',
             password: '1',
             name: 'Admin',
-            phone: '123456789',
+            phone: '0123456789',
+            typeRole: 'ADMIN'
         });
         accounts.push({
             id: 2,
@@ -64,6 +65,7 @@ module.exports = function (app) {
             password: '1',
             name: 'Leader',
             phone: '123456789',
+            typeRole: 'LEADER'
         });
         accounts.push({
             id: 3,
@@ -72,6 +74,7 @@ module.exports = function (app) {
             password: '1',
             name: 'User',
             phone: '123456789',
+            typeRole: 'USER'
         });
         accounts.push({
             id: 4,
@@ -80,6 +83,7 @@ module.exports = function (app) {
             password: '1',
             name: 'Hoang Minh',
             phone: '123456789',
+            typeRole: 'ADMIN'
         });
         for (let account of accounts) {
             const item = await Account.create(withoutId(account));

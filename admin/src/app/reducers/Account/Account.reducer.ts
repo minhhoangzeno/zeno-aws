@@ -8,17 +8,22 @@ export const AccountSlice = createSlice({
   name: "account",
   initialState,
   reducers: {
+    AddAccount: (state, action: PayloadAction<IAccount>) => {
+      const { password, ...obj } = action.payload;
+      state.push(obj);
+      return state;
+    },
     SetAccount: (state, action: PayloadAction<IAccount[]>) => {
       state = action.payload;
       return state;
     },
     UpdateAccount: (state, action: PayloadAction<IAccount>) => {
       const index = state.findIndex((el) => el.id === action.payload.id);
-
+      const { password, ...obj } = action.payload;
       if (index > -1) {
         state[index] = {
           ...state[index],
-          avatar: action.payload.avatar,
+          ...obj,
         };
         return state;
       }
@@ -32,7 +37,7 @@ export const AccountSlice = createSlice({
     },
   },
 });
-export const { SetAccount, UpdateAccount, DeleteAccount } =
+export const { SetAccount, UpdateAccount, DeleteAccount, AddAccount } =
   AccountSlice.actions;
 export const GetAccount = (state: RootState) => state.account;
 export default AccountSlice.reducer;
