@@ -14,9 +14,9 @@ export default function Dashboard() {
   const [data, setData] = useState<ITarget[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  useEffect(() => {
-    search();
-  }, [data]);
+  // useEffect(() => {
+  //   search();
+  // }, [data]);
   const search = async () => {
     await axios.get('http://14.225.192.139:3000/api/Targets').then((result) => {
       setData(result.data);

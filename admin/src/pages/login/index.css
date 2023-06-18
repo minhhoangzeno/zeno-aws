@@ -1,3 +1,12 @@
 .ant-form-item-label{
   max-width: 200px;
 }
+.ant-form-item{
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.title{
+  width: 120px;
+  text-align: left;
+}

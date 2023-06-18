@@ -16,7 +16,7 @@ import SingleLoading from "../../components/loading/Loading";
 import { setToken } from "../../helper/userToken";
 import { IAccount } from "../../interface/Account.interface";
 import { UserLevels } from "../../interface/constants/UserLevels.const";
-import "./index.css"
+import "./index.css";
 const { Content } = Layout;
 const { Title } = Typography;
 
@@ -32,7 +32,6 @@ export default function Login() {
     password: "",
     remember: false,
   });
-
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -103,20 +102,32 @@ export default function Login() {
               onFinishFailed={onFinishFailed}
               autoComplete="off"
             >
-              <Form.Item label="Email" required name="email">
-                <Input />
-              </Form.Item>
-              <Form.Item label="Mật khẩu" required name="password">
-                <Input.Password size="large" />
-              </Form.Item>
-              <Form.Item name="remember" valuePropName="checked">
-                <Checkbox>Ghi nhớ mật khẩu</Checkbox>
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Đăng nhập
-                </Button>
-              </Form.Item>
+              <ul>
+                <li className="flex items-center mb-6">
+                  <div className="title">Email</div>
+                  <Form.Item label="" required name="email">
+                    <Input />
+                  </Form.Item>
+                </li>
+                <li className="flex items-center mb-6">
+                  <div className="title">Mật khẩu</div>
+                  <Form.Item label="" required name="password">
+                    <Input.Password size="large" />
+                  </Form.Item>
+                </li>
+                <li className="flex items-center mb-6">
+                  <Form.Item name="remember" valuePropName="checked">
+                    <Checkbox>Ghi nhớ mật khẩu</Checkbox>
+                  </Form.Item>
+                </li>
+                <li className="flex items-center mb-6">
+                  <Form.Item>
+                    <Button type="primary" htmlType="submit">
+                      Đăng nhập
+                    </Button>
+                  </Form.Item>
+                </li>
+              </ul>
             </Form>
           </Col>
         </Row>

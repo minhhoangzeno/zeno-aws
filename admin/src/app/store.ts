@@ -11,6 +11,7 @@ import BannerReducer from "./reducers/Banner/Banner.reducer";
 import BlogReducer from "./reducers/Blog/Blog.reducer";
 import OrderReducer from "./reducers/Order/Order.reducer";
 import OrderProductReducer from "./reducers/OrderProduct/OrderProduct.reducer";
+import DurationTimeReducer from "./reducers/DurationTime/DurationTime.reducer";
 
 export const store = configureStore({
   reducer: {
@@ -24,8 +25,9 @@ export const store = configureStore({
     contact: ContactReducer,
     banner: BannerReducer,
     blog: BlogReducer,
-    order:OrderReducer,
-    orderProduct:OrderProductReducer
+    order: OrderReducer,
+    orderProduct: OrderProductReducer,
+    durationTime: DurationTimeReducer,
   },
 });
 
