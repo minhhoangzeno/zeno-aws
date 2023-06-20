@@ -33,6 +33,7 @@ export default function ModalTeam(props: IModalTeam) {
   const [userInfo, setUserInfo] = useState<IAccount[]>([]);
   useEffect(() => {
     search();
+    // eslint-disable-next-line
   }, [dispatch]);
   const search = async () => {
     await AccountAPI.fetchWhereTeam(team?.id ? team.id : 0).then((res) => setUserInfo(res.data.data));
@@ -78,7 +79,7 @@ export default function ModalTeam(props: IModalTeam) {
     <>
       <Modal
         destroyOnClose={true}
-        title={'Thêm Team/Cập nhật Team'}
+        title={team?.id ? 'Cập nhật Team' : 'Thêm Team'}
         style={{ top: 20 }}
         open={modalOpen}
         onOk={() => setModalOpen(false)}
