@@ -60,7 +60,12 @@ export class AccountAPI {
       },
     });
   };
-
+  static getAccountById = (id: number) => {
+    return request({
+      method: Method.GET,
+      url: `/${this.COMPONENT_NAME}/${id}`,
+    });
+  };
   static update = (id: number, data: IAccount) => {
     return request({
       method: Method.PATCH,

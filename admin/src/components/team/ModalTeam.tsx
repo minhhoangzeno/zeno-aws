@@ -1,11 +1,11 @@
 import { Button, Form, Input, message, Modal, Row, Select, Typography } from 'antd';
 import { useEffect, useState } from 'react';
-import { useAppDispatch } from '../../app/hooks';
-import { ITeam } from '../../interface/Team.interface';
 import { AccountAPI } from '../../apis/account.api';
-import { IAccount } from '../../interface/Account.interface';
 import { TeamAPI } from '../../apis/team.api';
-import { PutTeam } from '../../app/reducers/Team/Team.reducer';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { GetTeam, PutTeam, UpdateTeam } from '../../app/reducers/Team/Team.reducer';
+import { IAccount } from '../../interface/Account.interface';
+import { ITeam } from '../../interface/Team.interface';
 
 const { Text } = Typography;
 
@@ -24,17 +24,16 @@ interface IFormValue {
 export default function ModalTeam(props: IModalTeam) {
   const { modalOpen, setModalOpen, team } = props;
   const [form] = Form.useForm();
+  const emptyTeam = useAppSelector(GetTeam)[0];
   const dispatch = useAppDispatch();
   const [formValue, setFormValue] = useState<IFormValue>({
     name: team?.name,
     leaderId: team?.leaderId,
   });
   const [userInfo, setUserInfo] = useState<IAccount[]>([]);
-
   useEffect(() => {
     search();
   }, [dispatch]);
-
   const search = async () => {
     await AccountAPI.fetchWhereTeam(team?.id ? team.id : 0).then((res) => setUserInfo(res.data.data));
   };
@@ -59,8 +58,12 @@ export default function ModalTeam(props: IModalTeam) {
 
   const onFinish = () => {
     TeamAPI.put(team?.id ? { ...formValue, id: team.id } : formValue)
-      .then((result) => {
-        dispatch(PutTeam(result.data));
+      .then(async (result) => {
+        const infoLeader = await AccountAPI.getAccountById(result.data.leaderId).then((res) => res.data);
+        AccountAPI.update(result.data.leaderId, { ...infoLeader, teamId: result.data.id }).then((res) => {
+          dispatch(UpdateTeam({ ...emptyTeam, members: emptyTeam.members?.filter((el) => el.id !== res.data.id) }));
+        });
+        dispatch(PutTeam({ ...result.data, members: team?.members ? [...team.members] : [{ ...infoLeader, teamId: result.data.id }] }));
         message.success('Success!');
         setModalOpen(false);
       })
@@ -68,16 +71,14 @@ export default function ModalTeam(props: IModalTeam) {
         message.error('Error', err);
       });
   };
-
   const onFinishFailed = () => {
     message.error('Error!');
   };
-
   return (
     <>
       <Modal
         destroyOnClose={true}
-        title={'Thêm Account'}
+        title={'Thêm Team/Cập nhật Team'}
         style={{ top: 20 }}
         open={modalOpen}
         onOk={() => setModalOpen(false)}
