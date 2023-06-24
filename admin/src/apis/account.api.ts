@@ -1,8 +1,8 @@
-import { Method, request } from "../helper/request.helper";
-import { IAccount } from "../interface/Account.interface";
+import { Method, request } from '../helper/request.helper';
+import { IAccount } from '../interface/Account.interface';
 
 export class AccountAPI {
-  static readonly COMPONENT_NAME: string = "Accounts";
+  static readonly COMPONENT_NAME: string = 'Accounts';
 
   static login = ({ email, password }: { email: string; password: string }) => {
     return request({
@@ -29,7 +29,7 @@ export class AccountAPI {
       url: `/${this.COMPONENT_NAME}/get-me`,
       params: {
         filter: {
-          include: "role",
+          include: 'role',
         },
       },
     });
@@ -48,13 +48,32 @@ export class AccountAPI {
       url: `/${this.COMPONENT_NAME}`,
       params: {
         filter: {
-          include: "roles",
-          order: "createdAt DESC",
+          include: 'roles',
+          order: 'updatedAt ASC',
         },
       },
     });
   };
-
+  static fetchWhereTeam = (number: number) => {
+    return request({
+      method: Method.GET,
+      url: `/${this.COMPONENT_NAME}`,
+      params: {
+        filter: {
+          where: {
+            teamId: number,
+          },
+          order: 'updatedAt ASC',
+        },
+      },
+    });
+  };
+  static getAccountById = (id: number) => {
+    return request({
+      method: Method.GET,
+      url: `/${this.COMPONENT_NAME}/${id}`,
+    });
+  };
   static update = (id: number, data: IAccount) => {
     return request({
       method: Method.PATCH,
