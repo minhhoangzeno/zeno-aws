@@ -6,14 +6,13 @@ import {
   Modal,
   Row,
   Select,
-  Typography,
+  Typography
 } from "antd";
 import { useEffect } from "react";
 import { AccountAPI } from "../../apis/account.api";
 import { useAppDispatch } from "../../app/hooks";
 import {
-  AddAccount,
-  UpdateAccount,
+  UpdateAccount
 } from "../../app/reducers/Account/Account.reducer";
 import { IAccount } from "../../interface/Account.interface";
 import { UserLevels } from "../../interface/constants/UserLevels.const";

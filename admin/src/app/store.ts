@@ -11,7 +11,6 @@ export const store = configureStore({
     loading: LoadingReducer,
     account: AccountReducer,
     durationTime: DurationTimeReducer,
-    team: TeamReducer
   },
 });
 

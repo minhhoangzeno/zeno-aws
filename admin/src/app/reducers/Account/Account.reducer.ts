@@ -23,8 +23,7 @@ export const AccountSlice = createSlice({
       if (index > -1) {
         state[index] = {
           ...state[index],
-          avatar: action.payload.avatar,
-          teamId: action.payload.teamId,
+          ...obj
         };
         return state;
       }
@@ -38,6 +37,6 @@ export const AccountSlice = createSlice({
     },
   },
 });
-export const { SetAccount, UpdateAccount, DeleteAccount } = AccountSlice.actions;
+export const { SetAccount, UpdateAccount, DeleteAccount,AddAccount } = AccountSlice.actions;
 export const GetAccount = (state: RootState) => state.account;
 export default AccountSlice.reducer;
