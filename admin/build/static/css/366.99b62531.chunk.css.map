@@ -1,0 +1,1 @@
+{"version":3,"file":"static/css/366.99b62531.chunk.css","mappings":"AAAA,kBACE,UACF,CAEA,qBACE,WACF","sources":["pages/account/index.css"],"sourcesContent":[".ant-input-number {\n  width: 100%;\n}\n\n.ant-select-selector {\n  width: 150px;\n}\n"],"names":[],"sourceRoot":""}
