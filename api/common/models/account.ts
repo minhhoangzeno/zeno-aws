@@ -1,30 +1,29 @@
-import { Account } from "../../codegen/api/fetch/api";
-import { LoopbackError } from "../helpers/error";
+import { Account } from '../../codegen/api/fetch/api';
+import { LoopbackError } from '../helpers/error';
 
-import { HttpContext, PersistedModelStatic } from "../helpers/loopback";
-import { executeNativeSql } from "../helpers/native-sql";
-import { sendResetPasswordEmail } from "../helpers/sendEmail";
+import { HttpContext, PersistedModelStatic } from '../helpers/loopback';
+import { executeNativeSql } from '../helpers/native-sql';
 import {
   NEW_PASSWORD_IS_DIFFERENT_FROM_OLD,
   NEW_PASSWORD_IS_DIFFERENT_FROM_OLD_MESSAGE,
   WEAK_PASSWORD_ERROR_MESSAGE,
   WEAK_PASSWORD_STATUS_CODE,
-} from "../helpers/constants";
+} from '../helpers/constants';
 
-import { PasswordValidatorImpl } from "../helpers/PasswordValidatorHelper";
-import { knex } from "../helpers/knex";
+import { PasswordValidatorImpl } from '../helpers/PasswordValidatorHelper';
+import { knex } from '../helpers/knex';
+import { sendResetPasswordEmail } from '../helpers/mail/reset-password';
 module.exports = function (Account: PersistedModelStatic<Account>) {
   const PasswordValidatorHelper = new PasswordValidatorImpl();
   // Account.beforeRemote("**", async (ctx: HttpContext<Account>) => {
   //   console.log("methodString: ", ctx.methodString);
   // });
-  (Account as any).on("resetPasswordRequest", async (info: any) => {
+  (Account as any).on('resetPasswordRequest', async (info: any) => {
     const Email = Account.app.models.Email;
-    console.log(info);
     await sendResetPasswordEmail(Email, info);
   });
 
-  (Account as any).beforeRemote("changePassword", async (ctx: any) => {
+  (Account as any).beforeRemote('changePassword', async (ctx: any) => {
     let password = ctx.args.newPassword;
     let id = ctx.req.accessToken.userId;
 
@@ -35,7 +34,7 @@ module.exports = function (Account: PersistedModelStatic<Account>) {
         throw new LoopbackError(
           WEAK_PASSWORD_ERROR_MESSAGE,
           WEAK_PASSWORD_STATUS_CODE,
-          WEAK_PASSWORD_ERROR_MESSAGE
+          WEAK_PASSWORD_ERROR_MESSAGE,
         );
       } else {
         let acc = await Account.app.models.Account.findOne({
@@ -46,7 +45,7 @@ module.exports = function (Account: PersistedModelStatic<Account>) {
           throw new LoopbackError(
             NEW_PASSWORD_IS_DIFFERENT_FROM_OLD_MESSAGE,
             WEAK_PASSWORD_STATUS_CODE,
-            NEW_PASSWORD_IS_DIFFERENT_FROM_OLD
+            NEW_PASSWORD_IS_DIFFERENT_FROM_OLD,
           );
         }
       }
@@ -56,48 +55,29 @@ module.exports = function (Account: PersistedModelStatic<Account>) {
   (Account as any).getMe = async function (ctx: HttpContext<Account>) {
     const accessToken = ctx.req.accessToken;
     if (!accessToken) {
-      throw new LoopbackError("Error logged-in user", 401);
+      throw new LoopbackError('Error logged-in user', 401);
     }
     const userId = accessToken.userId;
     const user =
-      userId && (await Account.findById(userId, { include: "roles" }));
+      userId && (await Account.findById(userId, { include: 'roles' }));
     if (!user) {
-      throw new LoopbackError("Error not user", 401);
+      throw new LoopbackError('Error not user', 401);
     }
     return user;
   };
 
-  Account.afterRemote("find", async (ctx: any) => {
-    try {
-      const pg = knex("account").count().toString();
-      const data = await executeNativeSql(
-        Account.app.dataSources.postgres.connector,
-        pg,
-        []
-      );
-      if (data && data.length > 0) {
-        ctx.result = {
-          data: ctx.result,
-          total: Number(data[0].count),
-        };
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
   (Account as any).changeRole = async function (ctx: any) {
     const accessToken = ctx.req.accessToken;
     if (!accessToken) {
-      throw new LoopbackError("Error logged-in user", 401);
+      throw new LoopbackError('Error logged-in user', 401);
     }
     const userId = accessToken.userId;
     const user = userId && (await Account.findById(userId, {}));
     if (!user) {
-      throw new LoopbackError("Error not user", 401);
+      throw new LoopbackError('Error not user', 401);
     }
     const query = ctx.req.query;
-    
+
     const { accountId, roleId } = query.data;
     const CHANGE_ROLE = `
     UPDATE rolemapping
@@ -107,7 +87,7 @@ module.exports = function (Account: PersistedModelStatic<Account>) {
     executeNativeSql(
       Account.app.dataSources.postgres.connector,
       CHANGE_ROLE,
-      []
+      [],
     )
       .then(() => {
         return true;
@@ -117,7 +97,22 @@ module.exports = function (Account: PersistedModelStatic<Account>) {
       });
   };
 
-  Account.afterRemote("create", async (ctx: any) => {
+  (Account as any).findNoTeam = async function (ctx: any) {
+    const accessToken = ctx.req.accessToken;
+    if (!accessToken) {
+      throw new LoopbackError('Error logged-in user', 401);
+    }
+    const userId = accessToken.userId;
+    const user = userId && (await Account.findById(userId, {}));
+    if (!user) {
+      throw new LoopbackError('Error not user', 401);
+    }
+    const accounts = await Account.find({ where: { teamId: null } });
+    return accounts;
+  };
+
+
+  Account.afterRemote('create', async (ctx: any) => {
     try {
       const userId = ctx.result.id;
       const ADD_ROLE = `

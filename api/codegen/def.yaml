@@ -1194,6 +1194,19 @@ paths:
           schema:
             $ref: '#/definitions/x-any'
       deprecated: false
+  /Accounts/no-team:
+    get:
+      tags:
+        - Account
+      summary: Find user no team
+      operationId: Account.findNoTeam
+      parameters: []
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/x-any'
+      deprecated: false
   '/AccountTokens/{id}/user':
     get:
       tags:
@@ -3831,8 +3844,11 @@ definitions:
         type: number
         format: double
       month:
-        type: string
-        format: date-time
+        type: number
+        format: double
+      year:
+        type: number
+        format: double
       id:
         type: number
         format: double

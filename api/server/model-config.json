@@ -64,5 +64,9 @@
   "Team": {
     "dataSource": "postgres",
     "public": true
+  },
+  "Email": {
+    "dataSource": "mail",
+    "public": false
   }
 }

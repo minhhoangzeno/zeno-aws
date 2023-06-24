@@ -326,6 +326,23 @@ exports.AccountApiFetchParamCreator = {
     },
     /**
      *
+     * @summary Find user no team
+     */
+    accountFindNoTeam(options) {
+        const baseUrl = `/Accounts/no-team`;
+        let urlObj = url.parse(baseUrl, true);
+        let fetchOptions = assign({}, { method: "GET" }, options);
+        let contentTypeHeader = {};
+        if (contentTypeHeader) {
+            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
+        }
+        return {
+            url: url.format(urlObj),
+            options: fetchOptions,
+        };
+    },
+    /**
+     *
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
@@ -1426,6 +1443,23 @@ exports.AccountApiFp = {
     },
     /**
      *
+     * @summary Find user no team
+     */
+    accountFindNoTeam(options) {
+        const fetchArgs = exports.AccountApiFetchParamCreator.accountFindNoTeam(options);
+        return (fetch = isomorphicFetch, basePath = BASE_PATH) => {
+            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
+                if (response.status >= 200 && response.status < 300) {
+                    return response.json();
+                }
+                else {
+                    throw response;
+                }
+            });
+        };
+    },
+    /**
+     *
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
@@ -2148,6 +2182,13 @@ class AccountApi extends BaseAPI {
     }
     /**
      *
+     * @summary Find user no team
+     */
+    accountFindNoTeam(options) {
+        return exports.AccountApiFp.accountFindNoTeam(options)(this.fetch, this.basePath);
+    }
+    /**
+     *
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
@@ -2540,6 +2581,13 @@ const AccountApiFactory = function (fetch, basePath) {
          */
         accountFindById(params, options) {
             return exports.AccountApiFp.accountFindById(params, options)(fetch, basePath);
+        },
+        /**
+         *
+         * @summary Find user no team
+         */
+        accountFindNoTeam(options) {
+            return exports.AccountApiFp.accountFindNoTeam(options)(fetch, basePath);
         },
         /**
          *

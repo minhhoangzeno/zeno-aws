@@ -17,3 +17,8 @@ export const vnp_HashSecret = "TGFARZKFBTSJAQHNENLUFOLEVBLVKJOP";
 export const vnp_TmnCode = "VV2XA67I";
 export const vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
 export const web_Url = "http://localhost:3001/"
+
+
+export enum EmailText {
+  RESET_PASSWORD_TITLE = 'Plan de Transport - Réinitialisation Mot de passe',
+}

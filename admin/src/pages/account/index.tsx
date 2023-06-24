@@ -1,61 +1,42 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined, SyncOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined
+} from "@ant-design/icons";
 import {
   Button,
   message,
   Popconfirm,
   Row,
-  Select,
-  Table,
-  Typography,
+  Table, Typography
 } from "antd";
-import { UploadChangeParam } from "antd/es/upload";
 import { useEffect, useState } from "react";
 import { AccountAPI } from "../../apis/account.api";
-import { ContainerAPI } from "../../apis/container.api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   DeleteAccount,
   GetAccount,
-  SetAccount,
-  UpdateAccount,
+  SetAccount
 } from "../../app/reducers/Account/Account.reducer";
-import { selectUser, UpdateUser } from "../../app/reducers/Auth/Auth.reducer";
 import ModalAddAccount from "../../components/account/ModalAddAccount";
 import ModalEditAccount from "../../components/account/ModalEditAccount";
-import { GetFile } from "../../helper/getFile.helper";
 import { IAccount } from "../../interface/Account.interface";
 
 import "./index.css";
 
-const { Title, Text } = Typography;
-const { Option } = Select;
-
 export default function Account() {
   const data = useAppSelector(GetAccount);
-  const auth = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
 
   const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
 
   useEffect(() => {
     AccountAPI.fetchAll().then((result) => {
-      dispatch(SetAccount(result.data.data));
+      console.log(result.headers);
+
+      dispatch(SetAccount(result.data));
     });
   }, [dispatch]);
-
-  const upload = (record: IAccount, info: UploadChangeParam) => {
-    ContainerAPI.upload(info.file.originFileObj as File).then((result) => {
-      const photoURL = GetFile(result.data);
-      if (record.id) {
-        AccountAPI.update(record.id, { ...record, avatar: photoURL }).then(
-          (result) => {
-            dispatch(UpdateAccount(result.data));
-            dispatch(UpdateUser(result.data));
-          }
-        );
-      }
-    });
-  };
 
   const columns = [
     {

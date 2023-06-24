@@ -1,4 +1,4 @@
-import { Button, Checkbox, Col, Form, Input, Layout, message, Row } from 'antd';
+import { Button, Checkbox, Col, Form, Input, Layout, message, Row, Typography } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AccountAPI } from '../../apis/account.api';
@@ -97,7 +97,7 @@ export default function Login() {
                     <Input />
                   </Form.Item>
                 </li>
-                <li className="flex items-center mb-6">
+                <li className="flex items-center mb-2">
                   <div className="title">Mật khẩu</div>
                   <Form.Item
                     label=""
@@ -105,6 +105,14 @@ export default function Login() {
                     name="password">
                     <Input.Password size="large" />
                   </Form.Item>
+                </li>
+                <li className="flex mb-6 items-center justify-end">
+                  <Typography.Link
+                    onClick={() => {
+                      navigate('/forgot-password');
+                    }}>
+                    Quên mật khẩu
+                  </Typography.Link>
                 </li>
                 <li className="flex items-center mb-6">
                   <Form.Item

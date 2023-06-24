@@ -140,7 +140,8 @@ export interface RoleMapping {
 export interface Target {
     "revenue"?: number;
     "worksday"?: number;
-    "month"?: Date;
+    "month"?: number;
+    "year"?: number;
     "id"?: number;
     "accountId"?: number;
     "createdAt"?: Date;
@@ -455,6 +456,24 @@ export const AccountApiFetchParamCreator = {
         urlObj.query = assign({}, urlObj.query, {
             "filter": params["filter"],
         });
+        let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
+
+        let contentTypeHeader: Dictionary<string> = {};
+        if (contentTypeHeader) {
+            fetchOptions.headers = assign({}, contentTypeHeader, fetchOptions.headers);
+        }
+        return {
+            url: url.format(urlObj),
+            options: fetchOptions,
+        };
+    },
+    /**
+     * 
+     * @summary Find user no team
+     */
+    accountFindNoTeam(options?: any): FetchArgs {
+        const baseUrl = `/Accounts/no-team`;
+        let urlObj = url.parse(baseUrl, true);
         let fetchOptions: RequestInit = assign({}, { method: "GET" }, options);
 
         let contentTypeHeader: Dictionary<string> = {};
@@ -1590,6 +1609,22 @@ export const AccountApiFp = {
     },
     /**
      * 
+     * @summary Find user no team
+     */
+    accountFindNoTeam(options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<any> {
+        const fetchArgs = AccountApiFetchParamCreator.accountFindNoTeam(options);
+        return (fetch: FetchAPI = isomorphicFetch, basePath: string = BASE_PATH) => {
+            return fetch(basePath + fetchArgs.url, fetchArgs.options).then((response) => {
+                if (response.status >= 200 && response.status < 300) {
+                    return response.json();
+                } else {
+                    throw response;
+                }
+            });
+        };
+    },
+    /**
+     * 
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
@@ -2280,6 +2315,13 @@ export class AccountApi extends BaseAPI {
     }
     /**
      * 
+     * @summary Find user no team
+     */
+    accountFindNoTeam(options?: any) {
+        return AccountApiFp.accountFindNoTeam(options)(this.fetch, this.basePath);
+    }
+    /**
+     * 
      * @summary Find first instance of the model matched by filter from the data source.
      * @param filter Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string (&#x60;{\&quot;where\&quot;:{\&quot;something\&quot;:\&quot;value\&quot;}}&#x60;).  See https://loopback.io/doc/en/lb3/Querying-data.html#using-stringified-json-in-rest-queries for more details.
      */
@@ -2671,6 +2713,13 @@ export const AccountApiFactory = function (fetch?: FetchAPI, basePath?: string) 
          */
         accountFindById(params: {  "id": string; "filter"?: string; }, options?: any) {
             return AccountApiFp.accountFindById(params, options)(fetch, basePath);
+        },
+        /**
+         * 
+         * @summary Find user no team
+         */
+        accountFindNoTeam(options?: any) {
+            return AccountApiFp.accountFindNoTeam(options)(fetch, basePath);
         },
         /**
          * 

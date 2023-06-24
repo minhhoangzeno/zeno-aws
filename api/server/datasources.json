@@ -23,15 +23,15 @@
     "transports": [
       {
         "type": "smtp",
-        "host": "mail.ql6625.fr",
+        "host": "smtp.gmail.com",
         "secure": false,
         "port": 587,
         "tls": {
           "rejectUnauthorized": false
         },
         "auth": {
-          "user": "noreply@ql6625.fr",
-          "pass": "9fYXo4Ev"
+          "user": "minhhoangzeno@gmail.com",
+          "pass": "hfhikycedxwesgwt"
         },
         "requireTLS": true,
         "logger": false,

@@ -5,7 +5,12 @@
 'use strict';
 const loopback = require('loopback');
 const boot = require('loopback-boot');
+const cors = require('cors');
+const corsOptions = {
+    exposedHeaders: 'X-Total-Count',
+};
 const app = (module.exports = loopback());
+app.use(cors(corsOptions));
 const dotenv = require("dotenv");
 dotenv.config();
 app.start = function () {
