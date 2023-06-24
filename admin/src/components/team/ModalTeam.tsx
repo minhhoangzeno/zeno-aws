@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { GetTeam, PutTeam, UpdateTeam } from '../../app/reducers/Team/Team.reducer';
 import { IAccount } from '../../interface/Account.interface';
 import { ITeam } from '../../interface/Team.interface';
+import { SetTarget } from '../../app/reducers/Target/Target.reducer';
 
 const { Text } = Typography;
 
@@ -19,32 +20,27 @@ interface IModalTeam {
 
 interface IFormValue {
   name?: string;
-  leaderId?: number;
+  leaderId?: number | null;
 }
 export default function ModalTeam(props: IModalTeam) {
   const { modalOpen, setModalOpen, team } = props;
   const [form] = Form.useForm();
   const emptyTeam = useAppSelector(GetTeam)[0];
   const dispatch = useAppDispatch();
-  const [formValue, setFormValue] = useState<IFormValue>({
-    name: team?.name,
-    leaderId: team?.leaderId,
-  });
   const [userInfo, setUserInfo] = useState<IAccount[]>([]);
   useEffect(() => {
+    dispatch(SetTarget(false));
     search();
     // eslint-disable-next-line
   }, [dispatch]);
   const search = async () => {
-    await AccountAPI.fetchWhereTeam(team?.id ? team.id : 0).then((res) => setUserInfo(res.data.data));
+    if (team?.id) {
+      await AccountAPI.fetchWhereTeam(team.id).then((res) => setUserInfo(res.data));
+    } else {
+      await AccountAPI.fetchWhereNoTeam().then((res) => setUserInfo(res.data));
+    }
   };
   useEffect(() => {
-    setFormValue((fValues) => ({
-      ...fValues,
-      name: team?.name,
-      leaderId: team?.leaderId,
-    }));
-
     form.setFieldsValue({
       ...form.getFieldsValue(),
       name: team?.name,
@@ -52,19 +48,23 @@ export default function ModalTeam(props: IModalTeam) {
     });
   }, [team, form]);
 
-  const onValuesChange = () => {
-    const getFieldsValue = form.getFieldsValue();
-    setFormValue(getFieldsValue);
-  };
-
-  const onFinish = () => {
-    TeamAPI.put(team?.id ? { ...formValue, id: team.id } : formValue)
+  const onFinish = (fValue: IFormValue) => {
+    if (fValue.leaderId === undefined) {
+      fValue.leaderId = null;
+    }
+    TeamAPI.put(team?.id ? { ...fValue, id: team.id } : fValue)
       .then(async (result) => {
-        const infoLeader = await AccountAPI.getAccountById(result.data.leaderId).then((res) => res.data);
-        AccountAPI.update(result.data.leaderId, { ...infoLeader, teamId: result.data.id }).then((res) => {
-          dispatch(UpdateTeam({ ...emptyTeam, members: emptyTeam.members?.filter((el) => el.id !== res.data.id) }));
-        });
-        dispatch(PutTeam({ ...result.data, members: team?.members ? [...team.members] : [{ ...infoLeader, teamId: result.data.id }] }));
+        if (result.data.leaderId !== null) {
+          const infoLeader = await AccountAPI.getAccountById(result.data.leaderId).then((res) => res.data);
+          AccountAPI.update(result.data.leaderId, { ...infoLeader, teamId: result.data.id }).then((res) => {
+            dispatch(UpdateTeam({ ...emptyTeam, members: emptyTeam.members?.filter((el) => el.id !== res.data.id) }));
+          });
+
+          dispatch(PutTeam({ ...result.data, members: team?.members ? [...team.members] : [{ ...infoLeader, teamId: result.data.id }] }));
+        } else {
+          dispatch(PutTeam({ ...result.data, members: [] }));
+        }
+
         message.success('Success!');
         setModalOpen(false);
       })
@@ -88,10 +88,8 @@ export default function ModalTeam(props: IModalTeam) {
         forceRender>
         <Form
           form={form}
-          initialValues={formValue}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
-          onValuesChange={onValuesChange}
           colon={false}
           autoComplete="off">
           <Text>Tên Team</Text>

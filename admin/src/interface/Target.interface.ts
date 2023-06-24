@@ -6,4 +6,5 @@ export interface ITarget extends IBase {
   worksday?: number;
   month?: number;
   accountId?: number;
+  year?: number;
 }

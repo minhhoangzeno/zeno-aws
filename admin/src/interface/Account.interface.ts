@@ -1,7 +1,6 @@
 /** @format */
 
 import { IBase } from './Base.interface';
-import { UserLevels } from './constants/UserLevels.const';
 import { IRole } from './Role.interface';
 
 export interface IAccount extends IBase {
@@ -11,7 +10,7 @@ export interface IAccount extends IBase {
   phone?: string;
   email?: string;
   password?: string;
-  teamId?: number;
+  teamId?: number | null;
   roleId?: number;
   avatar?: string;
   typeRole?: string;

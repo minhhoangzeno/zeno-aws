@@ -20,7 +20,7 @@ export default function Team() {
   const [teamDrag, setTeamDrag] = useState<ITeam>({});
   const [dataModal, setDataModal] = useState<ITeam>({});
   const [editing, setEditing] = useState<boolean>(false);
-  const widthWidget = (1 / (dataTeam.length + 1)) * 100;
+  const widthWidget = (1 / dataTeam.length) * 100 - 2;
 
   useEffect(() => {
     search();
@@ -28,27 +28,24 @@ export default function Team() {
   }, [dispatch]);
 
   const search = async () => {
-    await TeamAPI.fetchAllMembers().then(async (resTeam) => {
-      await AccountAPI.fetchWhereTeam(0).then((res) => {
-        const emptyTeam: ITeam = { name: 'Chưa vào team', id: 0, members: res.data.data };
-        dispatch(SetTeam([emptyTeam, ...resTeam.data]));
-      });
+    const emptyTeam = await AccountAPI.fetchWhereNoTeam().then((res) => ({ name: 'Chưa vào team', members: res.data }));
+    await TeamAPI.fetchAllMembers().then((res) => {
+      dispatch(SetTeam([emptyTeam, ...res.data]));
     });
   };
-
   const handleOnDrag = (e: React.DragEvent, account: IAccount, team: ITeam) => {
     setAccountDrag(account);
     setTeamDrag(team);
   };
 
   const handleOnDrop = async (e: React.DragEvent, team: ITeam) => {
-    const updateAccount: IAccount = { ...accountDrag, teamId: team ? team.id : 0 };
+    const updateAccount: IAccount = { ...accountDrag, teamId: team.id ? team.id : null };
     if (accountDrag.id && team.id !== teamDrag.id) {
       await AccountAPI.update(accountDrag.id, updateAccount).then(() => {
         dispatch(
           UpdateTeam({
             ...teamDrag,
-            leaderId: teamDrag.leaderId === accountDrag.id ? 0 : teamDrag.leaderId,
+            leaderId: teamDrag.leaderId === accountDrag.id ? null : teamDrag.leaderId,
             members: teamDrag.members?.filter((el) => el.id !== accountDrag.id),
           })
         );
@@ -63,15 +60,11 @@ export default function Team() {
     const emptyTeam = dataTeam[0];
     if (record.id) {
       const memberOfTeam = record.members;
-      memberOfTeam?.map(async (el) => {
-        if (el.id) {
-          await AccountAPI.update(el.id, { ...el, teamId: 0 }).then((res) => {
-            if (emptyTeam.members) dispatch(UpdateTeam({ ...emptyTeam, members: [...emptyTeam.members, res.data] }));
-          });
-        }
-      });
+      const updateAccount: IAccount[] = [];
+      memberOfTeam?.map((el) => updateAccount.push({ ...el, teamId: null }));
       await TeamAPI.delete(record.id).then(() => {
         dispatch(DeleteTeam(record));
+        dispatch(UpdateTeam({ ...emptyTeam, members: emptyTeam.members ? [...emptyTeam.members, ...updateAccount] : [...updateAccount] }));
       });
     }
   };
@@ -114,7 +107,7 @@ export default function Team() {
         )}
       </Row>
 
-      <div className="flex flex-row-reverse justify-between">
+      <div className="flex flex-row-reverse justify-around">
         {dataTeam.length > 0 &&
           dataTeam.map((el: ITeam, index) => {
             return (
