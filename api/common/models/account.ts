@@ -111,6 +111,7 @@ module.exports = function (Account: PersistedModelStatic<Account>) {
     return accounts;
   };
 
+
   Account.afterRemote('create', async (ctx: any) => {
     try {
       const userId = ctx.result.id;
