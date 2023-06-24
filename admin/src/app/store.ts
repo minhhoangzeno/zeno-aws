@@ -1,9 +1,10 @@
-import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
-import AccountReducer from "./reducers/Account/Account.reducer";
-import AuthReducer from "./reducers/Auth/Auth.reducer";
-import DurationTimeReducer from "./reducers/DurationTime/DurationTime.reducer";
-import LoadingReducer from "./reducers/Loading/Loading.reducer";
+import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
+import AccountReducer from './reducers/Account/Account.reducer';
+import AuthReducer from './reducers/Auth/Auth.reducer';
+import DurationTimeReducer from './reducers/DurationTime/DurationTime.reducer';
+import LoadingReducer from './reducers/Loading/Loading.reducer';
 import TeamReducer from './reducers/Team/Team.reducer';
+import TargetReducer from './reducers/Target/Target.reducer';
 export const store = configureStore({
   reducer: {
     auth: AuthReducer,
@@ -11,6 +12,7 @@ export const store = configureStore({
     loading: LoadingReducer,
     account: AccountReducer,
     durationTime: DurationTimeReducer,
+    target: TargetReducer,
   },
 });
 

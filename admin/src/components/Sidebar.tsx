@@ -1,90 +1,37 @@
-import {
-  BookOutlined,
-  ContactsOutlined,
-  FileImageOutlined,
-  MessageOutlined,
-  PaperClipOutlined,
-  PieChartOutlined,
-  ProjectOutlined,
-  MoneyCollectOutlined,
-  UserOutlined,
-  FieldTimeOutlined,
-  GroupOutlined,
-} from "@ant-design/icons";
-import { Avatar, Layout, Menu, Row } from "antd";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import logo from "../assets/images/logo.png";
-import "./index.css";
+import { FieldTimeOutlined, GroupOutlined, PieChartOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Layout, Menu, Row } from 'antd';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import logo from '../assets/images/logo.png';
+import './index.css';
 const { Sider } = Layout;
 
 const menuItems = [
   {
-    key: "/dashboard",
+    key: '/dashboard',
     icon: <PieChartOutlined />,
-    label: "Dashboard",
+    label: 'Dashboard',
   },
   {
-    key: "/account",
+    key: '/account',
     icon: <UserOutlined />,
-    label: "Người dùng",
+    label: 'Người dùng',
   },
   {
-    key: "/team",
+    key: '/team',
     icon: <GroupOutlined />,
-    label: "Nhóm",
+    label: 'Nhóm',
   },
   {
-    key: "/duration-time",
+    key: '/duration-time',
     icon: <FieldTimeOutlined />,
-    label: "Khung giờ",
+    label: 'Khung giờ',
   },
-  // {
-  //   key: "/category-blog",
-  //   icon: <BookOutlined />,
-  //   label: "Danh mục bài viết",
-  // },
-  // {
-  //   key: "/product",
-  //   icon: <ProjectOutlined />,
-  //   label: "Sản phẩm",
-  // },
-  // {
-  //   key: "/category-product",
-  //   icon: <BookOutlined />,
-  //   label: "Danh mục sản phẩm",
-  // },
-  // {
-  //   key: "/feedback",
-  //   icon: <MessageOutlined />,
-  //   label: "Phản hồi",
-  // },
-  // {
-  //   key: "/contact",
-  //   icon: <ContactsOutlined />,
-  //   label: "Liên hệ",
-  // },
-  // {
-  //   key: "/banner",
-  //   icon: <FileImageOutlined />,
-  //   label: "Background sale",
-  // },
-  // {
-  //   key: "/blog",
-  //   icon: <PaperClipOutlined />,
-  //   label: "Blog",
-  // },
-  // {
-  //   key: "/order",
-  //   icon: <MoneyCollectOutlined
-  //    />,
-  //   label: "Order",
-  // },
 ];
 export default function SiderbarComponent() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [pathName, setPathName] = useState<string>("/");
+  const [pathName, setPathName] = useState<string>('/');
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
@@ -95,14 +42,15 @@ export default function SiderbarComponent() {
     <Sider
       collapsible
       collapsed={collapsed}
-      onCollapse={(value) => setCollapsed(value)}
-    >
+      onCollapse={(value) => setCollapsed(value)}>
       <Row
         className="items-center cursor-pointer justify-center"
         style={{ margin: 10 }}
-        onClick={() => navigate("/")}
-      >
-        <Avatar src={logo} size="large" />
+        onClick={() => navigate('/')}>
+        <Avatar
+          src={logo}
+          size="large"
+        />
       </Row>
       <Menu
         theme="dark"

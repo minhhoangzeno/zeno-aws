@@ -95,6 +95,17 @@ export class AccountAPI {
       },
     });
   };
+  static fetchWhereNoTeam = () => {
+    return request({
+      method: Method.GET,
+      url: `/${this.COMPONENT_NAME}/no-team`,
+      params: {
+        filter: {
+          order: 'updatedAt ASC',
+        },
+      },
+    });
+  };
   static getAccountById = (id: number) => {
     return request({
       method: Method.GET,
@@ -108,7 +119,13 @@ export class AccountAPI {
       data,
     });
   };
-
+  static put = (data: IAccount[]) => {
+    return request({
+      method: Method.PUT,
+      url: `/${this.COMPONENT_NAME}`,
+      data,
+    });
+  };
   static delete = (id: number) => {
     return request({
       method: Method.DELETE,
