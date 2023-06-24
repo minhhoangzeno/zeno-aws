@@ -19,7 +19,10 @@
       "type": "number"
     },
     "month": {
-      "type": "date"
+      "type": "number"
+    },
+    "year": {
+      "type": "number"
     }
   },
   "validations": [],

@@ -13,6 +13,8 @@ import NotFound from "./pages/404";
 const Dashboard = loadable(() => import("./pages/dashboard"));
 const Account = loadable(() => import("./pages/account"));
 const Login = loadable(() => import("./pages/login"));
+const ForgotPassword = loadable(() => import("./pages/forgot-password"));
+const ResetPassword = loadable(() => import("./pages/reset-password"));
 const Team = loadable(() => import("./pages/team"));
 const DurationTime = loadable(() => import("./pages/duration-time"));
 function App() {
@@ -72,6 +74,22 @@ function App() {
               element={
                 <GuestGuard>
                   <Login />
+                </GuestGuard>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <GuestGuard>
+                  <ForgotPassword />
+                </GuestGuard>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <GuestGuard>
+                  <ResetPassword />
                 </GuestGuard>
               }
             />

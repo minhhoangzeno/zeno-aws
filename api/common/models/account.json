@@ -109,6 +109,30 @@
           "verb": "post"
         }
       ]
+    },
+    "findNoTeam": {
+      "accepts": [
+        {
+          "arg": "ctx",
+          "type": "any",
+          "required": true,
+          "description": "context of request",
+          "http": {
+            "source": "context"
+          }
+        }
+      ],
+      "returns": {
+        "root": true,
+        "type": "any"
+      },
+      "description": "Find user no team",
+      "http": [
+        {
+          "path": "/no-team",
+          "verb": "get"
+        }
+      ]
     }
   }
 }

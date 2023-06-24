@@ -6,7 +6,8 @@ import {
   Input,
   Layout,
   message,
-  Row
+  Row,
+  Typography,
 } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +18,6 @@ import { IAccount } from "../../interface/Account.interface";
 import { UserLevels } from "../../interface/constants/UserLevels.const";
 import "./index.css";
 const { Content } = Layout;
-
 
 interface ILoginData {
   email: string;
@@ -108,11 +108,20 @@ export default function Login() {
                     <Input />
                   </Form.Item>
                 </li>
-                <li className="flex items-center mb-6">
+                <li className="flex items-center mb-2">
                   <div className="title">Mật khẩu</div>
                   <Form.Item label="" required name="password">
                     <Input.Password size="large" />
                   </Form.Item>
+                </li>
+                <li className="flex mb-6 items-center justify-end">
+                  <Typography.Link
+                    onClick={() => {
+                      navigate("/forgot-password");
+                    }}
+                  >
+                    Quên mật khẩu
+                  </Typography.Link>
                 </li>
                 <li className="flex items-center mb-6">
                   <Form.Item name="remember" valuePropName="checked">

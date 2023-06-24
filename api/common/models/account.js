@@ -2,21 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const error_1 = require("../helpers/error");
 const native_sql_1 = require("../helpers/native-sql");
-const sendEmail_1 = require("../helpers/sendEmail");
 const constants_1 = require("../helpers/constants");
 const PasswordValidatorHelper_1 = require("../helpers/PasswordValidatorHelper");
-const knex_1 = require("../helpers/knex");
+const reset_password_1 = require("../helpers/mail/reset-password");
 module.exports = function (Account) {
     const PasswordValidatorHelper = new PasswordValidatorHelper_1.PasswordValidatorImpl();
     // Account.beforeRemote("**", async (ctx: HttpContext<Account>) => {
     //   console.log("methodString: ", ctx.methodString);
     // });
-    Account.on("resetPasswordRequest", async (info) => {
+    Account.on('resetPasswordRequest', async (info) => {
         const Email = Account.app.models.Email;
-        console.log(info);
-        await (0, sendEmail_1.sendResetPasswordEmail)(Email, info);
+        await (0, reset_password_1.sendResetPasswordEmail)(Email, info);
     });
-    Account.beforeRemote("changePassword", async (ctx) => {
+    Account.beforeRemote('changePassword', async (ctx) => {
         let password = ctx.args.newPassword;
         let id = ctx.req.accessToken.userId;
         if (password) {
@@ -38,39 +36,24 @@ module.exports = function (Account) {
     Account.getMe = async function (ctx) {
         const accessToken = ctx.req.accessToken;
         if (!accessToken) {
-            throw new error_1.LoopbackError("Error logged-in user", 401);
+            throw new error_1.LoopbackError('Error logged-in user', 401);
         }
         const userId = accessToken.userId;
-        const user = userId && (await Account.findById(userId, { include: "roles" }));
+        const user = userId && (await Account.findById(userId, { include: 'roles' }));
         if (!user) {
-            throw new error_1.LoopbackError("Error not user", 401);
+            throw new error_1.LoopbackError('Error not user', 401);
         }
         return user;
     };
-    Account.afterRemote("find", async (ctx) => {
-        try {
-            const pg = (0, knex_1.knex)("account").count().toString();
-            const data = await (0, native_sql_1.executeNativeSql)(Account.app.dataSources.postgres.connector, pg, []);
-            if (data && data.length > 0) {
-                ctx.result = {
-                    data: ctx.result,
-                    total: Number(data[0].count),
-                };
-            }
-        }
-        catch (error) {
-            console.log(error);
-        }
-    });
     Account.changeRole = async function (ctx) {
         const accessToken = ctx.req.accessToken;
         if (!accessToken) {
-            throw new error_1.LoopbackError("Error logged-in user", 401);
+            throw new error_1.LoopbackError('Error logged-in user', 401);
         }
         const userId = accessToken.userId;
         const user = userId && (await Account.findById(userId, {}));
         if (!user) {
-            throw new error_1.LoopbackError("Error not user", 401);
+            throw new error_1.LoopbackError('Error not user', 401);
         }
         const query = ctx.req.query;
         const { accountId, roleId } = query.data;
@@ -87,7 +70,20 @@ module.exports = function (Account) {
             return false;
         });
     };
-    Account.afterRemote("create", async (ctx) => {
+    Account.findNoTeam = async function (ctx) {
+        const accessToken = ctx.req.accessToken;
+        if (!accessToken) {
+            throw new error_1.LoopbackError('Error logged-in user', 401);
+        }
+        const userId = accessToken.userId;
+        const user = userId && (await Account.findById(userId, {}));
+        if (!user) {
+            throw new error_1.LoopbackError('Error not user', 401);
+        }
+        const accounts = await Account.find({ where: { teamId: null } });
+        return accounts;
+    };
+    Account.afterRemote('create', async (ctx) => {
         try {
             const userId = ctx.result.id;
             const ADD_ROLE = `
