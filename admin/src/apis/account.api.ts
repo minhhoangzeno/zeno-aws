@@ -1,10 +1,11 @@
-import { Method, request } from "../helper/request.helper";
-import { IAccount } from "../interface/Account.interface";
-import { IForgotPassword } from "../interface/request/ForgotPassword.interface";
-import { IResetPassword } from "../interface/request/ResetPassword.interface";
+import { Method, request } from '../helper/request.helper';
+import { IAccount } from '../interface/Account.interface';
+import { IChangePassword } from '../interface/request/ChangePassword.interface';
+import { IForgotPassword } from '../interface/request/ForgotPassword.interface';
+import { IResetPassword } from '../interface/request/ResetPassword.interface';
 
 export class AccountAPI {
-  static readonly COMPONENT_NAME: string = "Accounts";
+  static readonly COMPONENT_NAME: string = 'Accounts';
 
   static login = ({ email, password }: { email: string; password: string }) => {
     return request({
@@ -31,7 +32,7 @@ export class AccountAPI {
       url: `/${this.COMPONENT_NAME}/get-me`,
       params: {
         filter: {
-          include: "role team",
+          include: 'role team',
         },
       },
     });
@@ -60,8 +61,8 @@ export class AccountAPI {
       url: `/${this.COMPONENT_NAME}`,
       params: {
         filter: {
-          include: "roles",
-          order: "updatedAt ASC",
+          include: 'roles',
+          order: 'updatedAt ASC',
         },
       },
     });
@@ -75,26 +76,12 @@ export class AccountAPI {
           where: {
             teamId: number,
           },
-          order: "updatedAt ASC",
+          order: 'updatedAt ASC',
         },
       },
     });
   };
 
-  static fetchNoWhereTeam = () => {
-    return request({
-      method: Method.GET,
-      url: `/${this.COMPONENT_NAME}`,
-      params: {
-        filter: {
-          where: {
-            teamId: { like: null },
-          },
-          order: "updatedAt ASC",
-        },
-      },
-    });
-  };
   static fetchWhereNoTeam = () => {
     return request({
       method: Method.GET,
@@ -160,6 +147,13 @@ export class AccountAPI {
       headers: {
         Authorization: token,
       },
+      data: data,
+    });
+  };
+  static changePassword = (data: IChangePassword) => {
+    return request({
+      method: Method.POST,
+      url: `/${this.COMPONENT_NAME}/change-password`,
       data: data,
     });
   };

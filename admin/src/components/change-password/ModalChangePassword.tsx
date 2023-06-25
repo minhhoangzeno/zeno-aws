@@ -1,65 +1,47 @@
 import { Button, Form, Input, message, Modal, Row, Typography } from 'antd';
 import { useEffect, useState } from 'react';
-import { TargetAPI } from '../../apis/target.api';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { selectUser } from '../../app/reducers/Auth/Auth.reducer';
-import { ITarget } from '../../interface/Target.interface';
+import { AccountAPI } from '../../apis/account.api';
 
 const { Text } = Typography;
 
-interface IModalTarget {
+interface IModalChangePassword {
   modalOpen: boolean;
   setModalOpen: (el: boolean) => void;
 }
 
 interface IFormValue {
-  revenue?: number;
-  worksday?: number;
-  accountId?: number;
-  month?: number;
-  year?: number;
+  oldPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
 }
-export default function ModalTarget(props: IModalTarget) {
+export default function ModalChangePassword(props: IModalChangePassword) {
   const auth = useAppSelector(selectUser);
   const { modalOpen, setModalOpen } = props;
-  const [target, setTarget] = useState<ITarget>({});
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const currentDate = new Date();
-  const currentMonth = currentDate.getMonth() + 1;
-  const currentYear = currentDate.getFullYear();
-  const currentMonthofYear = `tháng ${currentMonth} năm ${currentYear}`;
 
   useEffect(() => {
     search();
     // eslint-disable-next-line
   }, [dispatch]);
-  const search = async () => {
-    await TargetAPI.fetchById(auth?.id, currentMonth, currentYear).then((res) => {
-      setTarget(res.data[0]);
-    });
-  };
-  useEffect(() => {
-    form.setFieldsValue({
-      ...form.getFieldsValue(),
-      worksday: target?.worksday,
-      revenue: target?.revenue,
-    });
-  }, [target, form]);
+  const search = async () => {};
 
   const onFinish = (fValue: IFormValue) => {
-    TargetAPI.put(
-      target?.id
-        ? { ...fValue, id: target.id, accountId: auth?.id, month: currentMonth, year: currentYear }
-        : { ...fValue, accountId: auth?.id, month: currentMonth, year: currentYear }
-    )
-      .then(async (result) => {
-        message.success('Success!');
-        setModalOpen(false);
-      })
-      .catch((err) => {
-        message.error('Error', err);
-      });
+    if (fValue.confirmPassword === fValue.newPassword) {
+      AccountAPI.changePassword({ newPassword: fValue.newPassword, oldPassword: fValue.oldPassword })
+        .then(() => {
+          message.success('Success!');
+          setModalOpen(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          message.error('Error');
+        });
+    } else {
+      message.error('Mật khẩu nhập lại chưa đúng');
+    }
   };
   const onFinishFailed = () => {
     message.error('Error!');
@@ -68,7 +50,7 @@ export default function ModalTarget(props: IModalTarget) {
     <>
       <Modal
         destroyOnClose={true}
-        title={<Typography.Text>{target?.id ? 'Cập nhật Target ' : `Thêm mục tiêu ${currentMonthofYear} `}</Typography.Text>}
+        title={<Typography.Text>Thay đổi mật khẩu</Typography.Text>}
         style={{ top: 20 }}
         open={modalOpen}
         onOk={() => setModalOpen(false)}
@@ -81,21 +63,29 @@ export default function ModalTarget(props: IModalTarget) {
           onFinishFailed={onFinishFailed}
           colon={false}
           autoComplete="off">
-          <Text>Số ngày làm việc</Text>
+          <Text>Nhập mật khẩu cũ</Text>
           <Form.Item
-            name="worksday"
+            name="oldPassword"
             required
             className="my-4"
             label="">
-            <Input />
+            <Input.Password />
           </Form.Item>
-          <Text className="mt-4">Doanh thu</Text>
+          <Text className="mt-4">Nhập mật khẩu mới</Text>
           <Form.Item
-            name="revenue"
+            name="newPassword"
             required
             className="my-4"
             label="">
-            <Input />
+            <Input.Password />
+          </Form.Item>
+          <Text className="mt-4">Xác nhận mật khẩu</Text>
+          <Form.Item
+            name="confirmPassword"
+            required
+            className="my-4"
+            label="">
+            <Input.Password />
           </Form.Item>
           <Row className="justify-end mt-4">
             <Button
