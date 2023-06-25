@@ -36,7 +36,6 @@ export default function ModalTarget(props: IModalTarget) {
   }, [dispatch]);
   const search = async () => {
     await TargetAPI.fetchById(auth?.id, currentMonth, currentYear).then((res) => {
-      console.log(res.data);
       setTarget(res.data[0]);
     });
   };

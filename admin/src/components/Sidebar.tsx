@@ -1,4 +1,4 @@
-import { FieldTimeOutlined, GroupOutlined, PieChartOutlined, UserOutlined } from '@ant-design/icons';
+import { FieldTimeOutlined, GroupOutlined, InfoOutlined, PieChartOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Layout, Menu, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -26,6 +26,11 @@ const menuItems = [
     key: '/duration-time',
     icon: <FieldTimeOutlined />,
     label: 'Khung giờ',
+  },
+  {
+    key: '/order',
+    icon: <InfoOutlined />,
+    label: 'Báo cáo',
   },
 ];
 export default function SiderbarComponent() {

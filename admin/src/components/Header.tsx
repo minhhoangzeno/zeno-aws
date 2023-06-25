@@ -1,43 +1,78 @@
-import { LogoutOutlined } from '@ant-design/icons';
-import { Avatar, Button, Layout, message, Popconfirm, Row } from 'antd';
+import { DownOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Avatar, Button, Dropdown, Layout, MenuProps, message, Row, Space, Typography } from 'antd';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectUser, UserLogout } from '../app/reducers/Auth/Auth.reducer';
-import logo_admin from '../assets/images/admin.png';
-import { useEffect, useState } from 'react';
-import ModalTarget from './target/ModalTarget';
 import { GetTarget } from '../app/reducers/Target/Target.reducer';
+import logo_admin from '../assets/images/admin.png';
 import TargetPNG from '../assets/images/target.png';
+import ModalChangePassword from './change-password/ModalChangePassword';
+import './index.css';
+import ModalTarget from './target/ModalTarget';
+
+const { Text } = Typography;
 
 const { Header } = Layout;
 export default function HeaderComponent() {
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showModalChangePassword, setShowModalChangePassword] = useState<boolean>(false);
   const auth = useAppSelector(selectUser);
   const openFirst = useAppSelector(GetTarget);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  // const currentDate = new Date();
-  // const currentMonth = currentDate.getMonth() + 1;
-  // const currentYear = currentDate.getFullYear();
 
   useEffect(() => {
     if (openFirst) setShowModal(true);
     // eslint-disable-next-line
   }, []);
 
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+
+      label: (
+        <Text
+          onClick={() => {
+            setShowModalChangePassword(true);
+          }}>
+          Đổi mật khẩu
+        </Text>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <Text
+          className="text-black"
+          onClick={() => {
+            dispatch(UserLogout());
+            message.success('Logout success!');
+            navigate('/login');
+          }}>
+          {<LogoutOutlined style={{ marginRight: 4 }} />}
+          Đăng xuất
+        </Text>
+      ),
+    },
+  ];
   return (
     <Header>
-      {showModal && (
-        <ModalTarget
-          modalOpen={showModal}
-          setModalOpen={setShowModal}
-        />
-      )}
+      <ModalChangePassword
+        modalOpen={showModalChangePassword}
+        setModalOpen={setShowModalChangePassword}
+      />
+
+      <ModalTarget
+        modalOpen={showModal}
+        setModalOpen={setShowModal}
+      />
+
       <Row className="h-full justify-end items-center">
         <Button
           icon={
             <img
-              alt="mục tiêu"
+              alt="Mục tiêu"
               className="h-10 w-10 object-cover"
               src={TargetPNG}></img>
           }
@@ -48,24 +83,15 @@ export default function HeaderComponent() {
             setShowModal(true);
           }}
         />
-        <Avatar
-          src={auth?.avatar ? auth.avatar : logo_admin}
-          size="default"
-        />
-        <Popconfirm
-          title="Bạn chắc chắn muốn đăng xuất"
-          onConfirm={() => {
-            dispatch(UserLogout());
-            message.success('Logout success!');
-            navigate('/login');
-          }}>
-          <Button
-            icon={<LogoutOutlined />}
-            type="ghost"
-            className="text-white">
-            Đăng xuất
-          </Button>
-        </Popconfirm>
+        <Dropdown menu={{ items }}>
+          <Space>
+            <Avatar
+              src={auth?.avatar ? auth.avatar : logo_admin}
+              size="default"
+            />
+            <DownOutlined style={{ color: 'white', marginLeft: '5px' }} />
+          </Space>
+        </Dropdown>
       </Row>
     </Header>
   );
