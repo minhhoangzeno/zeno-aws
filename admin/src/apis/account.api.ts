@@ -31,7 +31,7 @@ export class AccountAPI {
       url: `/${this.COMPONENT_NAME}/get-me`,
       params: {
         filter: {
-          include: "role",
+          include: "role team",
         },
       },
     });
