@@ -17,6 +17,7 @@ const ForgotPassword = loadable(() => import("./pages/forgot-password"));
 const ResetPassword = loadable(() => import("./pages/reset-password"));
 const Team = loadable(() => import("./pages/team"));
 const DurationTime = loadable(() => import("./pages/duration-time"));
+const Order = loadable(() => import("./pages/order"));
 function App() {
   return (
     <div className="App">
@@ -55,6 +56,16 @@ function App() {
                 <AuthGuard>
                   <DashBoardLayout>
                     <Team />
+                  </DashBoardLayout>
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/order"
+              element={
+                <AuthGuard>
+                  <DashBoardLayout>
+                    <Order />
                   </DashBoardLayout>
                 </AuthGuard>
               }
