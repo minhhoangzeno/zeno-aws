@@ -1,16 +1,28 @@
-import { PlusOutlined, DeleteOutlined, EditOutlined, CheckOutlined } from '@ant-design/icons';
-import { Button, Popconfirm, Row, Tooltip, Typography, Form } from 'antd';
-import { useEffect, useState } from 'react';
-import { TeamAPI } from '../../apis/team.api';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import ModalTeam from '../../components/team/ModalTeam';
-import { ITeam } from '../../interface/Team.interface';
-import { IAccount } from '../../interface/Account.interface';
-import { AccountAPI } from '../../apis/account.api';
-import { DeleteTeam, GetTeam, SetTeam, UpdateTeam } from '../../app/reducers/Team/Team.reducer';
-import './index.css';
+import {
+  CheckOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Button, Divider, Form, Popconfirm, Row, Typography } from "antd";
+import { useEffect, useState } from "react";
+import { AccountAPI } from "../../apis/account.api";
+import { TeamAPI } from "../../apis/team.api";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  DeleteTeam,
+  GetTeam,
+  SetTeam,
+  UpdateTeam,
+} from "../../app/reducers/Team/Team.reducer";
+import ModalTeam from "../../components/team/ModalTeam";
+import { IAccount } from "../../interface/Account.interface";
+import { ITeam } from "../../interface/Team.interface";
+import "./index.css";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 export default function Team() {
   const dataTeam = useAppSelector(GetTeam);
@@ -28,7 +40,10 @@ export default function Team() {
   }, [dispatch]);
 
   const search = async () => {
-    const emptyTeam = await AccountAPI.fetchWhereNoTeam().then((res) => ({ name: 'Chưa vào team', members: res.data }));
+    const emptyTeam = await AccountAPI.fetchWhereNoTeam().then((res) => ({
+      name: "Chưa vào team",
+      members: res.data,
+    }));
     await TeamAPI.fetchAllMembers().then((res) => {
       dispatch(SetTeam([emptyTeam, ...res.data]));
     });
@@ -39,17 +54,24 @@ export default function Team() {
   };
 
   const handleOnDrop = async (e: React.DragEvent, team: ITeam) => {
-    const updateAccount: IAccount = { ...accountDrag, teamId: team.id ? team.id : null };
+    const updateAccount: IAccount = {
+      ...accountDrag,
+      teamId: team.id ? team.id : null,
+    };
     if (accountDrag.id && team.id !== teamDrag.id) {
       await AccountAPI.update(accountDrag.id, updateAccount).then(() => {
         dispatch(
           UpdateTeam({
             ...teamDrag,
-            leaderId: teamDrag.leaderId === accountDrag.id ? null : teamDrag.leaderId,
+            leaderId:
+              teamDrag.leaderId === accountDrag.id ? null : teamDrag.leaderId,
             members: teamDrag.members?.filter((el) => el.id !== accountDrag.id),
           })
         );
-        if (team.members) dispatch(UpdateTeam({ ...team, members: [...team.members, updateAccount] }));
+        if (team.members)
+          dispatch(
+            UpdateTeam({ ...team, members: [...team.members, updateAccount] })
+          );
       });
     }
   };
@@ -64,22 +86,25 @@ export default function Team() {
       memberOfTeam?.map((el) => updateAccount.push({ ...el, teamId: null }));
       await TeamAPI.delete(record.id).then(() => {
         dispatch(DeleteTeam(record));
-        dispatch(UpdateTeam({ ...emptyTeam, members: emptyTeam.members ? [...emptyTeam.members, ...updateAccount] : [...updateAccount] }));
+        dispatch(
+          UpdateTeam({
+            ...emptyTeam,
+            members: emptyTeam.members
+              ? [...emptyTeam.members, ...updateAccount]
+              : [...updateAccount],
+          })
+        );
       });
     }
   };
   return (
     <>
-      {showModal && (
-        <ModalTeam
-          modalOpen={showModal}
-          setModalOpen={setShowModal}
-          team={dataModal}
-        />
-      )}
-      <Row>
-        <Title level={3}>Nhóm</Title>
-      </Row>
+      <ModalTeam
+        modalOpen={showModal}
+        setModalOpen={setShowModal}
+        team={dataModal}
+      />
+
       <Row className="flex justify-between">
         <Button
           type="primary"
@@ -89,81 +114,103 @@ export default function Team() {
           onClick={() => {
             setDataModal({});
             setShowModal(true);
-          }}></Button>
+          }}
+        ></Button>
         {!editing ? (
           <Button
             type="primary"
             className="mb-4"
-            onClick={() => setEditing(true)}>
-            Chỉnh sửa
+            onClick={() => setEditing(true)}
+          >
+            <EditOutlined />
           </Button>
         ) : (
-          <Row>
+          <Row className="w-24 justify-between">
+            <Button
+              type="dashed"
+              onClick={() => setEditing(false)}
+              icon={
+                <CloseOutlined style={{ fontSize: "130%", color: "797978" }} />
+              }
+              className="flex justify-center items-center"
+            ></Button>
             <Button
               type="primary"
-              icon={<CheckOutlined style={{ fontSize: '130%' }} />}
-              onClick={() => setEditing(false)}></Button>
+              className="flex justify-center items-center"
+              icon={<CheckOutlined style={{ fontSize: "130%" }} />}
+              onClick={() => setEditing(false)}
+            ></Button>
           </Row>
         )}
       </Row>
 
-      <div className="flex flex-row-reverse justify-around">
+      <div className="flex justify-between">
         {dataTeam.length > 0 &&
           dataTeam.map((el: ITeam, index) => {
             return (
               <Form
                 disabled={!editing}
                 className="boxs rounded-lg bg-[#dcd5d5] overflow-hidden p-2 "
-                style={!editing ? { width: `${widthWidget}%`, opacity: 0.7 } : { width: `${widthWidget}%` }}
+                style={
+                  !editing
+                    ? { width: `${widthWidget}%`, opacity: 0.7 }
+                    : { width: `${widthWidget}%` }
+                }
                 key={index}
                 onDrop={(e) => {
                   if (editing) handleOnDrop(e, el);
                 }}
-                onDragOver={(e) => handleDragOver(e)}>
+                onDragOver={(e) => handleDragOver(e)}
+              >
                 <div className="w-full h-[60px]  text-[15px] font-bold flex justify-between uppercase items-center gap-2">
-                  <Text className="flex items-center justify-between max-w-[130px]">
-                    <div
-                      className=""
-                      title={el.name}>
+                  <Text className="flex items-center justify-between">
+                    <div className="text-blue-500" title={el.name}>
                       {el.name}
                     </div>
-                    <span className="ml-2 leading-[5px] p-2 rounded-[50%] bg-white">{el.members?.length}</span>
+
+                    <span className="ml-2 leading-[5px] p-2">
+                      {el.members?.length}
+                      &nbsp; <UserOutlined />
+                    </span>
                   </Text>
                   {index > 0 && (
                     <Row>
-                      <Tooltip title="Sửa">
-                        <Typography.Link
-                          disabled={!editing}
-                          className="mr-4"
-                          onClick={() => {
-                            setDataModal(el);
-                            setShowModal(true);
-                          }}>
-                          <EditOutlined style={{ fontSize: '130%', color: 'black' }} />
-                        </Typography.Link>
-                      </Tooltip>
+                      <Typography.Link
+                        disabled={!editing}
+                        className="mr-4"
+                        onClick={() => {
+                          setDataModal(el);
+                          setShowModal(true);
+                        }}
+                      >
+                        <EditOutlined style={{ fontSize: "130%" }} />
+                      </Typography.Link>
                       <Popconfirm
                         title="Bạn có chắc chắn muốn xóa không?"
                         onConfirm={() => {
                           remove(el);
-                        }}>
+                        }}
+                      >
                         <Typography.Link disabled={!editing}>
-                          <DeleteOutlined style={{ fontSize: '130%', color: 'black' }} />
+                          <DeleteOutlined style={{ fontSize: "130%" }} />
                         </Typography.Link>
                       </Popconfirm>
                     </Row>
                   )}
                 </div>
+                <Divider style={{ marginTop: 0, marginBottom: 8 }} />
                 <div className="widgets h-[400px] w-full flex justify-start items-center flex-col gap-2">
                   {el.members?.map((mem, index) => {
                     return (
                       <div
-                        className="text-[20px] rounded-[5px] bg-white h-10 min-h-10 flex flex-col justify-center items-start px-4 w-full"
+                        className="text-[20px] rounded-[5px] bg-white 
+                         min-h-10 flex flex-col justify-center items-start p-4 w-full"
                         key={index}
                         draggable={editing}
-                        onDragStart={(e) => handleOnDrag(e, mem, el)}>
+                        onDragStart={(e) => handleOnDrag(e, mem, el)}
+                      >
                         <p className="text-[15px]">
-                          {mem.name} {mem.id === el.leaderId ? '(Leader)' : ''}
+                          {mem.name} {mem.id === el.leaderId ? "(Leader)" : ""}
                         </p>
                         <p className="text-[10px]">{mem.email}</p>
                       </div>

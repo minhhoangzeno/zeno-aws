@@ -5,17 +5,13 @@ import {
   PropsWithChildren,
   ReactElement,
   useEffect,
-  useState,
+  useState
 } from "react";
 
 import { Navigate } from "react-router-dom";
 import { AccountAPI } from "../apis/account.api";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  selectUser,
-  UpdateUser,
-  UserLogout,
-} from "../app/reducers/Auth/Auth.reducer";
+import { useAppDispatch } from "../app/hooks";
+import { UpdateUser } from "../app/reducers/Auth/Auth.reducer";
 import GlobalLoading from "../components/global-loading/GlobalLoading";
 
 import { getToken } from "../helper/userToken";
@@ -24,7 +20,7 @@ const AuthGuard: FunctionComponent<
   PropsWithChildren<{ levels?: string[] }>
 > = ({ children, levels }) => {
   const dispatch = useAppDispatch();
-  const currentUser = useAppSelector(selectUser);
+
   const userToken = getToken();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -60,7 +56,6 @@ const AuthGuard: FunctionComponent<
     // if (levels && !levels.includes(currentUser?.typeRole as string)) {
     //   return <Navigate to="/layout-guard-roles" />;
     // }
-
 
     return children as ReactElement;
   }
