@@ -1,8 +1,7 @@
 import { Button, Form, Input, message, Modal, Row, Typography } from 'antd';
-import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectUser } from '../../app/reducers/Auth/Auth.reducer';
+import { useEffect } from 'react';
 import { AccountAPI } from '../../apis/account.api';
+import { useAppDispatch } from '../../app/hooks';
 
 const { Text } = Typography;
 
@@ -17,7 +16,7 @@ interface IFormValue {
   confirmPassword?: string;
 }
 export default function ModalChangePassword(props: IModalChangePassword) {
-  const auth = useAppSelector(selectUser);
+  
   const { modalOpen, setModalOpen } = props;
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();

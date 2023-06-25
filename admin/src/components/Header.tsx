@@ -1,15 +1,15 @@
 import { DownOutlined, LogoutOutlined } from '@ant-design/icons';
-import { Avatar, Button, Dropdown, Layout, MenuProps, message, Popconfirm, Row, Space, Typography } from 'antd';
+import { Avatar, Button, Dropdown, Layout, MenuProps, message, Row, Space, Typography } from 'antd';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectUser, UserLogout } from '../app/reducers/Auth/Auth.reducer';
-import logo_admin from '../assets/images/admin.png';
-import { useEffect, useState } from 'react';
-import ModalTarget from './target/ModalTarget';
 import { GetTarget } from '../app/reducers/Target/Target.reducer';
+import logo_admin from '../assets/images/admin.png';
 import TargetPNG from '../assets/images/target.png';
-import './index.css';
 import ModalChangePassword from './change-password/ModalChangePassword';
+import './index.css';
+import ModalTarget from './target/ModalTarget';
 
 const { Text } = Typography;
 
