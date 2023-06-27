@@ -1,20 +1,11 @@
-import {
-  Button,
-  Form,
-  InputNumber,
-  message,
-  Modal,
-  Row,
-  Select,
-  Typography
-} from "antd";
-import { useEffect } from "react";
-import { OrderAPI } from "../../apis/order.api";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { GetDurationTime } from "../../app/reducers/DurationTime/DurationTime.reducer";
-import { UpdateOrder } from "../../app/reducers/Order/Order.reducer";
-import { IOrder } from "../../interface/Order.interface";
-import "./index.css";
+import { Button, Form, InputNumber, message, Modal, Row, Select, Typography } from 'antd';
+import { useEffect } from 'react';
+import { OrderAPI } from '../../apis/order.api';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { GetDurationTime } from '../../app/reducers/DurationTime/DurationTime.reducer';
+import { UpdateOrder } from '../../app/reducers/Order/Order.reducer';
+import { IOrder } from '../../interface/Order.interface';
+import './index.css';
 interface EditOrderProps {
   isModalOpen: boolean;
   setIsModalOpen: (el: boolean) => void;
@@ -40,19 +31,19 @@ export default function ModalEditOrder(props: EditOrderProps) {
   }, [form, record, isModalOpen]);
 
   const onFinishFailed = () => {
-    message.error("Error!");
+    message.error('Error!');
   };
   const onFinish = (values: IOrder) => {
     if (record.id) {
       OrderAPI.update(record.id, values)
         .then((result) => {
           dispatch(UpdateOrder(result.data));
-          message.success("Success");
+          message.success('Success');
           setIsModalOpen(false);
         })
         .catch((err) => {
-          console.log("err", err);
-          message.error("Error!");
+          console.log('err', err);
+          message.error('Error!');
         });
     }
   };
@@ -60,13 +51,13 @@ export default function ModalEditOrder(props: EditOrderProps) {
   return (
     <>
       <Modal
+        forceRender
         width={840}
         open={isModalOpen}
         destroyOnClose={true}
         footer={null}
         onCancel={() => setIsModalOpen(false)}
-        title={<Typography.Text>Sửa báo cáo</Typography.Text>}
-      >
+        title={<Typography.Text>Sửa báo cáo</Typography.Text>}>
         <Row>
           <Form
             name="order"
@@ -75,15 +66,17 @@ export default function ModalEditOrder(props: EditOrderProps) {
             autoComplete="off"
             className="w-full"
             onFinishFailed={onFinishFailed}
-            onFinish={onFinish}
-          >
+            onFinish={onFinish}>
             <Row className="justify-between">
               <ul className="form-item">
                 <li>
                   <Typography.Text>Số cuộc gọi đã gọi</Typography.Text>
                 </li>
                 <li>
-                  <Form.Item label="" name="numberOfCall" required>
+                  <Form.Item
+                    label=""
+                    name="numberOfCall"
+                    required>
                     <InputNumber />
                   </Form.Item>
                 </li>
@@ -93,7 +86,10 @@ export default function ModalEditOrder(props: EditOrderProps) {
                   <Typography.Text>Số cuộc gọi đã tư vấn</Typography.Text>
                 </li>
                 <li>
-                  <Form.Item label="" name="numberOfAdvise" required>
+                  <Form.Item
+                    label=""
+                    name="numberOfAdvise"
+                    required>
                     <InputNumber />
                   </Form.Item>
                 </li>
@@ -106,7 +102,10 @@ export default function ModalEditOrder(props: EditOrderProps) {
                   <Typography.Text>Số cuộc gọi chốt</Typography.Text>
                 </li>
                 <li>
-                  <Form.Item label="" name="numberOfOrder" required>
+                  <Form.Item
+                    label=""
+                    name="numberOfOrder"
+                    required>
                     <InputNumber />
                   </Form.Item>
                 </li>
@@ -116,7 +115,10 @@ export default function ModalEditOrder(props: EditOrderProps) {
                   <Typography.Text>Số cuộc gọi xác nhận</Typography.Text>
                 </li>
                 <li>
-                  <Form.Item label="" name="numberOfAccepted" required>
+                  <Form.Item
+                    label=""
+                    name="numberOfAccepted"
+                    required>
                     <InputNumber />
                   </Form.Item>
                 </li>
@@ -128,7 +130,10 @@ export default function ModalEditOrder(props: EditOrderProps) {
                   <Typography.Text>Doanh thu chốt</Typography.Text>
                 </li>
                 <li>
-                  <Form.Item label="" name="revenueOfOrder" required>
+                  <Form.Item
+                    label=""
+                    name="revenueOfOrder"
+                    required>
                     <InputNumber />
                   </Form.Item>
                 </li>
@@ -138,7 +143,10 @@ export default function ModalEditOrder(props: EditOrderProps) {
                   <Typography.Text>Doanh thu xác nhận</Typography.Text>
                 </li>
                 <li>
-                  <Form.Item label="" name="revenueOfAccepted" required>
+                  <Form.Item
+                    label=""
+                    name="revenueOfAccepted"
+                    required>
                     <InputNumber />
                   </Form.Item>
                 </li>
@@ -150,12 +158,17 @@ export default function ModalEditOrder(props: EditOrderProps) {
                   <Typography.Text>Khung giờ</Typography.Text>
                 </li>
                 <li>
-                  <Form.Item label="" name="durationTimeId" required>
+                  <Form.Item
+                    label=""
+                    name="durationTimeId"
+                    required>
                     <Select>
                       {durationTimeList.length > 0 &&
                         durationTimeList.map((el) => {
                           return (
-                            <Option key={el.id} value={el.id}>
+                            <Option
+                              key={el.id}
+                              value={el.id}>
                               {el.title}
                             </Option>
                           );
@@ -166,10 +179,14 @@ export default function ModalEditOrder(props: EditOrderProps) {
               </ul>
             </Row>
             <Row className="justify-end">
-              <Button className="mr-4" onClick={() => setIsModalOpen(false)}>
+              <Button
+                className="mr-4"
+                onClick={() => setIsModalOpen(false)}>
                 Đóng
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                htmlType="submit">
                 Lưu
               </Button>
             </Row>

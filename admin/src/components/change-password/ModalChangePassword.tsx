@@ -2,6 +2,7 @@ import { Button, Form, Input, message, Modal, Row, Typography } from 'antd';
 import { useEffect } from 'react';
 import { AccountAPI } from '../../apis/account.api';
 import { useAppDispatch } from '../../app/hooks';
+import validator from 'validator';
 
 const { Text } = Typography;
 
@@ -16,7 +17,6 @@ interface IFormValue {
   confirmPassword?: string;
 }
 export default function ModalChangePassword(props: IModalChangePassword) {
-  
   const { modalOpen, setModalOpen } = props;
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
@@ -26,6 +26,25 @@ export default function ModalChangePassword(props: IModalChangePassword) {
     // eslint-disable-next-line
   }, [dispatch]);
   const search = async () => {};
+
+  const validate = (value: string) => {
+    if (value.length === 0) {
+      return true;
+    }
+    if (
+      validator.isStrongPassword(value, {
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+      })
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   const onFinish = (fValue: IFormValue) => {
     if (fValue.confirmPassword === fValue.newPassword) {
@@ -65,8 +84,25 @@ export default function ModalChangePassword(props: IModalChangePassword) {
           <Text>Nhập mật khẩu cũ</Text>
           <Form.Item
             name="oldPassword"
+            rules={[
+              {
+                required: true,
+                message: 'Mật khẩu không để trống !',
+              },
+              {
+                validator(rule, value) {
+                  if (validate(value)) {
+                    return Promise.resolve();
+                  } else {
+                    return Promise.reject('Error');
+                  }
+                },
+                message: 'Vui lòng nhập mật khẩu tối thiểu 8 kí tự, có ít nhất 1 kí tự viết hóa , 1 chữ số và 1 kí tự đặc biệt',
+              },
+            ]}
             required
             className="my-4"
+            hasFeedback
             label="">
             <Input.Password />
           </Form.Item>
@@ -74,7 +110,24 @@ export default function ModalChangePassword(props: IModalChangePassword) {
           <Form.Item
             name="newPassword"
             required
+            rules={[
+              {
+                required: true,
+                message: 'Mật khẩu không để trống !',
+              },
+              {
+                validator(rule, value) {
+                  if (validate(value)) {
+                    return Promise.resolve();
+                  } else {
+                    return Promise.reject('Error');
+                  }
+                },
+                message: 'Vui lòng nhập mật khẩu tối thiểu 8 kí tự, có ít nhất 1 kí tự viết hóa , 1 chữ số và 1 kí tự đặc biệt',
+              },
+            ]}
             className="my-4"
+            hasFeedback
             label="">
             <Input.Password />
           </Form.Item>
@@ -82,7 +135,24 @@ export default function ModalChangePassword(props: IModalChangePassword) {
           <Form.Item
             name="confirmPassword"
             required
+            rules={[
+              {
+                required: true,
+                message: 'Xác nhận mật khẩu không để trống !',
+              },
+              {
+                validator(rule, value) {
+                  if (validate(value)) {
+                    return Promise.resolve();
+                  } else {
+                    return Promise.reject('Error');
+                  }
+                },
+                message: 'Vui lòng nhập mật khẩu tối thiểu 8 kí tự, có ít nhất 1 kí tự viết hóa , 1 chữ số và 1 kí tự đặc biệt',
+              },
+            ]}
             className="my-4"
+            hasFeedback
             label="">
             <Input.Password />
           </Form.Item>

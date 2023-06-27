@@ -55,12 +55,14 @@ export class AccountAPI {
     });
   };
 
-  static fetchAll = () => {
+  static fetchAll = (skip: number, limit: number) => {
     return request({
       method: Method.GET,
       url: `/${this.COMPONENT_NAME}`,
       params: {
         filter: {
+          limit: limit,
+          skip: skip,
           include: 'roles',
           order: 'updatedAt ASC',
         },

@@ -1,21 +1,10 @@
-import {
-  Button,
-  Form,
-  Input,
-  message,
-  Modal,
-  Row,
-  Select,
-  Typography
-} from "antd";
-import { useEffect } from "react";
-import { AccountAPI } from "../../apis/account.api";
-import { useAppDispatch } from "../../app/hooks";
-import {
-  UpdateAccount
-} from "../../app/reducers/Account/Account.reducer";
-import { IAccount } from "../../interface/Account.interface";
-import { UserLevels } from "../../interface/constants/UserLevels.const";
+import { Button, Form, Input, message, Modal, Row, Select, Typography } from 'antd';
+import { useEffect } from 'react';
+import { AccountAPI } from '../../apis/account.api';
+import { useAppDispatch } from '../../app/hooks';
+import { UpdateAccount } from '../../app/reducers/Account/Account.reducer';
+import { IAccount } from '../../interface/Account.interface';
+import { UserLevels } from '../../interface/constants/UserLevels.const';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -70,19 +59,19 @@ export default function ModalEditAccount(props: IModalAddAccountProps) {
                 roleId: values.roleId,
               })
             );
-            message.success("Success");
+            message.success('Success');
             setModalOpen(false);
           });
         })
         .catch(() => {
-          message.error("Error");
+          message.error('Error');
           setModalOpen(false);
         });
     }
   };
 
   const onFinishFailed = () => {
-    message.error("Error!");
+    message.error('Error!');
   };
 
   return (
@@ -95,29 +84,44 @@ export default function ModalEditAccount(props: IModalAddAccountProps) {
         onOk={() => setModalOpen(false)}
         onCancel={() => setModalOpen(false)}
         footer={null}
-        forceRender
-      >
+        forceRender>
         <Form
           form={form}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           colon={false}
-          autoComplete="off"
-        >
+          autoComplete="off">
           <Text>Tên</Text>
-          <Form.Item name="name" required label="">
+          <Form.Item
+            name="name"
+            required
+            label="">
             <Input />
           </Form.Item>
           <Text>Email</Text>
-          <Form.Item name="email" required label="">
+          <Form.Item
+            name="email"
+            required
+            label=""
+            rules={[
+              {
+                type: 'email',
+                message: 'Địa chỉ Email không hợp lệ',
+              },
+              { required: true, message: 'Vui lòng nhập địa chỉ email' },
+            ]}>
             <Input />
           </Form.Item>
           <Text>Số điện thoại</Text>
-          <Form.Item name="phone" label="">
+          <Form.Item
+            name="phone"
+            label="">
             <Input />
           </Form.Item>
           <Text>Role</Text>
-          <Form.Item name="roleId" label="">
+          <Form.Item
+            name="roleId"
+            label="">
             <Select>
               <Option value={1}>{UserLevels.ADMIN}</Option>
               <Option value={2}>{UserLevels.LEADER}</Option>
@@ -126,10 +130,14 @@ export default function ModalEditAccount(props: IModalAddAccountProps) {
           </Form.Item>
 
           <Row className="justify-end">
-            <Button className="mr-4" onClick={() => setModalOpen(false)}>
+            <Button
+              className="mr-4"
+              onClick={() => setModalOpen(false)}>
               Đóng
             </Button>
-            <Button type="primary" htmlType="submit">
+            <Button
+              type="primary"
+              htmlType="submit">
               Lưu
             </Button>
           </Row>
