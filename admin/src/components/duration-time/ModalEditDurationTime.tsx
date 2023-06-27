@@ -1,9 +1,9 @@
-import { Button, Form, Input, message, Modal, Row, Typography } from "antd";
-import { useEffect } from "react";
-import { DurationTimeAPI } from "../../apis/durationTime.api";
-import { useAppDispatch } from "../../app/hooks";
-import { UpdateDurationTime } from "../../app/reducers/DurationTime/DurationTime.reducer";
-import { IDurationTime } from "../../interface/DurationTime.interface";
+import { Button, Form, Input, message, Modal, Row, Typography } from 'antd';
+import { useEffect } from 'react';
+import { DurationTimeAPI } from '../../apis/durationTime.api';
+import { useAppDispatch } from '../../app/hooks';
+import { UpdateDurationTime } from '../../app/reducers/DurationTime/DurationTime.reducer';
+import { IDurationTime } from '../../interface/DurationTime.interface';
 
 interface IEditurationTimeProps {
   isModalOpen: boolean;
@@ -20,19 +20,19 @@ const ModalEditDurationTime = (props: IEditurationTimeProps) => {
     });
   }, [record, form, isModalOpen]);
   const onFinishFailed = () => {
-    message.error("Error!");
+    message.error('Error!');
   };
 
   const onFinish = (values: IDurationTime) => {
     if (record.id) {
       DurationTimeAPI.update(record.id, values)
         .then((result) => {
-          message.success("Success");
+          message.success('Success');
           dispatch(UpdateDurationTime(result.data));
           setIsModalOpen(false);
         })
         .catch(() => {
-          message.error("Error!");
+          message.error('Error!');
         });
     }
   };
@@ -41,10 +41,10 @@ const ModalEditDurationTime = (props: IEditurationTimeProps) => {
       <Modal
         open={isModalOpen}
         destroyOnClose={true}
+        forceRender
         footer={null}
         onCancel={() => setIsModalOpen(false)}
-        title={<Typography.Text>Sửa khung giờ</Typography.Text>}
-      >
+        title={<Typography.Text>Sửa khung giờ</Typography.Text>}>
         <Row>
           <Form
             form={form}
@@ -52,16 +52,22 @@ const ModalEditDurationTime = (props: IEditurationTimeProps) => {
             autoComplete="off"
             className="w-full"
             onFinishFailed={onFinishFailed}
-            onFinish={onFinish}
-          >
-            <Form.Item label="Tiêu đề" name="title" required>
+            onFinish={onFinish}>
+            <Form.Item
+              label="Tiêu đề"
+              name="title"
+              required>
               <Input />
             </Form.Item>
             <Row className="justify-end">
-              <Button className="mr-4" onClick={() => setIsModalOpen(false)}>
+              <Button
+                className="mr-4"
+                onClick={() => setIsModalOpen(false)}>
                 Đóng
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                htmlType="submit">
                 Lưu
               </Button>
             </Row>
